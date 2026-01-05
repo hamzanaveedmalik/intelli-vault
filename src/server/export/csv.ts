@@ -44,8 +44,8 @@ export function generateVersionHistoryCSV(versions: Version[]): string {
   const rows: string[][] = [headers];
 
   versions.forEach((version) => {
-    const timestamp = new Date(version.createdAt).toLocaleString();
-    const whatChanged = version.changes ? JSON.stringify(version.changes) : "N/A";
+    const timestamp = new Date(version.timestamp).toLocaleString();
+    const whatChanged = version.whatChanged || "N/A";
     const reason = version.reason || "N/A";
 
     // Escape CSV values
@@ -57,8 +57,8 @@ export function generateVersionHistoryCSV(versions: Version[]): string {
     };
 
     rows.push([
-      version.versionNumber.toString(),
-      version.createdBy || "Unknown",
+      version.version.toString(),
+      version.editorId || "Unknown",
       timestamp,
       escapeCSV(whatChanged),
       escapeCSV(reason),

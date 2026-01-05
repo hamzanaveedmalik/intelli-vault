@@ -5,7 +5,8 @@ import { env } from "~/env";
 import { z } from "zod";
 
 const completeUploadSchema = z.object({
-  meetingId: z.string().uuid("Invalid meeting ID"),
+  meetingId: z.string().min(1, "Meeting ID is required"),
+  // Note: Prisma uses CUID format, not UUID, so we validate as a non-empty string
 });
 
 /**

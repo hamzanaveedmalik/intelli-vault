@@ -88,11 +88,10 @@ export default function UploadPage() {
         throw new Error("No upload URL received from server");
       }
 
-      // Validate meetingId is a valid UUID format
-      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-      if (!uuidRegex.test(meetingId)) {
-        console.error("Invalid meetingId format:", meetingId);
-        throw new Error(`Invalid meeting ID format: ${meetingId}`);
+      // Validate meetingId is present (Prisma uses CUID format, not UUID)
+      if (typeof meetingId !== "string" || meetingId.length === 0) {
+        console.error("Invalid meetingId:", meetingId);
+        throw new Error(`Invalid meeting ID: ${meetingId}`);
       }
 
       // Step 2: Upload file directly to S3/R2 using presigned URL

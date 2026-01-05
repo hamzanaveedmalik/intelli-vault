@@ -1,0 +1,226 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// Multi-Tenant Workspace Models (ADR-001)
+// ============================================
+
+model Workspace {
+  id             String   @id @default(cuid())
+  name           String
+  retentionYears Int      @default(6) // Minimum 5, default 6 (SEC requirement + buffer)
+  legalHold      Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Billing fields
+  billingStatus         BillingStatus @default(PILOT)
+  pilotStartDate        DateTime?
+  subscriptionStartDate DateTime?
+
+  // Relations
+  users       UserWorkspace[]
+  meetings    Meeting[]
+  auditEvents AuditEvent[]
+  invitations Invitation[]
+
+  @@index([createdAt])
+}
+
+enum BillingStatus {
+  PILOT
+  ACTIVE
+  CANCELLED
+}
+
+enum WorkspaceRole {
+  OWNER_CCO
+  MEMBER
+}
+
+model UserWorkspace {
+  userId      String
+  workspaceId String
+  role        WorkspaceRole
+
+  // Relations
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@id([userId, workspaceId])
+  @@index([workspaceId])
+}
+
+// ============================================
+// Meeting Models
+// ============================================
+
+enum MeetingStatus {
+  UPLOADING
+  PROCESSING
+  DRAFT_READY
+  DRAFT
+  FINALIZED
+}
+
+model Meeting {
+  id           String        @id @default(cuid())
+  workspaceId  String
+  clientName   String
+  meetingType  String
+  meetingDate  DateTime
+  status       MeetingStatus @default(UPLOADING)
+  fileUrl      String? // S3/R2 storage URL
+  transcript   Json? // { segments: [{ startTime, endTime, speaker, text }] }
+  extraction   Json? // { topics, recommendations, disclosures, decisions, followUps, evidenceMap }
+  finalizedBy  String? // userId who finalized
+  finalizedAt  DateTime? // timestamp when finalized
+  draftReadyAt DateTime? // timestamp when status changed to DRAFT_READY (for KPI tracking)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  // Relations
+  workspace   Workspace    @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  versions    Version[]
+  auditEvents AuditEvent[]
+
+  @@index([workspaceId])
+  @@index([workspaceId, status])
+  @@index([workspaceId, clientName])
+  @@index([workspaceId, meetingDate])
+}
+
+model Version {
+  id          String   @id @default(cuid())
+  meetingId   String
+  version     Int // Sequential version number
+  editorId    String // userId who made the change
+  whatChanged String // Field name and change description
+  reason      String? // Optional reason for edit
+  timestamp   DateTime @default(now())
+
+  // Relations
+  meeting Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+
+  @@index([meetingId])
+  @@index([meetingId, timestamp])
+}
+
+// ============================================
+// Audit Trail Models (ADR-005)
+// ============================================
+
+enum AuditAction {
+  UPLOAD
+  VIEW
+  EDIT
+  FINALIZE
+  EXPORT
+  DELETE
+}
+
+model AuditEvent {
+  id           String      @id @default(cuid())
+  workspaceId  String
+  userId       String
+  action       AuditAction
+  resourceType String // "meeting", "workspace", "user"
+  resourceId   String
+  metadata     Json? // Additional context (field changed, reason, etc.)
+  timestamp    DateTime    @default(now())
+
+  // Relations
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  meeting   Meeting?  @relation(fields: [meetingId], references: [id])
+  meetingId String?
+
+  @@index([workspaceId, timestamp])
+  @@index([workspaceId, resourceType, resourceId])
+  @@index([workspaceId, action])
+}
+
+// ============================================
+// NextAuth Models (Required for Auth.js v5)
+// ============================================
+
+model Account {
+  id                       String  @id @default(cuid())
+  userId                   String
+  type                     String
+  provider                 String
+  providerAccountId        String
+  refresh_token            String? // @db.Text
+  access_token             String? // @db.Text
+  expires_at               Int?
+  token_type               String?
+  scope                    String?
+  id_token                 String? // @db.Text
+  session_state            String?
+  user                     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  refresh_token_expires_in Int?
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+
+  // Relations
+  accounts   Account[]
+  sessions   Session[]
+  workspaces UserWorkspace[]
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ============================================
+// Invitation Models
+// ============================================
+
+model Invitation {
+  id          String        @id @default(cuid())
+  workspaceId String
+  email       String
+  role        WorkspaceRole
+  token       String        @unique
+  invitedBy   String // userId who sent the invitation
+  expiresAt   DateTime
+  acceptedAt  DateTime?
+  createdAt   DateTime      @default(now())
+
+  // Relations
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, email]) // One invitation per email per workspace
+  @@index([token])
+  @@index([workspaceId])
+  @@index([email])
+}

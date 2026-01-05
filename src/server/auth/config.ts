@@ -35,7 +35,12 @@ export const authConfig = {
     // DiscordProvider requires AUTH_DISCORD_ID and AUTH_DISCORD_SECRET
     // These are validated at runtime, not build time
     ...(process.env.AUTH_DISCORD_ID && process.env.AUTH_DISCORD_SECRET
-      ? [DiscordProvider]
+      ? [
+          DiscordProvider({
+            clientId: process.env.AUTH_DISCORD_ID,
+            clientSecret: process.env.AUTH_DISCORD_SECRET,
+          }),
+        ]
       : []),
     /**
      * ...add more providers here.

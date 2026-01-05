@@ -117,13 +117,10 @@ export async function POST(
     });
 
     // Return ZIP file
-    // Convert Buffer to ArrayBuffer for Edge Runtime compatibility
-    const arrayBuffer = zipBuffer.buffer.slice(
-      zipBuffer.byteOffset,
-      zipBuffer.byteOffset + zipBuffer.byteLength
-    );
+    // Convert Buffer to Uint8Array for Edge Runtime compatibility
+    const uint8Array = new Uint8Array(zipBuffer);
     
-    return new Response(arrayBuffer, {
+    return new Response(uint8Array, {
       headers: {
         "Content-Type": "application/zip",
         "Content-Disposition": `attachment; filename="${filename}"`,

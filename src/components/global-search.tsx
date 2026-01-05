@@ -20,6 +20,8 @@ interface SearchResult {
   meetingDate: string;
   status: string;
   type: string;
+  matchType?: "client" | "date" | "keyword" | "transcript" | "field";
+  snippet?: string;
 }
 
 interface GlobalSearchProps {
@@ -165,19 +167,37 @@ export function GlobalSearch({ className }: GlobalSearchProps) {
                   key={result.id}
                   value={result.id}
                   onSelect={() => handleSelect(result.id)}
-                  className="flex items-center justify-between gap-2"
+                  className="flex flex-col gap-2 py-3"
                 >
-                  <div className="flex flex-col gap-1 flex-1 min-w-0">
-                    <div className="font-medium truncate">{result.clientName}</div>
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <span>{new Date(result.meetingDate).toLocaleDateString()}</span>
-                      <span>•</span>
-                      <span>{result.type}</span>
+                  <div className="flex items-center justify-between gap-2 w-full">
+                    <div className="flex flex-col gap-1 flex-1 min-w-0">
+                      <div className="font-medium truncate">{result.clientName}</div>
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <span>{new Date(result.meetingDate).toLocaleDateString()}</span>
+                        <span>•</span>
+                        <span>{result.type}</span>
+                        {result.matchType && (
+                          <>
+                            <span>•</span>
+                            <Badge variant="outline" className="text-xs">
+                              {result.matchType === "client" && "Client"}
+                              {result.matchType === "date" && "Date"}
+                              {result.matchType === "transcript" && "Transcript"}
+                              {result.matchType === "field" && "Field"}
+                            </Badge>
+                          </>
+                        )}
+                      </div>
                     </div>
+                    <Badge variant={getStatusVariant(result.status)} className="shrink-0">
+                      {getStatusLabel(result.status)}
+                    </Badge>
                   </div>
-                  <Badge variant={getStatusVariant(result.status)} className="shrink-0">
-                    {getStatusLabel(result.status)}
-                  </Badge>
+                  {result.snippet && (
+                    <div className="text-xs text-muted-foreground line-clamp-2 pl-1">
+                      "{result.snippet}..."
+                    </div>
+                  )}
                 </CommandItem>
               ))}
             </CommandGroup>

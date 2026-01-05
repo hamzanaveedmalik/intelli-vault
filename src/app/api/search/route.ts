@@ -2,6 +2,16 @@ import { auth } from "~/server/auth";
 import { db } from "~/server/db";
 import { NextResponse } from "next/server";
 
+interface SearchResult {
+  id: string;
+  clientName: string;
+  meetingDate: string;
+  status: string;
+  type: string;
+  matchType?: "client" | "date" | "keyword" | "transcript" | "field";
+  snippet?: string;
+}
+
 export async function GET(request: Request) {
   try {
     const session = await auth();
@@ -18,38 +28,181 @@ export async function GET(request: Request) {
     }
 
     const workspaceId = session.user.workspaceId;
+    const results: SearchResult[] = [];
 
-    // Search by client name (case-insensitive)
-    const meetings = await db.meeting.findMany({
-      where: {
-        workspaceId,
-        clientName: {
-          contains: query,
-          mode: "insensitive",
+    // Parse date range (format: "2024-01-01 to 2024-12-31" or "2024-01-01-2024-12-31")
+    const dateRangeMatch = query.match(/(\d{4}-\d{2}-\d{2})\s*(?:to|-)\s*(\d{4}-\d{2}-\d{2})/i);
+    if (dateRangeMatch) {
+      const startDate = new Date(dateRangeMatch[1]!);
+      startDate.setHours(0, 0, 0, 0);
+      const endDate = new Date(dateRangeMatch[2]!);
+      endDate.setHours(23, 59, 59, 999);
+
+      const meetings = await db.meeting.findMany({
+        where: {
+          workspaceId,
+          meetingDate: {
+            gte: startDate,
+            lte: endDate,
+          },
         },
-      },
-      select: {
-        id: true,
-        clientName: true,
-        meetingDate: true,
-        status: true,
-        meetingType: true,
-      },
-      take: 20,
-      orderBy: {
-        meetingDate: "desc",
-      },
-    });
+        select: {
+          id: true,
+          clientName: true,
+          meetingDate: true,
+          status: true,
+          meetingType: true,
+        },
+        take: 20,
+        orderBy: {
+          meetingDate: "desc",
+        },
+      });
 
-    const results = meetings.map((meeting) => ({
-      id: meeting.id,
-      clientName: meeting.clientName,
-      meetingDate: meeting.meetingDate.toISOString(),
-      status: meeting.status,
-      type: meeting.meetingType,
-    }));
+      results.push(
+        ...meetings.map((meeting) => ({
+          id: meeting.id,
+          clientName: meeting.clientName,
+          meetingDate: meeting.meetingDate.toISOString(),
+          status: meeting.status,
+          type: meeting.meetingType,
+          matchType: "date" as const,
+        }))
+      );
+    } else {
+      // Search by client name (case-insensitive)
+      const clientNameResults = await db.meeting.findMany({
+        where: {
+          workspaceId,
+          clientName: {
+            contains: query,
+            mode: "insensitive",
+          },
+        },
+        select: {
+          id: true,
+          clientName: true,
+          meetingDate: true,
+          status: true,
+          meetingType: true,
+        },
+        take: 10,
+        orderBy: {
+          meetingDate: "desc",
+        },
+      });
 
-    return NextResponse.json({ results });
+      results.push(
+        ...clientNameResults.map((meeting) => ({
+          id: meeting.id,
+          clientName: meeting.clientName,
+          meetingDate: meeting.meetingDate.toISOString(),
+          status: meeting.status,
+          type: meeting.meetingType,
+          matchType: "client" as const,
+        }))
+      );
+
+      // Keyword search in transcripts and extracted fields
+      // Get all meetings with transcripts or extractions and filter in memory
+      // (For v1, we do simple filtering. Full indexing can be added in Story 7.4)
+      const allMeetings = await db.meeting.findMany({
+        where: {
+          workspaceId,
+          OR: [
+            { transcript: { not: null } },
+            { extraction: { not: null } },
+          ],
+        },
+        select: {
+          id: true,
+          clientName: true,
+          meetingDate: true,
+          status: true,
+          meetingType: true,
+          transcript: true,
+          extraction: true,
+        },
+        take: 50, // Get more to filter
+        orderBy: {
+          meetingDate: "desc",
+        },
+      });
+
+      const queryLower = query.toLowerCase();
+
+      // Filter meetings that match in transcript or extraction
+      for (const meeting of allMeetings) {
+        let snippet: string | undefined;
+        let matchType: "transcript" | "field" = "transcript";
+
+        // Check transcript
+        if (meeting.transcript) {
+          const transcript = meeting.transcript as {
+            segments?: Array<{ text?: string; startTime?: number; endTime?: number }>;
+          };
+          if (transcript.segments) {
+            const matchingSegment = transcript.segments.find((seg) =>
+              seg.text?.toLowerCase().includes(queryLower)
+            );
+            if (matchingSegment?.text) {
+              snippet = matchingSegment.text.substring(0, 100);
+              matchType = "transcript";
+            }
+          }
+        }
+
+        // Check extraction fields if no transcript match
+        if (!snippet && meeting.extraction) {
+          const extraction = meeting.extraction as {
+            topics?: string[];
+            recommendations?: Array<{ text?: string }>;
+            disclosures?: Array<{ text?: string }>;
+            decisions?: Array<{ text?: string }>;
+            followUps?: Array<{ text?: string }>;
+          };
+
+          const allFields = [
+            ...(extraction.topics || []),
+            ...(extraction.recommendations?.map((r) => r.text || "") || []),
+            ...(extraction.disclosures?.map((d) => d.text || "") || []),
+            ...(extraction.decisions?.map((d) => d.text || "") || []),
+            ...(extraction.followUps?.map((f) => f.text || "") || []),
+          ];
+
+          const matchingField = allFields.find((field) =>
+            field.toLowerCase().includes(queryLower)
+          );
+
+          if (matchingField) {
+            snippet = matchingField.substring(0, 100);
+            matchType = "field";
+          }
+        }
+
+        if (snippet) {
+          // Check if already in results
+          if (!results.find((r) => r.id === meeting.id)) {
+            results.push({
+              id: meeting.id,
+              clientName: meeting.clientName,
+              meetingDate: meeting.meetingDate.toISOString(),
+              status: meeting.status,
+              type: meeting.meetingType,
+              matchType,
+              snippet,
+            });
+          }
+        }
+      }
+    }
+
+    // Remove duplicates and limit to 20 results
+    const uniqueResults = Array.from(
+      new Map(results.map((r) => [r.id, r])).values()
+    ).slice(0, 20);
+
+    return NextResponse.json({ results: uniqueResults });
   } catch (error) {
     console.error("Search error:", error);
     return NextResponse.json(

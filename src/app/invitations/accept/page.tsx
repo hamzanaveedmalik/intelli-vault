@@ -4,6 +4,9 @@ import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 
+// Force dynamic rendering to avoid static generation issues with search params
+export const dynamic = "force-dynamic";
+
 function AcceptInvitationContent() {
   const router = useRouter();
   const searchParams = useSearchParams();

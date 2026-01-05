@@ -25,50 +25,71 @@ export async function generateComplianceNotePDF({
       });
 
       const buffers: Buffer[] = [];
-      doc.on("data", buffers.push.bind(buffers));
+      doc.on("data", (chunk: Buffer) => {
+        buffers.push(chunk);
+      });
       doc.on("end", () => {
         const pdfBuffer = Buffer.concat(buffers);
         resolve(pdfBuffer);
       });
-      doc.on("error", reject);
+      doc.on("error", (err) => {
+        console.error("PDFDocument stream error:", err);
+        reject(err);
+      });
 
       // Header
-      doc.fontSize(20).font("Helvetica-Bold").text("Client Interaction Record", { align: "center" });
+      doc.fontSize(20);
+      doc.font("Helvetica-Bold");
+      doc.text("Client Interaction Record", { align: "center" });
       doc.moveDown(0.5);
-      doc.fontSize(12).font("Helvetica").text(workspaceName, { align: "center" });
+      doc.fontSize(12);
+      doc.font("Helvetica");
+      doc.text(workspaceName || "Comply Vault", { align: "center" });
       doc.moveDown(1);
 
       // Client Information Section
-      doc.fontSize(14).font("Helvetica-Bold").text("Client Information", { underline: true });
+      doc.fontSize(14);
+      doc.font("Helvetica-Bold");
+      doc.text("Client Information", { underline: true });
       doc.moveDown(0.3);
-      doc.fontSize(11).font("Helvetica");
-      doc.text(`Client Name: ${meeting.clientName}`);
-      doc.text(`Meeting Type: ${meeting.meetingType}`);
-      doc.text(`Meeting Date: ${new Date(meeting.meetingDate).toLocaleDateString()}`);
+      doc.fontSize(11);
+      doc.font("Helvetica");
+      doc.text(`Client Name: ${meeting.clientName || "N/A"}`);
+      doc.text(`Meeting Type: ${meeting.meetingType || "N/A"}`);
+      doc.text(`Meeting Date: ${meeting.meetingDate ? new Date(meeting.meetingDate).toLocaleDateString() : "N/A"}`);
       doc.moveDown(1);
 
       // Topics Section
       if (extraction.topics && extraction.topics.length > 0) {
-        doc.fontSize(14).font("Helvetica-Bold").text("Topics Discussed", { underline: true });
+        doc.fontSize(14);
+        doc.font("Helvetica-Bold");
+        doc.text("Topics Discussed", { underline: true });
         doc.moveDown(0.3);
-        doc.fontSize(11).font("Helvetica");
+        doc.fontSize(11);
+        doc.font("Helvetica");
         extraction.topics.forEach((topic, index) => {
-          doc.text(`${index + 1}. ${topic}`);
+          doc.text(`${index + 1}. ${topic || "N/A"}`);
         });
         doc.moveDown(1);
       }
 
       // Recommendations Section
       if (extraction.recommendations && extraction.recommendations.length > 0) {
-        doc.fontSize(14).font("Helvetica-Bold").text("Recommendations", { underline: true });
+        doc.fontSize(14);
+        doc.font("Helvetica-Bold");
+        doc.text("Recommendations", { underline: true });
         doc.moveDown(0.3);
-        doc.fontSize(11).font("Helvetica");
+        doc.fontSize(11);
+        doc.font("Helvetica");
         extraction.recommendations.forEach((rec, index) => {
-          doc.text(`${index + 1}. ${rec.text}`);
-          if (rec.confidence !== undefined) {
-            doc.fontSize(9).font("Helvetica-Oblique").fillColor("gray");
+          doc.text(`${index + 1}. ${rec.text || "N/A"}`);
+          if (rec.confidence !== undefined && rec.confidence !== null) {
+            doc.fontSize(9);
+            doc.font("Helvetica-Oblique");
+            doc.fillColor("gray");
             doc.text(`   Confidence: ${(rec.confidence * 100).toFixed(0)}%`, { indent: 20 });
-            doc.fontSize(11).fillColor("black");
+            doc.fontSize(11);
+            doc.fillColor("black");
           }
         });
         doc.moveDown(1);
@@ -76,15 +97,21 @@ export async function generateComplianceNotePDF({
 
       // Disclosures Section
       if (extraction.disclosures && extraction.disclosures.length > 0) {
-        doc.fontSize(14).font("Helvetica-Bold").text("Disclosures Discussed", { underline: true });
+        doc.fontSize(14);
+        doc.font("Helvetica-Bold");
+        doc.text("Disclosures Discussed", { underline: true });
         doc.moveDown(0.3);
-        doc.fontSize(11).font("Helvetica");
+        doc.fontSize(11);
+        doc.font("Helvetica");
         extraction.disclosures.forEach((dis, index) => {
-          doc.text(`${index + 1}. ${dis.text}`);
-          if (dis.confidence !== undefined) {
-            doc.fontSize(9).font("Helvetica-Oblique").fillColor("gray");
+          doc.text(`${index + 1}. ${dis.text || "N/A"}`);
+          if (dis.confidence !== undefined && dis.confidence !== null) {
+            doc.fontSize(9);
+            doc.font("Helvetica-Oblique");
+            doc.fillColor("gray");
             doc.text(`   Confidence: ${(dis.confidence * 100).toFixed(0)}%`, { indent: 20 });
-            doc.fontSize(11).fillColor("black");
+            doc.fontSize(11);
+            doc.fillColor("black");
           }
         });
         doc.moveDown(1);
@@ -92,15 +119,21 @@ export async function generateComplianceNotePDF({
 
       // Decisions Section
       if (extraction.decisions && extraction.decisions.length > 0) {
-        doc.fontSize(14).font("Helvetica-Bold").text("Decisions", { underline: true });
+        doc.fontSize(14);
+        doc.font("Helvetica-Bold");
+        doc.text("Decisions", { underline: true });
         doc.moveDown(0.3);
-        doc.fontSize(11).font("Helvetica");
+        doc.fontSize(11);
+        doc.font("Helvetica");
         extraction.decisions.forEach((dec, index) => {
-          doc.text(`${index + 1}. ${dec.text}`);
-          if (dec.confidence !== undefined) {
-            doc.fontSize(9).font("Helvetica-Oblique").fillColor("gray");
+          doc.text(`${index + 1}. ${dec.text || "N/A"}`);
+          if (dec.confidence !== undefined && dec.confidence !== null) {
+            doc.fontSize(9);
+            doc.font("Helvetica-Oblique");
+            doc.fillColor("gray");
             doc.text(`   Confidence: ${(dec.confidence * 100).toFixed(0)}%`, { indent: 20 });
-            doc.fontSize(11).fillColor("black");
+            doc.fontSize(11);
+            doc.fillColor("black");
           }
         });
         doc.moveDown(1);
@@ -108,15 +141,21 @@ export async function generateComplianceNotePDF({
 
       // Follow-ups Section
       if (extraction.followUps && extraction.followUps.length > 0) {
-        doc.fontSize(14).font("Helvetica-Bold").text("Follow-ups", { underline: true });
+        doc.fontSize(14);
+        doc.font("Helvetica-Bold");
+        doc.text("Follow-ups", { underline: true });
         doc.moveDown(0.3);
-        doc.fontSize(11).font("Helvetica");
+        doc.fontSize(11);
+        doc.font("Helvetica");
         extraction.followUps.forEach((fu, index) => {
-          doc.text(`${index + 1}. ${fu.text}`);
-          if (fu.confidence !== undefined) {
-            doc.fontSize(9).font("Helvetica-Oblique").fillColor("gray");
+          doc.text(`${index + 1}. ${fu.text || "N/A"}`);
+          if (fu.confidence !== undefined && fu.confidence !== null) {
+            doc.fontSize(9);
+            doc.font("Helvetica-Oblique");
+            doc.fillColor("gray");
             doc.text(`   Confidence: ${(fu.confidence * 100).toFixed(0)}%`, { indent: 20 });
-            doc.fontSize(11).fillColor("black");
+            doc.fontSize(11);
+            doc.fillColor("black");
           }
         });
         doc.moveDown(1);
@@ -124,20 +163,26 @@ export async function generateComplianceNotePDF({
 
       // Sign-off Section
       doc.moveDown(1);
-      doc.fontSize(14).font("Helvetica-Bold").text("Sign-off", { underline: true });
+      doc.fontSize(14);
+      doc.font("Helvetica-Bold");
+      doc.text("Sign-off", { underline: true });
       doc.moveDown(0.5);
-      doc.fontSize(11).font("Helvetica");
+      doc.fontSize(11);
+      doc.font("Helvetica");
       if (meeting.finalizedBy && meeting.finalizedAt) {
-        doc.text(`Finalized by: ${meeting.finalizedBy.name || meeting.finalizedBy.email || "Unknown"}`);
+        const finalizedByName = meeting.finalizedBy.name || meeting.finalizedBy.email || "Unknown";
+        doc.text(`Finalized by: ${finalizedByName}`);
         doc.text(`Date: ${new Date(meeting.finalizedAt).toLocaleString()}`);
       } else {
         doc.text("Status: Draft (Not finalized)");
       }
 
       // Footer
-      doc.fontSize(8).font("Helvetica-Oblique").fillColor("gray");
+      doc.fontSize(8);
+      doc.font("Helvetica-Oblique");
+      doc.fillColor("gray");
       doc.text(
-        `Generated on ${new Date().toLocaleString()} | Meeting ID: ${meeting.id}`,
+        `Generated on ${new Date().toLocaleString()} | Meeting ID: ${meeting.id || "N/A"}`,
         { align: "center" }
       );
 
@@ -148,4 +193,3 @@ export async function generateComplianceNotePDF({
     }
   });
 }
-

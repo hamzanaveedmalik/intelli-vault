@@ -60,30 +60,50 @@ export async function generateAuditPack(data: ExportData): Promise<Buffer> {
       }
 
       // 2. Generate and add Evidence Map CSV
-      const evidenceMapCSV = generateEvidenceMapCSV(extraction);
-      archive.append(Buffer.from(evidenceMapCSV, "utf-8"), {
-        name: `${baseFilename}_evidence_map.csv`,
-      });
+      try {
+        const evidenceMapCSV = generateEvidenceMapCSV(extraction);
+        archive.append(Buffer.from(evidenceMapCSV, "utf-8"), {
+          name: `${baseFilename}_evidence_map.csv`,
+        });
+      } catch (csvError) {
+        console.error("Evidence Map CSV generation error:", csvError);
+        throw new Error(`Evidence Map CSV generation failed: ${csvError instanceof Error ? csvError.message : "Unknown error"}`);
+      }
 
       // 3. Generate and add Version History CSV
-      const versionHistoryCSV = generateVersionHistoryCSV(versions);
-      archive.append(Buffer.from(versionHistoryCSV, "utf-8"), {
-        name: `${baseFilename}_version_history.csv`,
-      });
+      try {
+        const versionHistoryCSV = generateVersionHistoryCSV(versions);
+        archive.append(Buffer.from(versionHistoryCSV, "utf-8"), {
+          name: `${baseFilename}_version_history.csv`,
+        });
+      } catch (csvError) {
+        console.error("Version History CSV generation error:", csvError);
+        throw new Error(`Version History CSV generation failed: ${csvError instanceof Error ? csvError.message : "Unknown error"}`);
+      }
 
       // 4. Generate and add Transcript TXT
       if (transcript && transcript.segments) {
-        const transcriptTXT = generateTranscriptTXT(transcript.segments);
-        archive.append(Buffer.from(transcriptTXT, "utf-8"), {
-          name: `${baseFilename}_transcript.txt`,
-        });
+        try {
+          const transcriptTXT = generateTranscriptTXT(transcript.segments);
+          archive.append(Buffer.from(transcriptTXT, "utf-8"), {
+            name: `${baseFilename}_transcript.txt`,
+          });
+        } catch (txtError) {
+          console.error("Transcript TXT generation error:", txtError);
+          throw new Error(`Transcript TXT generation failed: ${txtError instanceof Error ? txtError.message : "Unknown error"}`);
+        }
       }
 
       // 5. Generate and add Interaction Log CSV
-      const interactionLogCSV = generateInteractionLogCSV(meeting, extraction);
-      archive.append(Buffer.from(interactionLogCSV, "utf-8"), {
-        name: `${baseFilename}_interaction_log.csv`,
-      });
+      try {
+        const interactionLogCSV = generateInteractionLogCSV(meeting, extraction);
+        archive.append(Buffer.from(interactionLogCSV, "utf-8"), {
+          name: `${baseFilename}_interaction_log.csv`,
+        });
+      } catch (csvError) {
+        console.error("Interaction Log CSV generation error:", csvError);
+        throw new Error(`Interaction Log CSV generation failed: ${csvError instanceof Error ? csvError.message : "Unknown error"}`);
+      }
 
       // Finalize the archive
       await archive.finalize();

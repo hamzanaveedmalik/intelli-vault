@@ -8,26 +8,30 @@ export function generateEvidenceMapCSV(extraction: ExtractionData): string {
   const headers = ["Field", "Claim", "Start Time", "End Time", "Transcript Snippet", "Confidence", "Edited"];
   const rows: string[][] = [headers];
 
+  // Escape CSV values (handle commas, quotes, newlines)
+  const escapeCSV = (value: string): string => {
+    if (value.includes(",") || value.includes('"') || value.includes("\n")) {
+      return `"${value.replace(/"/g, '""')}"`;
+    }
+    return value;
+  };
+
+  if (!extraction.evidenceMap || extraction.evidenceMap.length === 0) {
+    return headers.join(",") + "\n";
+  }
+
   extraction.evidenceMap.forEach((item) => {
-    const startTime = formatTime(item.startTime);
-    const endTime = formatTime(item.endTime);
-    const confidence = item.confidence.toFixed(2);
+    const startTime = formatTime(item.startTime ?? 0);
+    const endTime = formatTime(item.endTime ?? 0);
+    const confidence = item.confidence !== undefined && item.confidence !== null ? item.confidence.toFixed(2) : "";
     const edited = item.edited ? "Yes" : "No";
-    
-    // Escape CSV values (handle commas, quotes, newlines)
-    const escapeCSV = (value: string): string => {
-      if (value.includes(",") || value.includes('"') || value.includes("\n")) {
-        return `"${value.replace(/"/g, '""')}"`;
-      }
-      return value;
-    };
 
     rows.push([
-      item.field,
-      escapeCSV(item.claim),
+      item.field ?? "",
+      escapeCSV(item.claim ?? ""),
       startTime,
       endTime,
-      escapeCSV(item.snippet),
+      escapeCSV(item.snippet ?? ""),
       confidence,
       edited,
     ]);

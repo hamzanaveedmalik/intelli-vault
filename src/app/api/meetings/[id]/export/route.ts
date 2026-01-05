@@ -56,6 +56,27 @@ export async function POST(
       );
     }
 
+    // Validate extraction data structure
+    if (!extraction.evidenceMap) {
+      console.warn("Extraction data missing evidenceMap, initializing empty array");
+      extraction.evidenceMap = [];
+    }
+    if (!extraction.topics) {
+      extraction.topics = [];
+    }
+    if (!extraction.recommendations) {
+      extraction.recommendations = [];
+    }
+    if (!extraction.disclosures) {
+      extraction.disclosures = [];
+    }
+    if (!extraction.decisions) {
+      extraction.decisions = [];
+    }
+    if (!extraction.followUps) {
+      extraction.followUps = [];
+    }
+
     // Get transcript
     const transcript = meeting.transcript as
       | { segments: TranscriptSegment[] }
@@ -144,14 +165,17 @@ export async function POST(
   } catch (error) {
     console.error("Error exporting audit pack:", error);
     const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    const errorStack = error instanceof Error ? error.stack : undefined;
     console.error("Error details:", {
       message: errorMessage,
-      stack: error instanceof Error ? error.stack : undefined,
+      stack: errorStack,
+      name: error instanceof Error ? error.name : undefined,
     });
     return Response.json(
       { 
         error: "Failed to export audit pack",
         details: process.env.NODE_ENV === "development" ? errorMessage : undefined,
+        stack: process.env.NODE_ENV === "development" ? errorStack : undefined,
       },
       { status: 500 }
     );

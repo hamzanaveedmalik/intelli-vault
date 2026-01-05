@@ -154,28 +154,6 @@ export default async function ReviewQueuePage({
       })
     );
 
-  const getStatusVariant = (status: string): "default" | "secondary" | "destructive" | "outline" => {
-    switch (status) {
-      case "DRAFT_READY":
-        return "default";
-      case "DRAFT":
-        return "outline";
-      default:
-        return "secondary";
-    }
-  };
-
-    const getStatusLabel = (status: string) => {
-      switch (status) {
-        case "DRAFT_READY":
-          return "Draft Ready";
-        case "DRAFT":
-          return "Draft";
-        default:
-          return status;
-      }
-    };
-
     return (
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="mb-8">
@@ -193,8 +171,6 @@ export default async function ReviewQueuePage({
             dateFrom: dateFrom || "",
             dateTo: dateTo || "",
           }}
-          getStatusVariant={getStatusVariant}
-          getStatusLabel={getStatusLabel}
         />
       </div>
     );

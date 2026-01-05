@@ -42,15 +42,34 @@ interface ReviewQueueClientProps {
     dateFrom: string;
     dateTo: string;
   };
-  getStatusVariant: (status: string) => "default" | "secondary" | "destructive" | "outline";
-  getStatusLabel: (status: string) => string;
 }
+
+// Helper functions moved to client component
+const getStatusVariant = (status: string): "default" | "secondary" | "destructive" | "outline" => {
+  switch (status) {
+    case "DRAFT_READY":
+      return "default";
+    case "DRAFT":
+      return "outline";
+    default:
+      return "secondary";
+  }
+};
+
+const getStatusLabel = (status: string) => {
+  switch (status) {
+    case "DRAFT_READY":
+      return "Draft Ready";
+    case "DRAFT":
+      return "Draft";
+    default:
+      return status;
+  }
+};
 
 export default function ReviewQueueClient({
   initialMeetings,
   initialFilters,
-  getStatusVariant,
-  getStatusLabel,
 }: ReviewQueueClientProps) {
   const router = useRouter();
   const [meetings] = useState<Meeting[]>(initialMeetings);

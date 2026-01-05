@@ -27,6 +27,7 @@ export function Sidebar({ userEmail, userName }: SidebarProps) {
 
   const navLinks = [
     { href: "/dashboard", label: "Dashboard" },
+    { href: "/review", label: "Review Queue" },
     { href: "/upload", label: "Upload" },
     { href: "/settings", label: "Settings" },
   ];

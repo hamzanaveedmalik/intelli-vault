@@ -7,8 +7,10 @@ import type { ExtractionData } from "~/server/extraction/types";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Badge } from "~/components/ui/badge";
 import ExtractedFields from "./extracted-fields";
+import EditableFields from "./editable-fields";
 import ReprocessButton from "./reprocess-button";
 import ExportButton from "./export-button";
+import VersionHistory from "./version-history";
 
 export default async function MeetingDetailPage({
   params,
@@ -188,12 +190,22 @@ export default async function MeetingDetailPage({
                 <CardTitle>Extracted Fields</CardTitle>
               </CardHeader>
               <CardContent>
-                <ExtractedFields extraction={extraction} />
-                <ReprocessButton
-                  meetingId={meeting.id}
-                  hasTranscript={!!(transcript && transcript.segments && transcript.segments.length > 0)}
-                  hasExtraction={!!extraction}
-                />
+                {meeting.status === "FINALIZED" ? (
+                  <ExtractedFields extraction={extraction} />
+                ) : (
+                  <EditableFields
+                    meetingId={meeting.id}
+                    extraction={extraction}
+                    isReadOnly={meeting.status === "FINALIZED"}
+                  />
+                )}
+                {meeting.status !== "FINALIZED" && (
+                  <ReprocessButton
+                    meetingId={meeting.id}
+                    hasTranscript={!!(transcript && transcript.segments && transcript.segments.length > 0)}
+                    hasExtraction={!!extraction}
+                  />
+                )}
               </CardContent>
             </Card>
           </div>
@@ -236,6 +248,18 @@ export default async function MeetingDetailPage({
                 status={meeting.status}
                 hasExtraction={!!extraction}
               />
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Version History */}
+        {(meeting.status === "DRAFT_READY" || meeting.status === "DRAFT" || meeting.status === "FINALIZED") && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Version History</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <VersionHistory meetingId={meeting.id} />
             </CardContent>
           </Card>
         )}

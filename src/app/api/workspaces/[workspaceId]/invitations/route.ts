@@ -11,7 +11,7 @@ const inviteUserSchema = z.object({
 
 export async function POST(
   request: Request,
-  { params }: { params: { workspaceId: string } }
+  { params }: { params: Promise<{ workspaceId: string }> }
 ) {
   try {
     const session = await auth();
@@ -19,7 +19,7 @@ export async function POST(
       return new Response("Unauthorized", { status: 401 });
     }
 
-    const { workspaceId } = params;
+    const { workspaceId } = await params;
     const body = await request.json();
     const { email, role } = inviteUserSchema.parse(body);
 

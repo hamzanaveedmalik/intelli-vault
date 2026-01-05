@@ -7,7 +7,7 @@ import type { TranscriptSegment } from "~/server/transcription";
 export default async function MeetingDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
   const session = await auth();
 
@@ -15,9 +15,11 @@ export default async function MeetingDetailPage({
     redirect("/workspaces/new");
   }
 
+  const { id } = await params;
+
   const meeting = await db.meeting.findFirst({
     where: {
-      id: params.id,
+      id,
       workspaceId: session.user.workspaceId,
     },
   });

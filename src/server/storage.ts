@@ -123,6 +123,25 @@ export function validateWorkspaceAccess(
 }
 
 /**
+ * Delete a file from S3/R2 storage
+ */
+export async function deleteFile(key: string): Promise<void> {
+  if (!BUCKET_NAME) {
+    throw new Error("S3_BUCKET_NAME environment variable is not set");
+  }
+
+  const s3Client = getS3Client();
+  const { DeleteObjectCommand } = await import("@aws-sdk/client-s3");
+  
+  const command = new DeleteObjectCommand({
+    Bucket: BUCKET_NAME,
+    Key: key,
+  });
+
+  await s3Client.send(command);
+}
+
+/**
  * Generate a presigned URL for direct client-side upload to S3/R2
  * This bypasses Vercel's 4.5 MB function payload limit
  */

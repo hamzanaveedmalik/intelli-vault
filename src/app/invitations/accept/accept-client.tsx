@@ -3,6 +3,9 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
+import { Button } from "~/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
+import { Alert, AlertDescription } from "~/components/ui/alert";
 
 export default function AcceptInvitationClient({ token }: { token?: string }) {
   const router = useRouter();
@@ -77,55 +80,66 @@ export default function AcceptInvitationClient({ token }: { token?: string }) {
 
   if (!token) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900">Invalid Invitation</h1>
-          <p className="mt-2 text-gray-600">This invitation link is invalid.</p>
-        </div>
+      <div className="flex min-h-screen items-center justify-center">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle>Invalid Invitation</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground">This invitation link is invalid.</p>
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
   if (error && !invitation) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900">Error</h1>
-          <p className="mt-2 text-red-600">{error}</p>
-        </div>
+      <div className="flex min-h-screen items-center justify-center">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle>Error</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Alert variant="destructive">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50">
-      <div className="w-full max-w-md space-y-8 rounded-lg bg-white p-8 shadow-md">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900">Accept Invitation</h2>
+    <div className="flex min-h-screen items-center justify-center">
+      <Card className="w-full max-w-md">
+        <CardHeader>
+          <CardTitle>Accept Invitation</CardTitle>
           {invitation && (
-            <p className="mt-2 text-sm text-gray-600">
+            <CardDescription>
               You&apos;ve been invited to join <strong>{invitation.workspaceName}</strong> as a{" "}
               <strong>{invitation.role === "OWNER_CCO" ? "Owner/CCO" : "Member"}</strong>
-            </p>
+            </CardDescription>
           )}
-        </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {error && (
+            <Alert variant="destructive">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
 
-        {error && (
-          <div className="rounded-md bg-red-50 p-3">
-            <p className="text-sm text-red-800">{error}</p>
-          </div>
-        )}
-
-        {invitation && (
-          <button
-            onClick={handleAccept}
-            disabled={isLoading}
-            className="w-full rounded-md bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {isLoading ? "Accepting..." : "Accept Invitation"}
-          </button>
-        )}
-      </div>
+          {invitation && (
+            <Button
+              onClick={handleAccept}
+              disabled={isLoading}
+              className="w-full"
+            >
+              {isLoading ? "Accepting..." : "Accept Invitation"}
+            </Button>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

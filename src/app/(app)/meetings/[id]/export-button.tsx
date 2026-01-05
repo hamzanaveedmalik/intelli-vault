@@ -23,11 +23,11 @@ export default function ExportButton({
 
   if (!hasExtraction) {
     return (
-      <div className="mt-4 rounded-md bg-yellow-50 p-3">
-        <p className="text-sm text-yellow-800">
+      <Alert variant="default" className="mt-4">
+        <AlertDescription>
           Extraction data is required to export. Please reprocess the meeting first.
-        </p>
-      </div>
+        </AlertDescription>
+      </Alert>
     );
   }
 
@@ -73,20 +73,20 @@ export default function ExportButton({
   };
 
   return (
-    <div className="mt-4">
-      <button
+    <div className="mt-4 space-y-2">
+      <Button
         onClick={handleExport}
         disabled={isExporting}
-        className="rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+        variant="default"
       >
         {isExporting ? "Exporting..." : "Export Audit Pack"}
-      </button>
+      </Button>
       {error && (
-        <div className="mt-2 rounded-md bg-red-50 p-3">
-          <p className="text-sm text-red-800">{error}</p>
-        </div>
+        <Alert variant="destructive">
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
       )}
-      <p className="mt-2 text-xs text-gray-500">
+      <p className="text-xs text-muted-foreground">
         Downloads a ZIP file containing PDF, CSV, and TXT exports
       </p>
     </div>

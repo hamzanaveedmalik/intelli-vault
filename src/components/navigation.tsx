@@ -3,6 +3,9 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
+import { Button } from "~/components/ui/button";
+import { Separator } from "~/components/ui/separator";
+import { cn } from "~/lib/utils";
 
 interface NavigationProps {
   userEmail?: string | null;
@@ -26,62 +29,55 @@ export function Navigation({ userEmail, userName }: NavigationProps) {
   ];
 
   return (
-    <nav className="border-b border-gray-200 bg-white">
+    <nav className="border-b">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           {/* Logo and Main Navigation */}
           <div className="flex items-center gap-8">
             <Link href="/dashboard" className="flex items-center">
-              <span className="text-xl font-bold text-gray-900">
+              <span className="text-xl font-bold">
                 RIA Compliance
               </span>
             </Link>
-            <div className="hidden md:flex md:gap-4">
+            <div className="hidden md:flex md:gap-1">
               {navLinks.map((link) => (
-                <Link
+                <Button
                   key={link.href}
-                  href={link.href}
-                  className={`rounded-md px-3 py-2 text-sm font-medium transition-colors ${
-                    isActive(link.href)
-                      ? "bg-blue-50 text-blue-700"
-                      : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                  }`}
+                  variant={isActive(link.href) ? "secondary" : "ghost"}
+                  asChild
                 >
-                  {link.label}
-                </Link>
+                  <Link href={link.href}>{link.label}</Link>
+                </Button>
               ))}
             </div>
           </div>
 
           {/* User Menu */}
           <div className="flex items-center gap-4">
-            <div className="hidden text-sm text-gray-600 sm:block">
+            <div className="hidden text-sm text-muted-foreground sm:block">
               {userName || userEmail || "User"}
             </div>
-            <button
+            <Button
+              variant="ghost"
               onClick={() => signOut({ callbackUrl: "/" })}
-              className="rounded-md px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900"
             >
               Sign Out
-            </button>
+            </Button>
           </div>
         </div>
 
         {/* Mobile Navigation */}
-        <div className="border-t border-gray-200 md:hidden">
+        <div className="border-t md:hidden">
           <div className="flex flex-col space-y-1 px-2 py-3">
             {navLinks.map((link) => (
-              <Link
+              <Button
                 key={link.href}
-                href={link.href}
-                className={`rounded-md px-3 py-2 text-sm font-medium ${
-                  isActive(link.href)
-                    ? "bg-blue-50 text-blue-700"
-                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                }`}
+                variant={isActive(link.href) ? "secondary" : "ghost"}
+                className="justify-start"
+                asChild
               >
-                {link.label}
-              </Link>
+                <Link href={link.href}>{link.label}</Link>
+              </Button>
             ))}
           </div>
         </div>

@@ -4,6 +4,8 @@ import { redirect } from "next/navigation";
 import { notFound } from "next/navigation";
 import type { TranscriptSegment } from "~/server/transcription";
 import type { ExtractionData } from "~/server/extraction/types";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import { Badge } from "~/components/ui/badge";
 import ExtractedFields from "./extracted-fields";
 import ReprocessButton from "./reprocess-button";
 import ExportButton from "./export-button";
@@ -58,20 +60,20 @@ export default async function MeetingDetailPage({
     });
   }
 
-  const getStatusColor = (status: string) => {
+  const getStatusVariant = (status: string): "default" | "secondary" | "destructive" | "outline" => {
     switch (status) {
       case "UPLOADING":
-        return "bg-gray-100 text-gray-800";
+        return "secondary";
       case "PROCESSING":
-        return "bg-blue-100 text-blue-800";
+        return "default";
       case "DRAFT_READY":
-        return "bg-green-100 text-green-800";
+        return "default";
       case "DRAFT":
-        return "bg-yellow-100 text-yellow-800";
+        return "outline";
       case "FINALIZED":
-        return "bg-purple-100 text-purple-800";
+        return "default";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "secondary";
     }
   };
 
@@ -100,112 +102,117 @@ export default async function MeetingDetailPage({
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">
-            Meeting Details
-          </h1>
-        </div>
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold">Meeting Details</h1>
+      </div>
 
-        <div className="space-y-6">
-          {/* Overview Card */}
-          <div className="rounded-lg bg-white p-6 shadow">
-            <h2 className="text-lg font-semibold text-gray-900">Overview</h2>
-            <dl className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div className="space-y-6">
+        {/* Overview Card */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Overview</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
-                <dt className="text-sm font-medium text-gray-500">Client Name</dt>
-                <dd className="mt-1 text-sm text-gray-900">{meeting.clientName}</dd>
+                <dt className="text-sm font-medium text-muted-foreground">Client Name</dt>
+                <dd className="mt-1 text-sm">{meeting.clientName}</dd>
               </div>
               <div>
-                <dt className="text-sm font-medium text-gray-500">Meeting Type</dt>
-                <dd className="mt-1 text-sm text-gray-900">{meeting.meetingType}</dd>
+                <dt className="text-sm font-medium text-muted-foreground">Meeting Type</dt>
+                <dd className="mt-1 text-sm">{meeting.meetingType}</dd>
               </div>
               <div>
-                <dt className="text-sm font-medium text-gray-500">Meeting Date</dt>
-                <dd className="mt-1 text-sm text-gray-900">
+                <dt className="text-sm font-medium text-muted-foreground">Meeting Date</dt>
+                <dd className="mt-1 text-sm">
                   {new Date(meeting.meetingDate).toLocaleDateString()}
                 </dd>
               </div>
               <div>
-                <dt className="text-sm font-medium text-gray-500">Status</dt>
+                <dt className="text-sm font-medium text-muted-foreground">Status</dt>
                 <dd className="mt-1">
-                  <span
-                    className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${getStatusColor(meeting.status)}`}
-                  >
+                  <Badge variant={getStatusVariant(meeting.status)}>
                     {getStatusLabel(meeting.status)}
-                  </span>
+                  </Badge>
                 </dd>
               </div>
             </dl>
-          </div>
+          </CardContent>
+        </Card>
 
-          {/* Two-Column Layout: Transcript + Extracted Fields */}
-          {meeting.status === "DRAFT_READY" || meeting.status === "DRAFT" || meeting.status === "FINALIZED" ? (
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-              {/* Left Column: Transcript */}
-              <div className="rounded-lg bg-white p-6 shadow">
-                <h2 className="mb-4 text-lg font-semibold text-gray-900">
-                  Transcript
-                </h2>
+        {/* Two-Column Layout: Transcript + Extracted Fields */}
+        {meeting.status === "DRAFT_READY" || meeting.status === "DRAFT" || meeting.status === "FINALIZED" ? (
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+            {/* Left Column: Transcript */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Transcript</CardTitle>
+              </CardHeader>
+              <CardContent>
                 {transcript && transcript.segments && transcript.segments.length > 0 ? (
                   <div className="max-h-[600px] space-y-4 overflow-y-auto">
                     {transcript.segments.map((segment, index) => (
                       <div
                         key={index}
                         data-timestamp={Math.floor(segment.startTime)}
-                        className="border-l-4 border-blue-500 pl-4"
+                        className="border-l-4 border-primary pl-4"
                       >
-                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
                           <span className="font-medium">
                             {formatTime(segment.startTime)}
                           </span>
-                          <span className="text-gray-400">•</span>
-                          <span className="font-medium text-blue-600">
+                          <span className="text-muted-foreground/50">•</span>
+                          <span className="font-medium text-primary">
                             {segment.speaker}
                           </span>
                         </div>
-                        <p className="mt-1 text-sm text-gray-900">
+                        <p className="mt-1 text-sm">
                           {segment.text}
                         </p>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <div className="rounded-md bg-gray-50 p-4">
-                    <p className="text-sm text-gray-600">
+                  <div className="rounded-md bg-muted p-4">
+                    <p className="text-sm text-muted-foreground">
                       Transcript is not available yet. Please check back in a few moments.
                     </p>
                   </div>
                 )}
-              </div>
+              </CardContent>
+            </Card>
 
-              {/* Right Column: Extracted Fields */}
-              <div className="rounded-lg bg-white p-6 shadow">
-                <div className="mb-4 flex items-center justify-between">
-                  <h2 className="text-lg font-semibold text-gray-900">
-                    Extracted Fields
-                  </h2>
-                </div>
+            {/* Right Column: Extracted Fields */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Extracted Fields</CardTitle>
+              </CardHeader>
+              <CardContent>
                 <ExtractedFields extraction={extraction} />
                 <ReprocessButton
                   meetingId={meeting.id}
                   hasTranscript={!!(transcript && transcript.segments && transcript.segments.length > 0)}
                   hasExtraction={!!extraction}
                 />
-              </div>
-            </div>
-          ) : (
-            <div className="rounded-lg bg-blue-50 p-4">
-              <p className="text-sm text-blue-800">
+              </CardContent>
+            </Card>
+          </div>
+        ) : (
+          <Card>
+            <CardContent className="pt-6">
+              <p className="text-sm text-muted-foreground">
                 {meeting.status === "PROCESSING"
                   ? "This meeting is being processed. The transcript will be available once processing is complete."
                   : "This meeting is still uploading. Please wait for processing to complete."}
               </p>
-            </div>
-          )}
+            </CardContent>
+          </Card>
+        )}
 
-          {meeting.status === "FINALIZED" && (
-            <div className="rounded-lg bg-green-50 p-4">
-              <p className="text-sm text-green-800 mb-2">
+        {meeting.status === "FINALIZED" && (
+          <Card>
+            <CardContent className="pt-6">
+              <p className="text-sm mb-2">
                 This meeting has been finalized and is ready for export.
               </p>
               <ExportButton
@@ -213,13 +220,15 @@ export default async function MeetingDetailPage({
                 status={meeting.status}
                 hasExtraction={!!extraction}
               />
-            </div>
-          )}
+            </CardContent>
+          </Card>
+        )}
 
-          {/* Export button for DRAFT_READY meetings */}
-          {meeting.status === "DRAFT_READY" && (
-            <div className="mt-6 rounded-lg bg-blue-50 p-4">
-              <p className="text-sm text-blue-800 mb-2">
+        {/* Export button for DRAFT_READY meetings */}
+        {meeting.status === "DRAFT_READY" && (
+          <Card>
+            <CardContent className="pt-6">
+              <p className="text-sm mb-2">
                 This meeting is ready for review. You can export a draft audit pack.
               </p>
               <ExportButton
@@ -227,9 +236,10 @@ export default async function MeetingDetailPage({
                 status={meeting.status}
                 hasExtraction={!!extraction}
               />
-            </div>
-          )}
-        </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
+    </div>
   );
 }

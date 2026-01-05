@@ -32,7 +32,11 @@ declare module "next-auth" {
  */
 export const authConfig = {
   providers: [
-    DiscordProvider,
+    // DiscordProvider requires AUTH_DISCORD_ID and AUTH_DISCORD_SECRET
+    // These are validated at runtime, not build time
+    ...(process.env.AUTH_DISCORD_ID && process.env.AUTH_DISCORD_SECRET
+      ? [DiscordProvider]
+      : []),
     /**
      * ...add more providers here.
      *

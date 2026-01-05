@@ -3,14 +3,21 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { env } from "~/env";
 
 // Initialize S3 client (works with AWS S3, Cloudflare R2, and other S3-compatible storage)
-const s3Client = new S3Client({
-  region: env.S3_REGION || "auto",
-  endpoint: env.S3_ENDPOINT, // For R2: https://<account-id>.r2.cloudflarestorage.com
-  credentials: {
-    accessKeyId: env.S3_ACCESS_KEY_ID,
-    secretAccessKey: env.S3_SECRET_ACCESS_KEY,
-  },
-});
+// Note: Client is created lazily to avoid build-time errors if env vars aren't set
+function getS3Client() {
+  if (!env.S3_ACCESS_KEY_ID || !env.S3_SECRET_ACCESS_KEY) {
+    throw new Error("S3_ACCESS_KEY_ID and S3_SECRET_ACCESS_KEY environment variables are required");
+  }
+  
+  return new S3Client({
+    region: env.S3_REGION || "auto",
+    endpoint: env.S3_ENDPOINT, // For R2: https://<account-id>.r2.cloudflarestorage.com
+    credentials: {
+      accessKeyId: env.S3_ACCESS_KEY_ID,
+      secretAccessKey: env.S3_SECRET_ACCESS_KEY,
+    },
+  });
+}
 
 const BUCKET_NAME = env.S3_BUCKET_NAME;
 
@@ -46,6 +53,7 @@ export async function uploadFile(
     throw new Error("S3_BUCKET_NAME environment variable is not set");
   }
 
+  const s3Client = getS3Client();
   const key = generateStorageKey(workspaceId, meetingId, filename);
 
   const command = new PutObjectCommand({
@@ -84,6 +92,7 @@ export async function getSignedFileUrl(
     throw new Error("S3_BUCKET_NAME environment variable is not set");
   }
 
+  const s3Client = getS3Client();
   const command = new GetObjectCommand({
     Bucket: BUCKET_NAME,
     Key: key,

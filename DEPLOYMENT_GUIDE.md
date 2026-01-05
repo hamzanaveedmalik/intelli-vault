@@ -102,14 +102,16 @@ Vercel will auto-detect Next.js. Settings:
 - **Output Directory**: `.next` (default)
 - **Install Command**: `npm install` (default)
 
-### 4.3 Add Environment Variables
+### 4.3 Add Environment Variables (CRITICAL - Do This BEFORE Deploying)
 
-**Critical**: Add all environment variables from your `.env` file:
+**⚠️ IMPORTANT**: You MUST add environment variables BEFORE clicking "Deploy", otherwise the build will fail.
 
 1. In Vercel project settings, go to **Settings** → **Environment Variables**
-2. Add each variable:
+2. Click **"Add New"** for each variable below
+3. Add variables for **Production**, **Preview**, and **Development** environments (or at least Production)
+4. Add each variable:
 
-**Required:**
+**Required (Minimum for Build to Succeed):**
 ```
 DATABASE_URL=postgresql://...
 AUTH_SECRET=...
@@ -118,12 +120,12 @@ AUTH_DISCORD_SECRET=...
 S3_BUCKET_NAME=...
 S3_ACCESS_KEY_ID=...
 S3_SECRET_ACCESS_KEY=...
-S3_REGION=...
-S3_ENDPOINT=...
 ```
 
 **Optional but Recommended:**
 ```
+S3_REGION=us-east-1
+S3_ENDPOINT=https://...r2.cloudflarestorage.com
 QSTASH_TOKEN=...
 QSTASH_CURRENT_SIGNING_KEY=...
 QSTASH_NEXT_SIGNING_KEY=...
@@ -135,9 +137,11 @@ NEXT_PUBLIC_APP_URL=https://your-app.vercel.app
 ```
 
 **Important Notes:**
-- `NEXT_PUBLIC_APP_URL` - Vercel will provide this after first deploy, update it after
+- ⚠️ **Add ALL required variables BEFORE clicking "Deploy"** - Build will fail without them
+- `NEXT_PUBLIC_APP_URL` - Set to your Vercel URL after first deploy (or leave empty for now)
 - Add variables for **Production**, **Preview**, and **Development** environments
 - Never commit `.env` file to GitHub!
+- You can add variables one by one, or use "Bulk Add" if available
 
 ### 4.4 Deploy
 

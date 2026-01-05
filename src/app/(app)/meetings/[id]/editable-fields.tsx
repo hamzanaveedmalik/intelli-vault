@@ -40,8 +40,23 @@ export default function EditableFields({
   const [isAdding, setIsAdding] = useState<string | null>(null);
   const [editValue, setEditValue] = useState("");
   const [editReason, setEditReason] = useState("");
+  const [editStartTime, setEditStartTime] = useState<number | undefined>(undefined);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Listen for timestamp clicks from transcript
+  useEffect(() => {
+    const handleSetTimestamp = (event: CustomEvent<{ timestamp: number }>) => {
+      if (isAdding || isEditing) {
+        setEditStartTime(event.detail.timestamp);
+      }
+    };
+
+    window.addEventListener('setTimestamp', handleSetTimestamp as EventListener);
+    return () => {
+      window.removeEventListener('setTimestamp', handleSetTimestamp as EventListener);
+    };
+  }, [isAdding, isEditing]);
 
   const formatTime = (seconds: number): string => {
     const mins = Math.floor(seconds / 60);

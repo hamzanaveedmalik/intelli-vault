@@ -1,6 +1,6 @@
 import PDFDocument from "pdfkit";
 import type { ExtractionData } from "../extraction/types";
-import type { Meeting, User } from "../../generated/prisma";
+import type { Meeting, User } from "./types";
 
 interface GeneratePDFOptions {
   meeting: Meeting & { finalizedBy?: User | null };

@@ -11,6 +11,7 @@ import EditableFields from "./editable-fields";
 import ReprocessButton from "./reprocess-button";
 import ExportButton from "./export-button";
 import VersionHistory from "./version-history";
+import TranscriptViewer from "./transcript-viewer";
 
 export default async function MeetingDetailPage({
   params,
@@ -96,11 +97,6 @@ export default async function MeetingDetailPage({
     }
   };
 
-  const formatTime = (seconds: number): string => {
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, "0")}`;
-  };
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -151,44 +147,7 @@ export default async function MeetingDetailPage({
                 <CardTitle>Transcript</CardTitle>
               </CardHeader>
               <CardContent>
-                {transcript && transcript.segments && transcript.segments.length > 0 ? (
-                  <div className="max-h-[600px] space-y-4 overflow-y-auto">
-                    {transcript.segments.map((segment, index) => (
-                      <div
-                        key={index}
-                        data-timestamp={Math.floor(segment.startTime)}
-                        data-segment-start={segment.startTime}
-                        className="border-l-4 border-primary pl-4 cursor-pointer hover:bg-muted/50 transition-colors"
-                        onClick={() => {
-                          // Dispatch custom event to set timestamp in editable fields
-                          window.dispatchEvent(new CustomEvent('setTimestamp', { 
-                            detail: { timestamp: segment.startTime } 
-                          }));
-                        }}
-                        title="Click to use this timestamp when adding/editing items"
-                      >
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <span className="font-medium">
-                            {formatTime(segment.startTime)}
-                          </span>
-                          <span className="text-muted-foreground/50">•</span>
-                          <span className="font-medium text-primary">
-                            {segment.speaker}
-                          </span>
-                        </div>
-                        <p className="mt-1 text-sm">
-                          {segment.text}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="rounded-md bg-muted p-4">
-                    <p className="text-sm text-muted-foreground">
-                      Transcript is not available yet. Please check back in a few moments.
-                    </p>
-                  </div>
-                )}
+                <TranscriptViewer segments={transcript?.segments ?? []} />
               </CardContent>
             </Card>
 

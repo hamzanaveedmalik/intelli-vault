@@ -79,7 +79,7 @@ export async function POST(
     }
 
     // Get version history
-    const versions = await db.version.findMany({
+    const versionsRaw = await db.version.findMany({
       where: {
         meetingId: meeting.id,
       },
@@ -87,6 +87,17 @@ export async function POST(
         timestamp: "asc",
       },
     });
+
+    // Cast versions to our type definition
+    const versions = versionsRaw.map((v) => ({
+      id: v.id,
+      meetingId: v.meetingId,
+      version: v.version,
+      editorId: v.editorId,
+      whatChanged: v.whatChanged,
+      reason: v.reason,
+      timestamp: v.timestamp,
+    }));
 
     // Generate audit pack
     const zipBuffer = await generateAuditPack({
@@ -132,8 +143,16 @@ export async function POST(
     });
   } catch (error) {
     console.error("Error exporting audit pack:", error);
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    console.error("Error details:", {
+      message: errorMessage,
+      stack: error instanceof Error ? error.stack : undefined,
+    });
     return Response.json(
-      { error: "Failed to export audit pack" },
+      { 
+        error: "Failed to export audit pack",
+        details: process.env.NODE_ENV === "development" ? errorMessage : undefined,
+      },
       { status: 500 }
     );
   }

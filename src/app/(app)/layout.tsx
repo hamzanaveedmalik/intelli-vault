@@ -22,6 +22,7 @@ export default async function AppLayout({
       <Sidebar
         userEmail={session.user.email}
         userName={session.user.name}
+        userRole={session.user.role}
       />
       {/* Main content with left padding for desktop sidebar and top padding for mobile */}
       <main className="lg:pl-64 pt-16 lg:pt-0">

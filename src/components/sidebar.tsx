@@ -12,9 +12,10 @@ import { useState } from "react";
 interface SidebarProps {
   userEmail?: string | null;
   userName?: string | null;
+  userRole?: string | null;
 }
 
-export function Sidebar({ userEmail, userName }: SidebarProps) {
+export function Sidebar({ userEmail, userName, userRole }: SidebarProps) {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -30,6 +31,7 @@ export function Sidebar({ userEmail, userName }: SidebarProps) {
     { href: "/review", label: "Review Queue" },
     { href: "/upload", label: "Upload" },
     { href: "/settings", label: "Settings" },
+    ...(userRole === "OWNER_CCO" ? [{ href: "/audit-logs", label: "Audit Logs" }] : []),
   ];
 
   const SidebarContent = () => (

@@ -53,11 +53,6 @@ export async function POST(
         { status: 403 }
       );
     }
-      return Response.json(
-        { error: "Cannot edit finalized meetings" },
-        { status: 403 }
-      );
-    }
 
     // Parse current extraction data
     const extraction = (meeting.extraction as ExtractionData | null) || {

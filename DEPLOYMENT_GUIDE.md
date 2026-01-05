@@ -12,6 +12,7 @@ cat .gitignore | grep -E "\.env|node_modules"
 ```
 
 Should see:
+
 - `.env`
 - `.env*.local`
 - `node_modules/`
@@ -79,6 +80,7 @@ git push -u origin main
 ```
 
 If you get authentication errors, you may need to:
+
 - Use GitHub CLI: `gh auth login`
 - Or use SSH: `git remote set-url origin git@github.com:YOUR_USERNAME/ria-compliance-tool.git`
 
@@ -118,6 +120,7 @@ Before clicking "Deploy", you MUST add environment variables:
 4. Add each variable one by one:
 
 **Required (Minimum for Build to Succeed):**
+
 ```
 DATABASE_URL=postgresql://...
 AUTH_SECRET=...
@@ -129,6 +132,7 @@ S3_SECRET_ACCESS_KEY=...
 ```
 
 **Optional but Recommended:**
+
 ```
 S3_REGION=us-east-1
 S3_ENDPOINT=https://...r2.cloudflarestorage.com
@@ -143,6 +147,7 @@ NEXT_PUBLIC_APP_URL=https://your-app.vercel.app
 ```
 
 **Important Notes:**
+
 - ⚠️ **Add ALL required variables BEFORE clicking "Deploy"** - Build will fail without them
 - `NEXT_PUBLIC_APP_URL` - Set to your Vercel URL after first deploy (or leave empty for now)
 - Add variables for **Production**, **Preview**, and **Development** environments
@@ -168,16 +173,19 @@ After first deploy:
 ### 5.1 Production Database Options
 
 **Option A: Vercel Postgres (Recommended)**
+
 - Go to Vercel dashboard → **Storage** → **Create Database** → **Postgres**
 - Copy connection string → Add as `DATABASE_URL` in environment variables
 
 **Option B: Supabase (Free Tier)**
+
 - Go to https://supabase.com
 - Create project
 - Get connection string from Settings → Database
 - Add as `DATABASE_URL` in Vercel
 
 **Option C: Neon (Free Tier)**
+
 - Go to https://neon.tech
 - Create project
 - Get connection string
@@ -197,6 +205,7 @@ npx prisma migrate deploy
 ```
 
 Or use Vercel CLI:
+
 ```bash
 vercel env pull .env.production
 npx prisma migrate deploy
@@ -221,6 +230,7 @@ npx prisma migrate deploy
 ### 6.3 Monitor Logs
 
 In Vercel dashboard:
+
 - Go to **Deployments** → Click latest deployment → **Functions** tab
 - Check logs for any errors
 
@@ -269,4 +279,3 @@ After initial setup:
 - [ ] Database connection string is secure
 - [ ] QStash signing keys are set
 - [ ] Production AUTH_SECRET is strong
-

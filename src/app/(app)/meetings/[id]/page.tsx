@@ -14,6 +14,7 @@ import VersionHistory from "./version-history";
 import TranscriptViewer from "./transcript-viewer";
 import ReadyForCCOButton from "./ready-for-cco-button";
 import FinalizeButton from "./finalize-button";
+import { DebugPanel } from "./debug";
 
 export default async function MeetingDetailPage({
   params,
@@ -188,15 +189,21 @@ export default async function MeetingDetailPage({
             </Card>
           </div>
         ) : (
-          <Card>
-            <CardContent className="pt-6">
-              <p className="text-sm text-muted-foreground">
-                {meeting.status === "PROCESSING"
-                  ? "This meeting is being processed. The transcript will be available once processing is complete."
-                  : "This meeting is still uploading. Please wait for processing to complete."}
-              </p>
-            </CardContent>
-          </Card>
+          <>
+            <Card>
+              <CardContent className="pt-6">
+                <p className="text-sm text-muted-foreground">
+                  {meeting.status === "PROCESSING"
+                    ? "This meeting is being processed. The transcript will be available once processing is complete."
+                    : "This meeting is still uploading. Please wait for processing to complete."}
+                </p>
+              </CardContent>
+            </Card>
+            {/* Debug Panel for stuck meetings */}
+            {meeting.status === "PROCESSING" && (
+              <DebugPanel meetingId={meeting.id} />
+            )}
+          </>
         )}
 
         {meeting.status === "FINALIZED" && (

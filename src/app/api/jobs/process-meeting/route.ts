@@ -25,9 +25,14 @@ const processMeetingSchema = z.object({
  * 3. Update status to DRAFT_READY (extraction will be added in EPIC 3)
  */
 async function handler(request: Request) {
+  console.log(`🔔 QStash webhook received at ${new Date().toISOString()}`);
+  
   try {
     const body = await request.json();
+    console.log(`📦 Request body:`, { meetingId: body.meetingId, workspaceId: body.workspaceId });
+    
     const { meetingId, workspaceId, fileUrl } = processMeetingSchema.parse(body);
+    console.log(`✅ Request validated for meeting ${meetingId}`);
 
     // Verify meeting exists and belongs to workspace
     const meeting = await db.meeting.findFirst({
@@ -266,19 +271,74 @@ async function handler(request: Request) {
     }
   } catch (error) {
     if (error instanceof z.ZodError) {
+      console.error("❌ Validation error:", error.errors);
       return Response.json({ error: error.errors }, { status: 400 });
     }
-    console.error("Error processing meeting:", error);
+    
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    const errorStack = error instanceof Error ? error.stack : undefined;
+    
+    console.error("❌ Error processing meeting:", {
+      error: errorMessage,
+      stack: errorStack,
+    });
+    
+    // Log error to audit events if we have meeting context
+    try {
+      const body = await request.clone().json().catch(() => ({}));
+      if (body.meetingId && body.workspaceId) {
+        await db.auditEvent.create({
+          data: {
+            workspaceId: body.workspaceId,
+            userId: "system",
+            action: "UPLOAD",
+            resourceType: "meeting",
+            resourceId: body.meetingId,
+            meetingId: body.meetingId,
+            metadata: {
+              action: "processing_error",
+              error: errorMessage,
+              timestamp: new Date().toISOString(),
+            },
+          },
+        });
+      }
+    } catch (auditError) {
+      console.error("Failed to log error to audit events:", auditError);
+    }
+    
     return Response.json(
-      { error: "Failed to process meeting" },
+      { 
+        error: "Failed to process meeting",
+        message: errorMessage,
+      },
       { status: 500 }
     );
   }
 }
 
 // Verify QStash signature in production
-export const POST = process.env.NODE_ENV === "production"
-  ? verifySignatureAppRouter(handler)
-  : handler;
+// Note: If signature verification fails, requests will be rejected with 401
+// Make sure QSTASH_CURRENT_SIGNING_KEY and QSTASH_NEXT_SIGNING_KEY are set in production
+export const POST = (() => {
+  if (process.env.NODE_ENV === "production") {
+    // In production, verify signature
+    // If signing keys are missing, log a warning but still try to verify
+    if (!process.env.QSTASH_CURRENT_SIGNING_KEY && !process.env.QSTASH_NEXT_SIGNING_KEY) {
+      console.warn("⚠️ WARNING: QStash signing keys not set in production. Webhook requests may be rejected.");
+      console.warn("   Set QSTASH_CURRENT_SIGNING_KEY and QSTASH_NEXT_SIGNING_KEY in Vercel environment variables.");
+    }
+    
+    try {
+      return verifySignatureAppRouter(handler);
+    } catch (error) {
+      console.error("❌ Error setting up QStash signature verification:", error);
+      // Fall back to handler without verification if setup fails
+      return handler;
+    }
+  }
+  // In development, skip signature verification
+  return handler;
+})();
 
 

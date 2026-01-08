@@ -101,7 +101,9 @@ model Meeting {
   @@index([workspaceId, status])
   @@index([workspaceId, clientName])
   @@index([workspaceId, meetingDate])
-  @@index([workspaceId, searchableText]) // Indexed text for fast keyword search
+  // Note: searchableText is NOT indexed with btree (too large for index)
+  // We use PostgreSQL's native full-text search via to_tsvector() in queries
+  // The field is limited to 50KB to prevent database issues
 }
 
 model Version {

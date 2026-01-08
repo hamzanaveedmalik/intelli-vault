@@ -72,6 +72,20 @@ export function generateSearchableText(
   }
 
   // Join all parts and normalize whitespace
-  return parts.join(" ").replace(/\s+/g, " ").trim();
+  const fullText = parts.join(" ").replace(/\s+/g, " ").trim();
+  
+  // Limit to 50KB to prevent database issues
+  // PostgreSQL btree indexes have a limit of ~2700 bytes per index entry
+  // We store this without a btree index and use PostgreSQL's native full-text search
+  // 50KB is still plenty for search - most transcripts are much smaller
+  const MAX_SEARCHABLE_TEXT_LENGTH = 50 * 1024; // 50KB
+  
+  if (fullText.length > MAX_SEARCHABLE_TEXT_LENGTH) {
+    console.warn(`⚠️ searchableText exceeds ${MAX_SEARCHABLE_TEXT_LENGTH} bytes (${fullText.length}), truncating`);
+    // Truncate but keep it searchable by taking from the beginning
+    return fullText.substring(0, MAX_SEARCHABLE_TEXT_LENGTH);
+  }
+  
+  return fullText;
 }
 

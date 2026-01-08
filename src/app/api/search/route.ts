@@ -90,15 +90,9 @@ export async function GET(request: Request) {
           meetingType: true,
         },
         take: 20, // Increased limit
-        orderBy: [
-          // Prioritize exact matches and starts-with matches
-          {
-            clientName: "asc", // Sort alphabetically for consistent results
-          },
-          {
-            meetingDate: "desc",
-          },
-        ],
+        orderBy: {
+          meetingDate: "desc",
+        },
       });
 
       results.push(

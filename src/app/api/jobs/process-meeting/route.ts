@@ -321,47 +321,79 @@ async function handler(request: Request) {
       );
     }
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      console.error("❌ Validation error:", error.errors);
-      return Response.json({ error: error.errors }, { status: 400 });
-    }
-    
+    const elapsed = Date.now() - startTime;
     const errorMessage = error instanceof Error ? error.message : "Unknown error";
     const errorStack = error instanceof Error ? error.stack : undefined;
+    const errorName = error instanceof Error ? error.name : "UnknownError";
     
-    console.error("❌ Error processing meeting:", {
+    console.error("❌ CRITICAL ERROR in process-meeting handler:", {
       error: errorMessage,
+      name: errorName,
       stack: errorStack,
+      elapsed: `${elapsed}ms`,
     });
     
-    // Log error to audit events if we have meeting context
+    // Handle validation errors separately
+    if (error instanceof z.ZodError) {
+      console.error("❌ Validation error:", error.errors);
+      return Response.json({ 
+        error: "Validation failed", 
+        details: error.errors 
+      }, { status: 400 });
+    }
+    
+    // Try to get meeting context from request body for error logging
+    let meetingId: string | undefined;
+    let workspaceId: string | undefined;
+    
     try {
-      const body = await request.clone().json().catch(() => ({}));
-      if (body.meetingId && body.workspaceId) {
+      // Try to read body from request (may have already been consumed)
+      const bodyText = await request.clone().text().catch(() => "");
+      if (bodyText) {
+        const body = JSON.parse(bodyText);
+        meetingId = body.meetingId;
+        workspaceId = body.workspaceId;
+      }
+    } catch {
+      // Ignore errors reading body - it may have already been consumed
+      console.warn("⚠️ Could not read request body for error logging");
+    }
+    
+    // Log error to audit events if we have meeting context
+    if (meetingId && workspaceId) {
+      try {
         await db.auditEvent.create({
           data: {
-            workspaceId: body.workspaceId,
+            workspaceId,
             userId: "system",
             action: "UPLOAD",
             resourceType: "meeting",
-            resourceId: body.meetingId,
-            meetingId: body.meetingId,
+            resourceId: meetingId,
+            meetingId,
             metadata: {
               action: "processing_error",
               error: errorMessage,
+              errorName,
+              elapsed,
               timestamp: new Date().toISOString(),
             },
           },
         });
+        console.log("✅ Error logged to audit events");
+      } catch (auditError) {
+        console.error("❌ Failed to log error to audit events:", auditError);
       }
-    } catch (auditError) {
-      console.error("Failed to log error to audit events:", auditError);
     }
     
+    // Return detailed error response for debugging
     return Response.json(
       { 
         error: "Failed to process meeting",
         message: errorMessage,
+        errorName,
+        elapsed: `${elapsed}ms`,
+        // Only include stack in development
+        ...(process.env.NODE_ENV !== "production" && errorStack ? { stack: errorStack } : {}),
       },
       { status: 500 }
     );

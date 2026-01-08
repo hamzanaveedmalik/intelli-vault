@@ -18,31 +18,65 @@ export async function sendInvitationEmail({
 }) {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
   const invitationUrl = `${baseUrl}/invitations/accept?token=${invitationToken}`;
+  const dashboardUrl = `${baseUrl}/dashboard`;
+
+  const roleDescription = role === "OWNER_CCO" 
+    ? "Owner/CCO - You can finalize records, manage workspace settings, and invite team members."
+    : "Member - You can view and edit meeting records.";
 
   const emailContent = {
     from: process.env.EMAIL_FROM || "noreply@ria-compliance.com",
     to: email,
     subject: `Invitation to join ${workspaceName} on Comply Vault`,
     html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; line-height: 1.6;">
         <h2>You've been invited to join ${workspaceName}</h2>
-        <p>You've been invited to join the workspace <strong>${workspaceName}</strong> on Comply Vault with the role: <strong>${role === "OWNER_CCO" ? "Owner/CCO" : "Member"}</strong>.</p>
-        <p>Click the button below to accept the invitation:</p>
-        <a href="${invitationUrl}" style="display: inline-block; padding: 12px 24px; background-color: #2563eb; color: white; text-decoration: none; border-radius: 6px; margin: 20px 0;">
-          Accept Invitation
-        </a>
+        <p>You've been invited to join the workspace <strong>${workspaceName}</strong> on Comply Vault.</p>
+        
+        <div style="background-color: #f3f4f6; padding: 15px; border-radius: 6px; margin: 20px 0;">
+          <p style="margin: 0;"><strong>Your Role:</strong> ${role === "OWNER_CCO" ? "Owner/CCO" : "Member"}</p>
+          <p style="margin: 5px 0 0 0; font-size: 14px; color: #6b7280;">${roleDescription}</p>
+        </div>
+        
+        <p><strong>What is Comply Vault?</strong></p>
+        <p>Comply Vault helps RIA firms create exam-ready client interaction records from meeting recordings. Upload recordings, review extracted compliance data, and export audit packs.</p>
+        
+        <div style="margin: 30px 0;">
+          <a href="${invitationUrl}" style="display: inline-block; padding: 12px 24px; background-color: #2563eb; color: white; text-decoration: none; border-radius: 6px;">
+            Accept Invitation
+          </a>
+        </div>
+        
         <p>Or copy and paste this link into your browser:</p>
-        <p style="word-break: break-all; color: #666;">${invitationUrl}</p>
-        <p style="color: #999; font-size: 12px; margin-top: 30px;">This invitation will expire in 7 days.</p>
+        <p style="word-break: break-all; color: #666; font-size: 12px;">${invitationUrl}</p>
+        
+        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb; color: #6b7280; font-size: 12px;">
+          <p><strong>Next Steps After Accepting:</strong></p>
+          <ol style="padding-left: 20px; margin: 10px 0;">
+            <li>Review your workspace settings</li>
+            <li>Upload your first meeting recording</li>
+            <li>Review and finalize meeting records</li>
+          </ol>
+          <p style="margin-top: 15px;">This invitation will expire in 7 days.</p>
+        </div>
       </div>
     `,
     text: `
       You've been invited to join ${workspaceName} on Comply Vault.
       
-      Role: ${role === "OWNER_CCO" ? "Owner/CCO" : "Member"}
+      Your Role: ${role === "OWNER_CCO" ? "Owner/CCO" : "Member"}
+      ${roleDescription}
+      
+      What is Comply Vault?
+      Comply Vault helps RIA firms create exam-ready client interaction records from meeting recordings.
       
       Accept your invitation by visiting:
       ${invitationUrl}
+      
+      Next Steps After Accepting:
+      1. Review your workspace settings
+      2. Upload your first meeting recording
+      3. Review and finalize meeting records
       
       This invitation will expire in 7 days.
     `,

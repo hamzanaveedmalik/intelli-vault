@@ -157,7 +157,7 @@ export function GlobalSearch({ className }: GlobalSearchProps) {
           value={query}
           onValueChange={setQuery}
         />
-        <CommandList>
+        <CommandList shouldFilter={false}>
           {isLoading && (
             <div className="flex items-center justify-center py-6">
               <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
@@ -178,9 +178,10 @@ export function GlobalSearch({ className }: GlobalSearchProps) {
               {results.map((result) => (
                 <CommandItem
                   key={result.id}
-                  value={result.id}
+                  value={`${result.clientName} ${result.type} ${result.id}`}
                   onSelect={() => handleSelect(result.id)}
                   className="flex flex-col gap-2 py-3"
+                  keywords={[result.clientName, result.type, result.matchType || ""]}
                 >
                   <div className="flex items-center justify-between gap-2 w-full">
                     <div className="flex flex-col gap-1 flex-1 min-w-0">

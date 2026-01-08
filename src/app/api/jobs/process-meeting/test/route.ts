@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 
+export const dynamic = "force-dynamic";
+
 /**
  * Test endpoint to verify the process-meeting handler is accessible
  * This helps debug QStash webhook issues

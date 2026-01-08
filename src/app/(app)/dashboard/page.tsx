@@ -4,15 +4,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
-import { Badge } from "~/components/ui/badge";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "~/components/ui/table";
+import { DashboardClient } from "./dashboard-client";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -78,40 +70,6 @@ export default async function DashboardPage() {
     if (seconds === null) return "N/A";
     const minutes = seconds / 60;
     return `${minutes.toFixed(1)} min`;
-  };
-
-  const getStatusVariant = (status: string): "default" | "secondary" | "destructive" | "outline" => {
-    switch (status) {
-      case "UPLOADING":
-        return "secondary";
-      case "PROCESSING":
-        return "default";
-      case "DRAFT_READY":
-        return "default";
-      case "DRAFT":
-        return "outline";
-      case "FINALIZED":
-        return "default";
-      default:
-        return "secondary";
-    }
-  };
-
-  const getStatusLabel = (status: string) => {
-    switch (status) {
-      case "UPLOADING":
-        return "Uploading";
-      case "PROCESSING":
-        return "Processing";
-      case "DRAFT_READY":
-        return "Draft Ready";
-      case "DRAFT":
-        return "Draft";
-      case "FINALIZED":
-        return "Finalized";
-      default:
-        return status;
-    }
   };
 
   return (
@@ -202,54 +160,16 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
       ) : (
-        <Card>
-          <CardHeader>
-            <CardTitle>Meetings</CardTitle>
-            <CardDescription>
-              A list of all your meeting recordings
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Client Name</TableHead>
-                  <TableHead>Meeting Type</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Created</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {meetings.map((meeting) => (
-                  <TableRow key={meeting.id}>
-                    <TableCell className="font-medium">
-                      {meeting.clientName}
-                    </TableCell>
-                    <TableCell>{meeting.meetingType}</TableCell>
-                    <TableCell>
-                      {new Date(meeting.meetingDate).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={getStatusVariant(meeting.status)}>
-                        {getStatusLabel(meeting.status)}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      {new Date(meeting.createdAt).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <Button variant="link" asChild>
-                        <Link href={`/meetings/${meeting.id}`}>View</Link>
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
+        <DashboardClient
+          initialMeetings={meetings.map((m) => ({
+            id: m.id,
+            clientName: m.clientName,
+            meetingType: m.meetingType,
+            meetingDate: m.meetingDate.toISOString(),
+            status: m.status,
+            createdAt: m.createdAt.toISOString(),
+          }))}
+        />
       )}
     </div>
   );

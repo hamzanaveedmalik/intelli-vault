@@ -1,6 +1,5 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
@@ -16,6 +15,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
+import { useNotifications } from "~/hooks/use-notifications";
 
 interface UserMenuProps {
   userEmail?: string | null;
@@ -26,27 +26,7 @@ interface UserMenuProps {
 
 export function UserMenu({ userEmail, userName, userImage, userRole }: UserMenuProps) {
   const router = useRouter();
-  const [notificationCount, setNotificationCount] = useState(0);
-
-  // Fetch notification count
-  useEffect(() => {
-    const fetchNotifications = async () => {
-      try {
-        const response = await fetch("/api/notifications/count");
-        if (response.ok) {
-          const data = await response.json();
-          setNotificationCount(data.count || 0);
-        }
-      } catch (error) {
-        console.error("Error fetching notifications:", error);
-      }
-    };
-
-    fetchNotifications();
-    // Poll for notifications every 30 seconds
-    const interval = setInterval(fetchNotifications, 30000);
-    return () => clearInterval(interval);
-  }, []);
+  const { notificationCount } = useNotifications();
 
   const getInitials = () => {
     if (userName) {

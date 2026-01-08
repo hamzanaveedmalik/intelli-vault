@@ -14,6 +14,7 @@ import VersionHistory from "./version-history";
 import TranscriptViewer from "./transcript-viewer";
 import ReadyForCCOButton from "./ready-for-cco-button";
 import FinalizeButton from "./finalize-button";
+import { MeetingStatusPoller } from "./meeting-status-poller";
 
 export default async function MeetingDetailPage({
   params,
@@ -110,6 +111,12 @@ export default async function MeetingDetailPage({
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      {/* Poll for status changes */}
+      <MeetingStatusPoller
+        meetingId={meeting.id}
+        initialStatus={meeting.status}
+        clientName={meeting.clientName}
+      />
       <div className="mb-8">
         <h1 className="text-3xl font-bold">Meeting Details</h1>
       </div>

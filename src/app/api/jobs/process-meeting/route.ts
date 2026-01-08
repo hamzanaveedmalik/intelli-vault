@@ -25,29 +25,72 @@ const processMeetingSchema = z.object({
  * 3. Update status to DRAFT_READY (extraction will be added in EPIC 3)
  */
 async function handler(request: Request) {
+  const startTime = Date.now();
   console.log(`🔔 QStash webhook received at ${new Date().toISOString()}`);
+  console.log(`📋 Request headers:`, Object.fromEntries(request.headers.entries()));
   
   try {
-    const body = await request.json();
-    console.log(`📦 Request body:`, { meetingId: body.meetingId, workspaceId: body.workspaceId });
+    // Parse request body with error handling
+    let body: any;
+    try {
+      body = await request.json();
+      console.log(`📦 Request body parsed:`, { 
+        meetingId: body.meetingId, 
+        workspaceId: body.workspaceId,
+        fileUrl: body.fileUrl ? body.fileUrl.substring(0, 50) + "..." : "missing"
+      });
+    } catch (parseError) {
+      console.error("❌ Failed to parse request body:", parseError);
+      return Response.json(
+        { error: "Invalid request body", details: parseError instanceof Error ? parseError.message : "Unknown error" },
+        { status: 400 }
+      );
+    }
     
-    const { meetingId, workspaceId, fileUrl } = processMeetingSchema.parse(body);
-    console.log(`✅ Request validated for meeting ${meetingId}`);
+    // Validate request body
+    let validatedData: { meetingId: string; workspaceId: string; fileUrl: string };
+    try {
+      validatedData = processMeetingSchema.parse(body);
+      console.log(`✅ Request validated for meeting ${validatedData.meetingId}`);
+    } catch (validationError) {
+      console.error("❌ Request validation failed:", validationError);
+      if (validationError instanceof z.ZodError) {
+        return Response.json(
+          { error: "Validation failed", details: validationError.errors },
+          { status: 400 }
+        );
+      }
+      throw validationError;
+    }
+    
+    const { meetingId, workspaceId, fileUrl } = validatedData;
 
     // Verify meeting exists and belongs to workspace
-    const meeting = await db.meeting.findFirst({
-      where: {
-        id: meetingId,
-        workspaceId,
-      },
-    });
+    let meeting;
+    try {
+      meeting = await db.meeting.findFirst({
+        where: {
+          id: meetingId,
+          workspaceId,
+        },
+      });
+    } catch (dbError) {
+      console.error("❌ Database error fetching meeting:", dbError);
+      return Response.json(
+        { error: "Database error", details: dbError instanceof Error ? dbError.message : "Unknown error" },
+        { status: 500 }
+      );
+    }
 
     if (!meeting) {
+      console.error(`❌ Meeting not found: ${meetingId} in workspace ${workspaceId}`);
       return Response.json(
         { error: "Meeting not found or access denied" },
         { status: 404 }
       );
     }
+    
+    console.log(`📄 Meeting found: ${meeting.id}, status: ${meeting.status}, fileUrl: ${meeting.fileUrl ? "exists" : "missing"}`);
 
     // Update meeting status to PROCESSING (if not already)
     if (meeting.status !== "PROCESSING") {
@@ -61,7 +104,15 @@ async function handler(request: Request) {
       // Step 1: Get signed URL for audio file
       // fileUrl is stored as S3 key (e.g., "workspaces/{workspaceId}/meetings/{meetingId}/recording.mp4")
       // We need to generate a signed URL for transcription service to access it
-      const audioUrl = await getSignedFileUrl(fileUrl, 3600); // 1 hour expiry
+      console.log(`🔗 Generating signed URL for file: ${fileUrl.substring(0, 50)}...`);
+      let audioUrl: string;
+      try {
+        audioUrl = await getSignedFileUrl(fileUrl, 3600); // 1 hour expiry
+        console.log(`✅ Signed URL generated (length: ${audioUrl.length})`);
+      } catch (s3Error) {
+        console.error("❌ Failed to generate signed URL:", s3Error);
+        throw new Error(`S3 error: ${s3Error instanceof Error ? s3Error.message : "Unknown error"}`);
+      }
 
       // Step 2: Transcribe audio
       console.log(`Transcribing meeting ${meetingId}...`);

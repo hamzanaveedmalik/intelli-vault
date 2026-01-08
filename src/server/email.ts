@@ -70,6 +70,121 @@ export async function sendInvitationEmail({
 }
 
 /**
+ * Send welcome email with onboarding checklist when workspace is provisioned
+ */
+export async function sendWelcomeEmail({
+  email,
+  workspaceName,
+  userName,
+  setupFee,
+  pilotCode,
+}: {
+  email: string;
+  workspaceName: string;
+  userName: string;
+  setupFee: number;
+  pilotCode: string | null;
+}) {
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  const dashboardUrl = `${baseUrl}/dashboard`;
+  const settingsUrl = `${baseUrl}/settings`;
+  const uploadUrl = `${baseUrl}/upload`;
+
+  const emailContent = {
+    from: process.env.EMAIL_FROM || "noreply@ria-compliance.com",
+    to: email,
+    subject: `Welcome to Comply Vault - ${workspaceName} Pilot Setup`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; line-height: 1.6;">
+        <h2>Welcome to Comply Vault, ${userName}!</h2>
+        <p>Your pilot workspace <strong>${workspaceName}</strong> has been successfully created.</p>
+        
+        ${setupFee > 0 ? `
+          <div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 12px; margin: 20px 0;">
+            <p style="margin: 0;"><strong>Next Step:</strong> Complete your $500 setup fee to activate your 60-day free pilot period.</p>
+          </div>
+        ` : `
+          <div style="background-color: #d1fae5; border-left: 4px solid #10b981; padding: 12px; margin: 20px 0;">
+            <p style="margin: 0;"><strong>Pilot Activated:</strong> Your 60-day free pilot period has started!</p>
+          </div>
+        `}
+        
+        <h3 style="margin-top: 30px 0 15px 0;">Onboarding Checklist</h3>
+        <p>Get started with these steps:</p>
+        <ol style="padding-left: 20px;">
+          <li style="margin-bottom: 10px;">
+            <strong>Complete Workspace Setup</strong><br>
+            <a href="${settingsUrl}" style="color: #2563eb;">Configure retention settings and legal hold</a>
+          </li>
+          <li style="margin-bottom: 10px;">
+            <strong>Invite Team Members</strong><br>
+            Add your team members and assign roles (Owner/CCO or Member)
+          </li>
+          <li style="margin-bottom: 10px;">
+            <strong>Upload Your First Meeting</strong><br>
+            <a href="${uploadUrl}" style="color: #2563eb;">Upload a meeting recording</a> to see the system in action
+          </li>
+          <li style="margin-bottom: 10px;">
+            <strong>Review and Finalize</strong><br>
+            Review the extracted fields, make any edits, and finalize your first record
+          </li>
+        </ol>
+        
+        <div style="margin: 30px 0;">
+          <a href="${dashboardUrl}" style="display: inline-block; padding: 12px 24px; background-color: #2563eb; color: white; text-decoration: none; border-radius: 6px;">
+            Go to Dashboard
+          </a>
+        </div>
+        
+        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb; color: #6b7280; font-size: 12px;">
+          <p><strong>Pilot Period:</strong> Your 60-day free pilot period starts today and includes full access to all features.</p>
+          <p><strong>Support:</strong> If you need help, reply to this email or contact support@complyvault.com</p>
+        </div>
+      </div>
+    `,
+    text: `
+      Welcome to Comply Vault, ${userName}!
+      
+      Your pilot workspace ${workspaceName} has been successfully created.
+      
+      ${setupFee > 0 ? `Next Step: Complete your $500 setup fee to activate your 60-day free pilot period.` : `Pilot Activated: Your 60-day free pilot period has started!`}
+      
+      Onboarding Checklist:
+      1. Complete Workspace Setup: ${settingsUrl}
+      2. Invite Team Members: Add your team members and assign roles
+      3. Upload Your First Meeting: ${uploadUrl}
+      4. Review and Finalize: Review the extracted fields and finalize your first record
+      
+      Go to Dashboard: ${dashboardUrl}
+      
+      Pilot Period: Your 60-day free pilot period starts today and includes full access to all features.
+      Support: If you need help, reply to this email or contact support@complyvault.com
+    `,
+  };
+
+  // In development without Resend API key, log the email instead
+  if (!resend) {
+    console.log("📧 [DEV MODE] Welcome email would be sent:");
+    console.log("To:", email);
+    console.log("Subject:", emailContent.subject);
+    console.log("Workspace:", workspaceName);
+    return { success: true, id: "dev-mode" };
+  }
+
+  try {
+    const result = await resend.emails.send(emailContent);
+    if (result.error) {
+      throw new Error(result.error.message);
+    }
+    return { success: true, id: result.data?.id || "sent" };
+  } catch (error) {
+    console.error("Error sending welcome email:", error);
+    // Don't throw - email failures shouldn't block the workflow
+    return { success: false, error: error instanceof Error ? error.message : "Unknown error" };
+  }
+}
+
+/**
  * Send email notification when meeting draft is ready for review
  */
 export async function sendDraftReadyEmail({

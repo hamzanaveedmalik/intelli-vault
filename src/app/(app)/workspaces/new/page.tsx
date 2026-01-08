@@ -7,17 +7,21 @@ import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { Alert, AlertDescription } from "~/components/ui/alert";
+import { Separator } from "~/components/ui/separator";
 
 export default function NewWorkspacePage() {
   const router = useRouter();
   const [name, setName] = useState("");
+  const [pilotCode, setPilotCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
+    setSuccess(null);
 
     try {
       const response = await fetch("/api/workspaces", {
@@ -25,7 +29,10 @@ export default function NewWorkspacePage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ name }),
+        body: JSON.stringify({ 
+          name,
+          pilotCode: pilotCode.trim() || undefined,
+        }),
       });
 
       if (!response.ok) {
@@ -34,8 +41,12 @@ export default function NewWorkspacePage() {
       }
 
       const data = await response.json();
-      // Redirect to dashboard (will be created in Story 1.9)
-      router.push(`/dashboard`);
+      setSuccess(data.message || "Workspace created successfully!");
+      
+      // Redirect to dashboard after a brief delay
+      setTimeout(() => {
+        router.push(`/dashboard`);
+      }, 2000);
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
       setIsLoading(false);
@@ -43,12 +54,12 @@ export default function NewWorkspacePage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center">
+    <div className="flex min-h-screen items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle>Create Your Workspace</CardTitle>
+          <CardTitle>Create Your Pilot Workspace</CardTitle>
           <CardDescription>
-            Set up your firm&apos;s compliance documentation system
+            Set up your firm&apos;s compliance documentation system. Start your 60-day free pilot period.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -69,19 +80,47 @@ export default function NewWorkspacePage() {
               </p>
             </div>
 
+            <Separator />
+
+            <div className="space-y-2">
+              <Label htmlFor="pilotCode">Pilot Code (Optional)</Label>
+              <Input
+                id="pilotCode"
+                type="text"
+                value={pilotCode}
+                onChange={(e) => setPilotCode(e.target.value)}
+                placeholder="Enter pilot code for free setup"
+              />
+              <p className="text-xs text-muted-foreground">
+                If you have a pilot code, enter it here to skip the $500 setup fee. Otherwise, you&apos;ll be prompted to complete payment after workspace creation.
+              </p>
+            </div>
+
             {error && (
               <Alert variant="destructive">
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
 
-            <Button
-              type="submit"
-              disabled={isLoading || !name.trim()}
-              className="w-full"
-            >
-              {isLoading ? "Creating..." : "Create Workspace"}
-            </Button>
+            {success && (
+              <Alert>
+                <AlertDescription>{success}</AlertDescription>
+              </Alert>
+            )}
+
+            <div className="space-y-2">
+              <Button
+                type="submit"
+                disabled={isLoading || !name.trim()}
+                className="w-full"
+              >
+                {isLoading ? "Creating..." : "Create Pilot Workspace"}
+              </Button>
+              <p className="text-xs text-center text-muted-foreground">
+                By creating a workspace, you agree to start your 60-day free pilot period.
+                {!pilotCode.trim() && " A $500 setup fee will be required to activate."}
+              </p>
+            </div>
           </form>
         </CardContent>
       </Card>

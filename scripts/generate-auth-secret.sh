@@ -44,3 +44,4 @@ echo ""
 echo "⚠️  Important: This is different from your production AUTH_SECRET!"
 echo ""
 
+

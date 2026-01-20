@@ -1,7 +1,4 @@
-import PDFDocument from "pdfkit";
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
+import { jsPDF } from "jspdf";
 import type { ExtractionData } from "../extraction/types";
 import type { Meeting, User } from "./types";
 
@@ -9,57 +6,6 @@ interface GeneratePDFOptions {
   meeting: Meeting & { finalizedBy?: User | null };
   extraction: ExtractionData;
   workspaceName: string;
-}
-
-let pdfkitFontPatched = false;
-
-function patchPdfkitStandardFonts() {
-  if (pdfkitFontPatched) {
-    return;
-  }
-
-  const originalReadFileSync = fs.readFileSync.bind(fs);
-  
-  // In Next.js standalone/serverless, the AFM files are in the API route directory
-  // Try multiple possible locations
-  const possibleDataDirs = [
-    // Development
-    path.join(process.cwd(), "src", "app", "api", "meetings", "[id]", "export", "data"),
-    // Production serverless bundle (relative to .next/server)
-    path.join(process.cwd(), ".next", "server", "app", "api", "meetings", "[id]", "export", "data"),
-    // Standalone output
-    path.join(process.cwd(), "app", "api", "meetings", "[id]", "export", "data"),
-  ];
-  
-  const fontFiles = new Set([
-    "Helvetica.afm",
-    "Helvetica-Bold.afm",
-    "Helvetica-Oblique.afm",
-    "Helvetica-BoldOblique.afm",
-  ]);
-
-  fs.readFileSync = ((filePath: fs.PathLike, options?: { encoding?: BufferEncoding } | BufferEncoding) => {
-    const rawPath = typeof filePath === "string" ? filePath : filePath.toString();
-    const basename = path.basename(rawPath);
-
-    if (rawPath.includes(`${path.sep}data${path.sep}`) && fontFiles.has(basename)) {
-      // Try each possible location
-      for (const dataDir of possibleDataDirs) {
-        const localFontPath = path.join(dataDir, basename);
-        try {
-          if (fs.existsSync(localFontPath)) {
-            return originalReadFileSync(localFontPath, options as any);
-          }
-        } catch (e) {
-          // Continue to next location
-        }
-      }
-    }
-
-    return originalReadFileSync(filePath as any, options as any);
-  }) as typeof fs.readFileSync;
-
-  pdfkitFontPatched = true;
 }
 
 /**
@@ -71,181 +17,207 @@ export async function generateComplianceNotePDF({
   extraction,
   workspaceName,
 }: GeneratePDFOptions): Promise<Buffer> {
-  return new Promise((resolve, reject) => {
-    try {
-      patchPdfkitStandardFonts();
+  try {
+    const doc = new jsPDF({
+      format: "letter",
+      unit: "pt",
+    });
 
-      const doc = new PDFDocument({
-        margin: 50,
-        size: "LETTER",
+    let yPos = 50;
+    const margin = 50;
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const maxWidth = pageWidth - 2 * margin;
+
+    // Header
+    doc.setFontSize(20);
+    doc.setFont("helvetica", "bold");
+    doc.text("Client Interaction Record", pageWidth / 2, yPos, { align: "center" });
+    yPos += 20;
+
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "normal");
+    doc.text(workspaceName || "Comply Vault", pageWidth / 2, yPos, { align: "center" });
+    yPos += 30;
+
+    // Client Information Section
+    doc.setFontSize(14);
+    doc.setFont("helvetica", "bold");
+    doc.text("Client Information", margin, yPos);
+    yPos += 20;
+
+    doc.setFontSize(11);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Client Name: ${meeting.clientName || "N/A"}`, margin, yPos);
+    yPos += 15;
+    doc.text(`Meeting Type: ${meeting.meetingType || "N/A"}`, margin, yPos);
+    yPos += 15;
+    doc.text(
+      `Meeting Date: ${meeting.meetingDate ? new Date(meeting.meetingDate).toLocaleDateString() : "N/A"}`,
+      margin,
+      yPos
+    );
+    yPos += 25;
+
+    // Topics Section
+    if (extraction.topics && extraction.topics.length > 0) {
+      doc.setFontSize(14);
+      doc.setFont("helvetica", "bold");
+      doc.text("Topics Discussed", margin, yPos);
+      yPos += 20;
+
+      doc.setFontSize(11);
+      doc.setFont("helvetica", "normal");
+      extraction.topics.forEach((topic, index) => {
+        const lines = doc.splitTextToSize(`${index + 1}. ${topic || "N/A"}`, maxWidth);
+        doc.text(lines, margin, yPos);
+        yPos += lines.length * 15;
       });
-
-      const buffers: Buffer[] = [];
-      doc.on("data", (chunk: Buffer) => {
-        buffers.push(chunk);
-      });
-      doc.on("end", () => {
-        const pdfBuffer = Buffer.concat(buffers);
-        resolve(pdfBuffer);
-      });
-      doc.on("error", (err) => {
-        console.error("PDFDocument stream error:", err);
-        reject(err);
-      });
-
-      // Header
-      doc.fontSize(20);
-      doc.font("Helvetica-Bold");
-      doc.text("Client Interaction Record", { align: "center" });
-      doc.moveDown(0.5);
-      doc.fontSize(12);
-      doc.font("Helvetica");
-      doc.text(workspaceName || "Comply Vault", { align: "center" });
-      doc.moveDown(1);
-
-      // Client Information Section
-      doc.fontSize(14);
-      doc.font("Helvetica-Bold");
-      doc.text("Client Information", { underline: true });
-      doc.moveDown(0.3);
-      doc.fontSize(11);
-      doc.font("Helvetica");
-      doc.text(`Client Name: ${meeting.clientName || "N/A"}`);
-      doc.text(`Meeting Type: ${meeting.meetingType || "N/A"}`);
-      doc.text(`Meeting Date: ${meeting.meetingDate ? new Date(meeting.meetingDate).toLocaleDateString() : "N/A"}`);
-      doc.moveDown(1);
-
-      // Topics Section
-      if (extraction.topics && extraction.topics.length > 0) {
-        doc.fontSize(14);
-        doc.font("Helvetica-Bold");
-        doc.text("Topics Discussed", { underline: true });
-        doc.moveDown(0.3);
-        doc.fontSize(11);
-        doc.font("Helvetica");
-        extraction.topics.forEach((topic, index) => {
-          doc.text(`${index + 1}. ${topic || "N/A"}`);
-        });
-        doc.moveDown(1);
-      }
-
-      // Recommendations Section
-      if (extraction.recommendations && extraction.recommendations.length > 0) {
-        doc.fontSize(14);
-        doc.font("Helvetica-Bold");
-        doc.text("Recommendations", { underline: true });
-        doc.moveDown(0.3);
-        doc.fontSize(11);
-        doc.font("Helvetica");
-        extraction.recommendations.forEach((rec, index) => {
-          doc.text(`${index + 1}. ${rec.text || "N/A"}`);
-          if (rec.confidence !== undefined && rec.confidence !== null) {
-            doc.fontSize(9);
-            doc.font("Helvetica-Oblique");
-            doc.fillColor("gray");
-            doc.text(`   Confidence: ${(rec.confidence * 100).toFixed(0)}%`, { indent: 20 });
-            doc.fontSize(11);
-            doc.fillColor("black");
-          }
-        });
-        doc.moveDown(1);
-      }
-
-      // Disclosures Section
-      if (extraction.disclosures && extraction.disclosures.length > 0) {
-        doc.fontSize(14);
-        doc.font("Helvetica-Bold");
-        doc.text("Disclosures Discussed", { underline: true });
-        doc.moveDown(0.3);
-        doc.fontSize(11);
-        doc.font("Helvetica");
-        extraction.disclosures.forEach((dis, index) => {
-          doc.text(`${index + 1}. ${dis.text || "N/A"}`);
-          if (dis.confidence !== undefined && dis.confidence !== null) {
-            doc.fontSize(9);
-            doc.font("Helvetica-Oblique");
-            doc.fillColor("gray");
-            doc.text(`   Confidence: ${(dis.confidence * 100).toFixed(0)}%`, { indent: 20 });
-            doc.fontSize(11);
-            doc.fillColor("black");
-          }
-        });
-        doc.moveDown(1);
-      }
-
-      // Decisions Section
-      if (extraction.decisions && extraction.decisions.length > 0) {
-        doc.fontSize(14);
-        doc.font("Helvetica-Bold");
-        doc.text("Decisions", { underline: true });
-        doc.moveDown(0.3);
-        doc.fontSize(11);
-        doc.font("Helvetica");
-        extraction.decisions.forEach((dec, index) => {
-          doc.text(`${index + 1}. ${dec.text || "N/A"}`);
-          if (dec.confidence !== undefined && dec.confidence !== null) {
-            doc.fontSize(9);
-            doc.font("Helvetica-Oblique");
-            doc.fillColor("gray");
-            doc.text(`   Confidence: ${(dec.confidence * 100).toFixed(0)}%`, { indent: 20 });
-            doc.fontSize(11);
-            doc.fillColor("black");
-          }
-        });
-        doc.moveDown(1);
-      }
-
-      // Follow-ups Section
-      if (extraction.followUps && extraction.followUps.length > 0) {
-        doc.fontSize(14);
-        doc.font("Helvetica-Bold");
-        doc.text("Follow-ups", { underline: true });
-        doc.moveDown(0.3);
-        doc.fontSize(11);
-        doc.font("Helvetica");
-        extraction.followUps.forEach((fu, index) => {
-          doc.text(`${index + 1}. ${fu.text || "N/A"}`);
-          if (fu.confidence !== undefined && fu.confidence !== null) {
-            doc.fontSize(9);
-            doc.font("Helvetica-Oblique");
-            doc.fillColor("gray");
-            doc.text(`   Confidence: ${(fu.confidence * 100).toFixed(0)}%`, { indent: 20 });
-            doc.fontSize(11);
-            doc.fillColor("black");
-          }
-        });
-        doc.moveDown(1);
-      }
-
-      // Sign-off Section
-      doc.moveDown(1);
-      doc.fontSize(14);
-      doc.font("Helvetica-Bold");
-      doc.text("Sign-off", { underline: true });
-      doc.moveDown(0.5);
-      doc.fontSize(11);
-      doc.font("Helvetica");
-      if (meeting.finalizedBy && meeting.finalizedAt) {
-        const finalizedByName = meeting.finalizedBy.name || meeting.finalizedBy.email || "Unknown";
-        doc.text(`Finalized by: ${finalizedByName}`);
-        doc.text(`Date: ${new Date(meeting.finalizedAt).toLocaleString()}`);
-      } else {
-        doc.text("Status: Draft (Not finalized)");
-      }
-
-      // Footer
-      doc.fontSize(8);
-      doc.font("Helvetica-Oblique");
-      doc.fillColor("gray");
-      doc.text(
-        `Generated on ${new Date().toLocaleString()} | Meeting ID: ${meeting.id || "N/A"}`,
-        { align: "center" }
-      );
-
-      doc.end();
-    } catch (error) {
-      console.error("PDFDocument error:", error);
-      reject(error);
+      yPos += 15;
     }
-  });
+
+    // Recommendations Section
+    if (extraction.recommendations && extraction.recommendations.length > 0) {
+      doc.setFontSize(14);
+      doc.setFont("helvetica", "bold");
+      doc.text("Recommendations", margin, yPos);
+      yPos += 20;
+
+      doc.setFontSize(11);
+      extraction.recommendations.forEach((rec, index) => {
+        doc.setFont("helvetica", "normal");
+        const lines = doc.splitTextToSize(`${index + 1}. ${rec.text || "N/A"}`, maxWidth);
+        doc.text(lines, margin, yPos);
+        yPos += lines.length * 15;
+
+        if (rec.confidence !== undefined && rec.confidence !== null) {
+          doc.setFontSize(9);
+          doc.setFont("helvetica", "italic");
+          doc.setTextColor(128, 128, 128);
+          doc.text(`Confidence: ${(rec.confidence * 100).toFixed(0)}%`, margin + 20, yPos);
+          yPos += 12;
+          doc.setTextColor(0, 0, 0);
+          doc.setFontSize(11);
+        }
+      });
+      yPos += 15;
+    }
+
+    // Disclosures Section
+    if (extraction.disclosures && extraction.disclosures.length > 0) {
+      doc.setFontSize(14);
+      doc.setFont("helvetica", "bold");
+      doc.text("Disclosures Discussed", margin, yPos);
+      yPos += 20;
+
+      doc.setFontSize(11);
+      extraction.disclosures.forEach((dis, index) => {
+        doc.setFont("helvetica", "normal");
+        const lines = doc.splitTextToSize(`${index + 1}. ${dis.text || "N/A"}`, maxWidth);
+        doc.text(lines, margin, yPos);
+        yPos += lines.length * 15;
+
+        if (dis.confidence !== undefined && dis.confidence !== null) {
+          doc.setFontSize(9);
+          doc.setFont("helvetica", "italic");
+          doc.setTextColor(128, 128, 128);
+          doc.text(`Confidence: ${(dis.confidence * 100).toFixed(0)}%`, margin + 20, yPos);
+          yPos += 12;
+          doc.setTextColor(0, 0, 0);
+          doc.setFontSize(11);
+        }
+      });
+      yPos += 15;
+    }
+
+    // Decisions Section
+    if (extraction.decisions && extraction.decisions.length > 0) {
+      doc.setFontSize(14);
+      doc.setFont("helvetica", "bold");
+      doc.text("Decisions", margin, yPos);
+      yPos += 20;
+
+      doc.setFontSize(11);
+      extraction.decisions.forEach((dec, index) => {
+        doc.setFont("helvetica", "normal");
+        const lines = doc.splitTextToSize(`${index + 1}. ${dec.text || "N/A"}`, maxWidth);
+        doc.text(lines, margin, yPos);
+        yPos += lines.length * 15;
+
+        if (dec.confidence !== undefined && dec.confidence !== null) {
+          doc.setFontSize(9);
+          doc.setFont("helvetica", "italic");
+          doc.setTextColor(128, 128, 128);
+          doc.text(`Confidence: ${(dec.confidence * 100).toFixed(0)}%`, margin + 20, yPos);
+          yPos += 12;
+          doc.setTextColor(0, 0, 0);
+          doc.setFontSize(11);
+        }
+      });
+      yPos += 15;
+    }
+
+    // Follow-ups Section
+    if (extraction.followUps && extraction.followUps.length > 0) {
+      doc.setFontSize(14);
+      doc.setFont("helvetica", "bold");
+      doc.text("Follow-ups", margin, yPos);
+      yPos += 20;
+
+      doc.setFontSize(11);
+      extraction.followUps.forEach((fu, index) => {
+        doc.setFont("helvetica", "normal");
+        const lines = doc.splitTextToSize(`${index + 1}. ${fu.text || "N/A"}`, maxWidth);
+        doc.text(lines, margin, yPos);
+        yPos += lines.length * 15;
+
+        if (fu.confidence !== undefined && fu.confidence !== null) {
+          doc.setFontSize(9);
+          doc.setFont("helvetica", "italic");
+          doc.setTextColor(128, 128, 128);
+          doc.text(`Confidence: ${(fu.confidence * 100).toFixed(0)}%`, margin + 20, yPos);
+          yPos += 12;
+          doc.setTextColor(0, 0, 0);
+          doc.setFontSize(11);
+        }
+      });
+      yPos += 15;
+    }
+
+    // Sign-off Section
+    yPos += 10;
+    doc.setFontSize(14);
+    doc.setFont("helvetica", "bold");
+    doc.text("Sign-off", margin, yPos);
+    yPos += 20;
+
+    doc.setFontSize(11);
+    doc.setFont("helvetica", "normal");
+    if (meeting.finalizedBy && meeting.finalizedAt) {
+      const finalizedByName = meeting.finalizedBy.name || meeting.finalizedBy.email || "Unknown";
+      doc.text(`Finalized by: ${finalizedByName}`, margin, yPos);
+      yPos += 15;
+      doc.text(`Date: ${new Date(meeting.finalizedAt).toLocaleString()}`, margin, yPos);
+    } else {
+      doc.text("Status: Draft (Not finalized)", margin, yPos);
+    }
+
+    // Footer
+    const pageHeight = doc.internal.pageSize.getHeight();
+    doc.setFontSize(8);
+    doc.setFont("helvetica", "italic");
+    doc.setTextColor(128, 128, 128);
+    doc.text(
+      `Generated on ${new Date().toLocaleString()} | Meeting ID: ${meeting.id || "N/A"}`,
+      pageWidth / 2,
+      pageHeight - 30,
+      { align: "center" }
+    );
+
+    // Convert to Buffer
+    const pdfOutput = doc.output("arraybuffer");
+    return Buffer.from(pdfOutput);
+  } catch (error) {
+    console.error("jsPDF error:", error);
+    throw new Error(`PDF generation failed: ${error instanceof Error ? error.message : "Unknown error"}`);
+  }
 }

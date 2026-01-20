@@ -9,9 +9,13 @@ function getS3Client() {
     throw new Error("S3_ACCESS_KEY_ID and S3_SECRET_ACCESS_KEY environment variables are required");
   }
   
+  const isR2Endpoint = !!env.S3_ENDPOINT?.includes("r2.cloudflarestorage.com");
+
   return new S3Client({
     region: env.S3_REGION || "auto",
     endpoint: env.S3_ENDPOINT, // For R2: https://<account-id>.r2.cloudflarestorage.com
+    // R2 works best with path-style URLs (bucket in path, not subdomain).
+    forcePathStyle: isR2Endpoint,
     credentials: {
       accessKeyId: env.S3_ACCESS_KEY_ID,
       secretAccessKey: env.S3_SECRET_ACCESS_KEY,

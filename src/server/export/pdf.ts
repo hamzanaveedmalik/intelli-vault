@@ -1,4 +1,7 @@
 import PDFDocument from "pdfkit";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 import type { ExtractionData } from "../extraction/types";
 import type { Meeting, User } from "./types";
 
@@ -6,6 +9,40 @@ interface GeneratePDFOptions {
   meeting: Meeting & { finalizedBy?: User | null };
   extraction: ExtractionData;
   workspaceName: string;
+}
+
+let pdfkitFontPatched = false;
+
+function patchPdfkitStandardFonts() {
+  if (pdfkitFontPatched) {
+    return;
+  }
+
+  const originalReadFileSync = fs.readFileSync.bind(fs);
+  const moduleDir = path.dirname(fileURLToPath(import.meta.url));
+  const dataDir = path.join(moduleDir, "data");
+  const fontFiles = new Set([
+    "Helvetica.afm",
+    "Helvetica-Bold.afm",
+    "Helvetica-Oblique.afm",
+    "Helvetica-BoldOblique.afm",
+  ]);
+
+  fs.readFileSync = ((filePath: fs.PathLike, options?: { encoding?: BufferEncoding } | BufferEncoding) => {
+    const rawPath = typeof filePath === "string" ? filePath : filePath.toString();
+    const basename = path.basename(rawPath);
+
+    if (rawPath.includes(`${path.sep}data${path.sep}`) && fontFiles.has(basename)) {
+      const localFontPath = path.join(dataDir, basename);
+      if (fs.existsSync(localFontPath)) {
+        return originalReadFileSync(localFontPath, options as any);
+      }
+    }
+
+    return originalReadFileSync(filePath as any, options as any);
+  }) as typeof fs.readFileSync;
+
+  pdfkitFontPatched = true;
 }
 
 /**
@@ -19,6 +56,8 @@ export async function generateComplianceNotePDF({
 }: GeneratePDFOptions): Promise<Buffer> {
   return new Promise((resolve, reject) => {
     try {
+      patchPdfkitStandardFonts();
+
       const doc = new PDFDocument({
         margin: 50,
         size: "LETTER",

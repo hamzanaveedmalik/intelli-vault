@@ -1,6 +1,8 @@
 import { auth } from "~/server/auth";
 import { db } from "~/server/db";
 import { publishProcessMeetingJob } from "~/server/qstash";
+import { getSignedFileUrl } from "~/server/storage";
+import { sha256FromResponseBody } from "~/server/hash";
 import { env } from "~/env";
 import { createErrorResponse, AppError, ErrorMessages } from "~/server/errors";
 import { z } from "zod";
@@ -9,6 +11,8 @@ const completeUploadSchema = z.object({
   meetingId: z.string().min(1, "Meeting ID is required"),
   // Note: Prisma uses CUID format, not UUID, so we validate as a non-empty string
 });
+
+export const runtime = "nodejs";
 
 /**
  * Complete upload: Verify file was uploaded and trigger processing
@@ -48,6 +52,31 @@ export async function POST(request: Request) {
         "Please try uploading the file again",
         "INVALID_STATUS"
       );
+    }
+
+    // Compute SHA-256 hash for provenance if missing
+    let sourceFileSha256 = meeting.sourceFileSha256 ?? null;
+    if (!sourceFileSha256 && meeting.fileUrl) {
+      try {
+        const signedUrl = await getSignedFileUrl(meeting.fileUrl, 900);
+        const response = await fetch(signedUrl);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch uploaded file (status ${response.status})`);
+        }
+        sourceFileSha256 = await sha256FromResponseBody(response.body);
+      } catch (hashError) {
+        console.error("❌ Failed to compute file hash:", hashError);
+      }
+    }
+
+    if (sourceFileSha256 || !meeting.sourceUploadedAt) {
+      await db.meeting.update({
+        where: { id: meeting.id },
+        data: {
+          sourceFileSha256: sourceFileSha256 ?? undefined,
+          sourceUploadedAt: meeting.sourceUploadedAt ?? new Date(),
+        },
+      });
     }
 
     // Update meeting status to PROCESSING and publish QStash job
@@ -105,6 +134,7 @@ export async function POST(request: Request) {
         metadata: {
           action: "upload_completed",
           qstashJobPublished: !!env.QSTASH_TOKEN && meeting.status === "PROCESSING",
+          sha256: sourceFileSha256 ?? undefined,
         },
       },
     });

@@ -197,6 +197,16 @@ export async function generateComplianceNotePDF({
       doc.text(`Finalized by: ${finalizedByName}`, margin, yPos);
       yPos += 15;
       doc.text(`Date: ${new Date(meeting.finalizedAt).toLocaleString()}`, margin, yPos);
+      yPos += 15;
+      if (meeting.finalizeReason) {
+        doc.text(`Reason: ${meeting.finalizeReason}`, margin, yPos);
+        yPos += 15;
+      }
+      if (meeting.finalizeNote) {
+        const noteLines = doc.splitTextToSize(`Note: ${meeting.finalizeNote}`, maxWidth);
+        doc.text(noteLines, margin, yPos);
+        yPos += noteLines.length * 15;
+      }
     } else {
       doc.text("Status: Draft (Not finalized)", margin, yPos);
     }

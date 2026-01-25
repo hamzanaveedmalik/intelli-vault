@@ -14,6 +14,15 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "~/components/ui/dialog";
+import { Label } from "~/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select";
+import { Textarea } from "~/components/ui/textarea";
 
 interface FinalizeButtonProps {
   meetingId: string;
@@ -29,6 +38,8 @@ export default function FinalizeButton({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState(false);
+  const [finalizeReason, setFinalizeReason] = useState<string>("");
+  const [finalizeNote, setFinalizeNote] = useState<string>("");
   const router = useRouter();
 
   // Only show for OWNER_CCO users and meetings in DRAFT_READY or DRAFT status
@@ -45,11 +56,22 @@ export default function FinalizeButton({
     setError(null);
 
     try {
+      if (!finalizeReason) {
+        throw new Error("Finalize reason is required");
+      }
+      if ((finalizeReason === "EXCEPTION_APPROVED" || finalizeReason === "OTHER") && !finalizeNote.trim()) {
+        throw new Error("Finalize note is required for this reason");
+      }
+
       const response = await fetch(`/api/meetings/${meetingId}/finalize`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
+        body: JSON.stringify({
+          finalizeReason,
+          finalizeNote: finalizeNote.trim() || undefined,
+        }),
       });
 
       if (!response.ok) {
@@ -58,6 +80,8 @@ export default function FinalizeButton({
       }
 
       setIsOpen(false);
+      setFinalizeReason("");
+      setFinalizeNote("");
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "An unknown error occurred");
@@ -83,6 +107,34 @@ export default function FinalizeButton({
               This action cannot be undone. Are you sure you want to proceed?
             </DialogDescription>
           </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="finalizeReason">Finalize Reason</Label>
+              <Select value={finalizeReason} onValueChange={setFinalizeReason}>
+                <SelectTrigger id="finalizeReason">
+                  <SelectValue placeholder="Select a reason" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="COMPLETE_REVIEW">Complete review</SelectItem>
+                  <SelectItem value="REQUIRED_CHANGES_ADDRESSED">Required changes addressed</SelectItem>
+                  <SelectItem value="EXCEPTION_APPROVED">Exception approved</SelectItem>
+                  <SelectItem value="OTHER">Other</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="finalizeNote">Finalize Note</Label>
+              <Textarea
+                id="finalizeNote"
+                value={finalizeNote}
+                onChange={(e) => setFinalizeNote(e.target.value)}
+                placeholder="Add context for this sign-off (required for exceptions or other)."
+              />
+              <p className="text-xs text-muted-foreground">
+                Required for “Exception approved” and “Other”.
+              </p>
+            </div>
+          </div>
           {error && (
             <Alert variant="destructive">
               <AlertDescription>{error}</AlertDescription>

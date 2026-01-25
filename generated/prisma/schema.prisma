@@ -33,6 +33,7 @@ model Workspace {
   meetings    Meeting[]
   auditEvents AuditEvent[]
   invitations Invitation[]
+  flags       Flag[]
 
   @@index([createdAt])
 }
@@ -73,35 +74,55 @@ enum MeetingStatus {
   FINALIZED
 }
 
+enum FinalizeReason {
+  COMPLETE_REVIEW
+  REQUIRED_CHANGES_ADDRESSED
+  EXCEPTION_APPROVED
+  OTHER
+}
+
 model Meeting {
-  id             String        @id @default(cuid())
-  workspaceId    String
-  clientName     String
-  meetingType    String
-  meetingDate    DateTime
-  status         MeetingStatus @default(UPLOADING)
-  fileUrl        String? // S3/R2 storage URL
-  transcript     Json? // { segments: [{ startTime, endTime, speaker, text }] }
-  extraction     Json? // { topics, recommendations, disclosures, decisions, followUps, evidenceMap }
-  searchableText String? // Indexed text for fast keyword search (transcript + extracted fields)
-  finalizedBy    String? // userId who finalized
-  finalizedAt    DateTime? // timestamp when finalized
-  draftReadyAt   DateTime? // timestamp when status changed to DRAFT_READY (for KPI tracking)
-  timeToFinalize Int? // Time-to-Finalize in seconds (draftReadyAt → finalizedAt) for KPI tracking
-  readyForCCO    Boolean       @default(false) // flag indicating meeting is ready for CCO review
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
+  id                     String          @id @default(cuid())
+  workspaceId            String
+  clientName             String
+  meetingType            String
+  meetingDate            DateTime
+  status                 MeetingStatus   @default(UPLOADING)
+  fileUrl                String? // S3/R2 storage URL
+  sourceFileSha256       String?
+  sourceFileName         String?
+  sourceFileSize         Int?
+  sourceFileMime         String?
+  sourceUploadedAt       DateTime?
+  transcript             Json? // { segments: [{ startTime, endTime, speaker, text }] }
+  extraction             Json? // { topics, recommendations, disclosures, decisions, followUps, evidenceMap }
+  searchableText         String? // Indexed text for fast keyword search (transcript + extracted fields)
+  finalizedBy            String? // userId who finalized
+  finalizedAt            DateTime? // timestamp when finalized
+  finalizeReason         FinalizeReason?
+  finalizeNote           String?
+  finalizedPolicyVersion Int?
+  samplingBucket         String?
+  samplingRuleId         String?
+  draftReadyAt           DateTime? // timestamp when status changed to DRAFT_READY (for KPI tracking)
+  timeToFinalize         Int? // Time-to-Finalize in seconds (draftReadyAt → finalizedAt) for KPI tracking
+  readyForCCO            Boolean         @default(false) // flag indicating meeting is ready for CCO review
+  createdAt              DateTime        @default(now())
+  updatedAt              DateTime        @updatedAt
 
   // Relations
   workspace   Workspace    @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   versions    Version[]
   auditEvents AuditEvent[]
+  flags       Flag[]
+  // Note: searchableText is NOT indexed with btree (too large for index)
+  // We use PostgreSQL's native full-text search via to_tsvector() in queries
+  // The field is limited to 50KB to prevent database issues
 
   @@index([workspaceId])
   @@index([workspaceId, status])
   @@index([workspaceId, clientName])
   @@index([workspaceId, meetingDate])
-  @@index([workspaceId, searchableText]) // Indexed text for fast keyword search
 }
 
 model Version {
@@ -131,6 +152,64 @@ enum AuditAction {
   FINALIZE
   EXPORT
   DELETE
+}
+
+enum FlagType {
+  MISSING_DISCLOSURE
+  CONFLICT_LANGUAGE
+  MISSING_SUITABILITY_BASIS
+}
+
+enum FlagSeverity {
+  INFO
+  WARN
+  CRITICAL
+}
+
+enum FlagStatus {
+  OPEN
+  RESOLVED
+  DISMISSED
+  OVERRIDDEN
+}
+
+enum FlagResolutionType {
+  ADD_CONTEXT
+  DISMISSED_WITH_REASON
+  DISCLOSED_ELSEWHERE
+  FOLLOW_UP_REQUIRED
+  OVERRIDE_APPROVED
+}
+
+enum FlagCreatedByType {
+  SYSTEM
+  USER
+}
+
+model Flag {
+  id               String              @id @default(cuid())
+  workspaceId      String
+  meetingId        String
+  type             FlagType
+  severity         FlagSeverity        @default(WARN)
+  status           FlagStatus          @default(OPEN)
+  evidence         Json?
+  createdByType    FlagCreatedByType   @default(SYSTEM)
+  createdByUserId  String?
+  resolvedByUserId String?
+  resolvedAt       DateTime?
+  resolutionType   FlagResolutionType?
+  resolutionNote   String?
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+
+  meeting   Meeting   @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId])
+  @@index([workspaceId, meetingId])
+  @@index([workspaceId, status])
+  @@index([meetingId, type])
 }
 
 model AuditEvent {

@@ -1,5 +1,16 @@
 import { auth } from "~/server/auth";
 import { db } from "~/server/db";
+import { z } from "zod";
+
+const finalizeSchema = z.object({
+  finalizeReason: z.enum([
+    "COMPLETE_REVIEW",
+    "REQUIRED_CHANGES_ADDRESSED",
+    "EXCEPTION_APPROVED",
+    "OTHER",
+  ]),
+  finalizeNote: z.string().optional(),
+});
 
 export async function POST(
   request: Request,
@@ -20,6 +31,8 @@ export async function POST(
     }
 
     const { id } = await params;
+    const body = await request.json();
+    const { finalizeReason, finalizeNote } = finalizeSchema.parse(body);
 
     // Find the meeting
     const meeting = await db.meeting.findFirst({
@@ -41,6 +54,36 @@ export async function POST(
       );
     }
 
+    if ((finalizeReason === "OTHER" || finalizeReason === "EXCEPTION_APPROVED") && !finalizeNote?.trim()) {
+      return Response.json(
+        { error: "Finalize note is required for this reason" },
+        { status: 400 }
+      );
+    }
+
+    const openCriticalFlags = await db.flag.findMany({
+      where: {
+        meetingId: meeting.id,
+        status: "OPEN",
+        severity: "CRITICAL",
+      },
+    });
+
+    if (openCriticalFlags.length > 0 && finalizeReason !== "EXCEPTION_APPROVED") {
+      return Response.json(
+        {
+          error: "Critical flags must be resolved or explicitly overridden before finalization",
+          flags: openCriticalFlags.map((flag) => ({
+            id: flag.id,
+            type: flag.type,
+            severity: flag.severity,
+            status: flag.status,
+          })),
+        },
+        { status: 400 }
+      );
+    }
+
     // Calculate Time-to-Finalize if draftReadyAt exists
     let timeToFinalize: number | null = null;
     const now = new Date();
@@ -57,6 +100,8 @@ export async function POST(
         finalizedBy: session.user.id,
         finalizedAt: now,
         timeToFinalize,
+        finalizeReason,
+        finalizeNote: finalizeNote?.trim() || null,
       },
     });
 
@@ -73,6 +118,9 @@ export async function POST(
           finalizedAt: now.toISOString(),
           previousStatus: meeting.status,
           timeToFinalize: timeToFinalize ? `${timeToFinalize}s` : null,
+          finalizeReason,
+          finalizeNote: finalizeNote?.trim() || null,
+          flagsOverridden: openCriticalFlags.length > 0,
         },
       },
     });
@@ -85,10 +133,18 @@ export async function POST(
         finalizedAt: finalizedMeeting.finalizedAt,
         finalizedBy: finalizedMeeting.finalizedBy,
         timeToFinalize: finalizedMeeting.timeToFinalize,
+        finalizeReason: finalizedMeeting.finalizeReason,
+        finalizeNote: finalizedMeeting.finalizeNote,
       },
     });
   } catch (error) {
     console.error("Error finalizing meeting:", error);
+    if (error instanceof z.ZodError) {
+      return Response.json(
+        { error: "Invalid request body", details: error.errors },
+        { status: 400 }
+      );
+    }
     return Response.json(
       { error: error instanceof Error ? error.message : "An unknown error occurred" },
       { status: 500 }

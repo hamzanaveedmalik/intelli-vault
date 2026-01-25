@@ -16,6 +16,7 @@ import ReadyForCCOButton from "./ready-for-cco-button";
 import FinalizeButton from "./finalize-button";
 import { MeetingStatusPoller } from "./meeting-status-poller";
 import RetryButton from "./retry-button";
+import FlagsPanel from "./flags-panel";
 
 export default async function MeetingDetailPage({
   params,
@@ -40,6 +41,15 @@ export default async function MeetingDetailPage({
   if (!meeting) {
     notFound();
   }
+
+  const flags = await db.flag.findMany({
+    where: {
+      meetingId: meeting.id,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
 
   // Parse transcript if available
   const transcript = meeting.transcript as
@@ -283,6 +293,17 @@ export default async function MeetingDetailPage({
             </CardContent>
           </Card>
         )}
+
+        <FlagsPanel
+          flags={flags.map((flag) => ({
+            id: flag.id,
+            type: flag.type,
+            severity: flag.severity,
+            status: flag.status,
+            evidence: flag.evidence,
+            createdAt: flag.createdAt.toISOString(),
+          }))}
+        />
       </div>
     </div>
   );

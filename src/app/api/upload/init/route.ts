@@ -65,6 +65,9 @@ export async function POST(request: Request) {
         meetingType: validation.meetingType,
         meetingDate: new Date(validation.meetingDate),
         status: "UPLOADING",
+        sourceFileName: validation.fileName,
+        sourceFileSize: validation.fileSize,
+        sourceFileMime: getContentType(validation.fileName),
       },
     });
 
@@ -79,7 +82,12 @@ export async function POST(request: Request) {
     // Store the key in the meeting record
     await db.meeting.update({
       where: { id: meeting.id },
-      data: { fileUrl: key },
+      data: {
+        fileUrl: key,
+        sourceFileName: validation.fileName,
+        sourceFileSize: validation.fileSize,
+        sourceFileMime: getContentType(validation.fileName),
+      },
     });
 
     // Log upload initiation

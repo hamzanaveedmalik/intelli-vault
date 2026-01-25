@@ -6,6 +6,7 @@ import { getSignedFileUrl } from "~/server/storage";
 import { sendDraftReadyEmail } from "~/server/email";
 import { extractFields } from "~/server/extraction";
 import { toExtractionData, validateEvidenceCoverage } from "~/server/extraction/evidence";
+import { detectMissingDisclosureFlags } from "~/server/flags";
 import { generateSearchableText } from "~/server/search/index";
 import { createErrorResponse, AppError, ErrorMessages } from "~/server/errors";
 import type { Transcript } from "~/server/transcription/types";
@@ -191,7 +192,29 @@ async function handler(request: Request) {
         },
       });
 
-      // Step 9: Log extraction completion
+      // Step 9: Generate missing disclosure flags
+      const missingDisclosureFlags = detectMissingDisclosureFlags(extractionData);
+      await db.flag.deleteMany({
+        where: {
+          meetingId,
+          type: "MISSING_DISCLOSURE",
+        },
+      });
+      if (missingDisclosureFlags.length > 0) {
+        await db.flag.createMany({
+          data: missingDisclosureFlags.map((flag) => ({
+            workspaceId,
+            meetingId,
+            type: flag.type,
+            severity: flag.severity,
+            status: "OPEN",
+            evidence: flag.evidence as any,
+            createdByType: "SYSTEM",
+          })),
+        });
+      }
+
+      // Step 10: Log extraction completion
       await db.auditEvent.create({
         data: {
           workspaceId,
@@ -215,7 +238,7 @@ async function handler(request: Request) {
         },
       });
 
-      // Step 10: Send email notification (async, don't block on failure)
+      // Step 11: Send email notification (async, don't block on failure)
       try {
         // Get the user who uploaded the meeting (from audit events)
         const uploadEvent = await db.auditEvent.findFirst({

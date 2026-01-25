@@ -3,6 +3,7 @@ import { db } from "~/server/db";
 import { uploadFile } from "~/server/storage";
 import { validateFile, getContentType } from "~/server/storage-utils";
 import { publishProcessMeetingJob } from "~/server/qstash";
+import { sha256FromBuffer } from "~/server/hash";
 import { env } from "~/env";
 import { z } from "zod";
 
@@ -55,6 +56,7 @@ export async function POST(request: Request) {
     // Convert file to buffer
     const arrayBuffer = await file.arrayBuffer();
     const fileBuffer = Buffer.from(arrayBuffer);
+    const fileHash = sha256FromBuffer(fileBuffer);
 
     // Create meeting record first (to get meetingId)
     const meeting = await db.meeting.create({
@@ -64,6 +66,11 @@ export async function POST(request: Request) {
         meetingType: validation.meetingType,
         meetingDate: new Date(validation.meetingDate),
         status: "UPLOADING",
+        sourceFileSha256: fileHash,
+        sourceFileName: file.name,
+        sourceFileSize: file.size,
+        sourceFileMime: getContentType(file.name),
+        sourceUploadedAt: new Date(),
       },
     });
 
@@ -80,7 +87,14 @@ export async function POST(request: Request) {
     // This allows us to generate signed URLs when needed
     await db.meeting.update({
       where: { id: meeting.id },
-      data: { fileUrl: key }, // Store the key, not the S3 URL
+      data: {
+        fileUrl: key, // Store the key, not the S3 URL
+        sourceFileSha256: fileHash,
+        sourceFileName: file.name,
+        sourceFileSize: file.size,
+        sourceFileMime: getContentType(file.name),
+        sourceUploadedAt: new Date(),
+      },
     });
 
     // Publish QStash job for background processing
@@ -121,6 +135,7 @@ export async function POST(request: Request) {
           fileName: file.name,
           fileSize: file.size,
           contentType: getContentType(file.name),
+          sha256: fileHash,
         },
       },
     });

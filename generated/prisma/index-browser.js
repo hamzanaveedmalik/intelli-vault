@@ -147,11 +147,21 @@ exports.Prisma.MeetingScalarFieldEnum = {
   meetingDate: 'meetingDate',
   status: 'status',
   fileUrl: 'fileUrl',
+  sourceFileSha256: 'sourceFileSha256',
+  sourceFileName: 'sourceFileName',
+  sourceFileSize: 'sourceFileSize',
+  sourceFileMime: 'sourceFileMime',
+  sourceUploadedAt: 'sourceUploadedAt',
   transcript: 'transcript',
   extraction: 'extraction',
   searchableText: 'searchableText',
   finalizedBy: 'finalizedBy',
   finalizedAt: 'finalizedAt',
+  finalizeReason: 'finalizeReason',
+  finalizeNote: 'finalizeNote',
+  finalizedPolicyVersion: 'finalizedPolicyVersion',
+  samplingBucket: 'samplingBucket',
+  samplingRuleId: 'samplingRuleId',
   draftReadyAt: 'draftReadyAt',
   timeToFinalize: 'timeToFinalize',
   readyForCCO: 'readyForCCO',
@@ -167,6 +177,24 @@ exports.Prisma.VersionScalarFieldEnum = {
   whatChanged: 'whatChanged',
   reason: 'reason',
   timestamp: 'timestamp'
+};
+
+exports.Prisma.FlagScalarFieldEnum = {
+  id: 'id',
+  workspaceId: 'workspaceId',
+  meetingId: 'meetingId',
+  type: 'type',
+  severity: 'severity',
+  status: 'status',
+  evidence: 'evidence',
+  createdByType: 'createdByType',
+  createdByUserId: 'createdByUserId',
+  resolvedByUserId: 'resolvedByUserId',
+  resolvedAt: 'resolvedAt',
+  resolutionType: 'resolutionType',
+  resolutionNote: 'resolutionNote',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.AuditEventScalarFieldEnum = {
@@ -274,6 +302,45 @@ exports.MeetingStatus = exports.$Enums.MeetingStatus = {
   FINALIZED: 'FINALIZED'
 };
 
+exports.FinalizeReason = exports.$Enums.FinalizeReason = {
+  COMPLETE_REVIEW: 'COMPLETE_REVIEW',
+  REQUIRED_CHANGES_ADDRESSED: 'REQUIRED_CHANGES_ADDRESSED',
+  EXCEPTION_APPROVED: 'EXCEPTION_APPROVED',
+  OTHER: 'OTHER'
+};
+
+exports.FlagType = exports.$Enums.FlagType = {
+  MISSING_DISCLOSURE: 'MISSING_DISCLOSURE',
+  CONFLICT_LANGUAGE: 'CONFLICT_LANGUAGE',
+  MISSING_SUITABILITY_BASIS: 'MISSING_SUITABILITY_BASIS'
+};
+
+exports.FlagSeverity = exports.$Enums.FlagSeverity = {
+  INFO: 'INFO',
+  WARN: 'WARN',
+  CRITICAL: 'CRITICAL'
+};
+
+exports.FlagStatus = exports.$Enums.FlagStatus = {
+  OPEN: 'OPEN',
+  RESOLVED: 'RESOLVED',
+  DISMISSED: 'DISMISSED',
+  OVERRIDDEN: 'OVERRIDDEN'
+};
+
+exports.FlagCreatedByType = exports.$Enums.FlagCreatedByType = {
+  SYSTEM: 'SYSTEM',
+  USER: 'USER'
+};
+
+exports.FlagResolutionType = exports.$Enums.FlagResolutionType = {
+  ADD_CONTEXT: 'ADD_CONTEXT',
+  DISMISSED_WITH_REASON: 'DISMISSED_WITH_REASON',
+  DISCLOSED_ELSEWHERE: 'DISCLOSED_ELSEWHERE',
+  FOLLOW_UP_REQUIRED: 'FOLLOW_UP_REQUIRED',
+  OVERRIDE_APPROVED: 'OVERRIDE_APPROVED'
+};
+
 exports.AuditAction = exports.$Enums.AuditAction = {
   UPLOAD: 'UPLOAD',
   VIEW: 'VIEW',
@@ -288,6 +355,7 @@ exports.Prisma.ModelName = {
   UserWorkspace: 'UserWorkspace',
   Meeting: 'Meeting',
   Version: 'Version',
+  Flag: 'Flag',
   AuditEvent: 'AuditEvent',
   Account: 'Account',
   Session: 'Session',

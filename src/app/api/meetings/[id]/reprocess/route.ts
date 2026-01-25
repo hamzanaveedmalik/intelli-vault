@@ -3,6 +3,7 @@ import { db } from "~/server/db";
 import { z } from "zod";
 import { extractFields } from "~/server/extraction";
 import { toExtractionData, validateEvidenceCoverage } from "~/server/extraction/evidence";
+import { detectMissingDisclosureFlags } from "~/server/flags";
 import { generateSearchableText } from "~/server/search/index";
 import type { Transcript } from "~/server/transcription/types";
 
@@ -117,6 +118,28 @@ export async function POST(
           draftReadyAt: new Date(),
         },
       });
+
+      // Generate missing disclosure flags
+      const missingDisclosureFlags = detectMissingDisclosureFlags(extractionData);
+      await db.flag.deleteMany({
+        where: {
+          meetingId: meeting.id,
+          type: "MISSING_DISCLOSURE",
+        },
+      });
+      if (missingDisclosureFlags.length > 0) {
+        await db.flag.createMany({
+          data: missingDisclosureFlags.map((flag) => ({
+            workspaceId: session.user.workspaceId,
+            meetingId: meeting.id,
+            type: flag.type,
+            severity: flag.severity,
+            status: "OPEN",
+            evidence: flag.evidence as any,
+            createdByType: "SYSTEM",
+          })),
+        });
+      }
 
       // Log extraction completion
       await db.auditEvent.create({

@@ -34,6 +34,11 @@ export type Meeting = $Result.DefaultSelection<Prisma.$MeetingPayload>
  */
 export type Version = $Result.DefaultSelection<Prisma.$VersionPayload>
 /**
+ * Model Flag
+ * 
+ */
+export type Flag = $Result.DefaultSelection<Prisma.$FlagPayload>
+/**
  * Model AuditEvent
  * 
  */
@@ -96,6 +101,16 @@ export const MeetingStatus: {
 export type MeetingStatus = (typeof MeetingStatus)[keyof typeof MeetingStatus]
 
 
+export const FinalizeReason: {
+  COMPLETE_REVIEW: 'COMPLETE_REVIEW',
+  REQUIRED_CHANGES_ADDRESSED: 'REQUIRED_CHANGES_ADDRESSED',
+  EXCEPTION_APPROVED: 'EXCEPTION_APPROVED',
+  OTHER: 'OTHER'
+};
+
+export type FinalizeReason = (typeof FinalizeReason)[keyof typeof FinalizeReason]
+
+
 export const AuditAction: {
   UPLOAD: 'UPLOAD',
   VIEW: 'VIEW',
@@ -106,6 +121,53 @@ export const AuditAction: {
 };
 
 export type AuditAction = (typeof AuditAction)[keyof typeof AuditAction]
+
+
+export const FlagType: {
+  MISSING_DISCLOSURE: 'MISSING_DISCLOSURE',
+  CONFLICT_LANGUAGE: 'CONFLICT_LANGUAGE',
+  MISSING_SUITABILITY_BASIS: 'MISSING_SUITABILITY_BASIS'
+};
+
+export type FlagType = (typeof FlagType)[keyof typeof FlagType]
+
+
+export const FlagSeverity: {
+  INFO: 'INFO',
+  WARN: 'WARN',
+  CRITICAL: 'CRITICAL'
+};
+
+export type FlagSeverity = (typeof FlagSeverity)[keyof typeof FlagSeverity]
+
+
+export const FlagStatus: {
+  OPEN: 'OPEN',
+  RESOLVED: 'RESOLVED',
+  DISMISSED: 'DISMISSED',
+  OVERRIDDEN: 'OVERRIDDEN'
+};
+
+export type FlagStatus = (typeof FlagStatus)[keyof typeof FlagStatus]
+
+
+export const FlagResolutionType: {
+  ADD_CONTEXT: 'ADD_CONTEXT',
+  DISMISSED_WITH_REASON: 'DISMISSED_WITH_REASON',
+  DISCLOSED_ELSEWHERE: 'DISCLOSED_ELSEWHERE',
+  FOLLOW_UP_REQUIRED: 'FOLLOW_UP_REQUIRED',
+  OVERRIDE_APPROVED: 'OVERRIDE_APPROVED'
+};
+
+export type FlagResolutionType = (typeof FlagResolutionType)[keyof typeof FlagResolutionType]
+
+
+export const FlagCreatedByType: {
+  SYSTEM: 'SYSTEM',
+  USER: 'USER'
+};
+
+export type FlagCreatedByType = (typeof FlagCreatedByType)[keyof typeof FlagCreatedByType]
 
 }
 
@@ -121,9 +183,33 @@ export type MeetingStatus = $Enums.MeetingStatus
 
 export const MeetingStatus: typeof $Enums.MeetingStatus
 
+export type FinalizeReason = $Enums.FinalizeReason
+
+export const FinalizeReason: typeof $Enums.FinalizeReason
+
 export type AuditAction = $Enums.AuditAction
 
 export const AuditAction: typeof $Enums.AuditAction
+
+export type FlagType = $Enums.FlagType
+
+export const FlagType: typeof $Enums.FlagType
+
+export type FlagSeverity = $Enums.FlagSeverity
+
+export const FlagSeverity: typeof $Enums.FlagSeverity
+
+export type FlagStatus = $Enums.FlagStatus
+
+export const FlagStatus: typeof $Enums.FlagStatus
+
+export type FlagResolutionType = $Enums.FlagResolutionType
+
+export const FlagResolutionType: typeof $Enums.FlagResolutionType
+
+export type FlagCreatedByType = $Enums.FlagCreatedByType
+
+export const FlagCreatedByType: typeof $Enums.FlagCreatedByType
 
 /**
  * ##  Prisma Client ʲˢ
@@ -282,6 +368,16 @@ export class PrismaClient<
     * ```
     */
   get version(): Prisma.VersionDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.flag`: Exposes CRUD operations for the **Flag** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Flags
+    * const flags = await prisma.flag.findMany()
+    * ```
+    */
+  get flag(): Prisma.FlagDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.auditEvent`: Exposes CRUD operations for the **AuditEvent** model.
@@ -787,6 +883,7 @@ export namespace Prisma {
     UserWorkspace: 'UserWorkspace',
     Meeting: 'Meeting',
     Version: 'Version',
+    Flag: 'Flag',
     AuditEvent: 'AuditEvent',
     Account: 'Account',
     Session: 'Session',
@@ -811,7 +908,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "workspace" | "userWorkspace" | "meeting" | "version" | "auditEvent" | "account" | "session" | "user" | "verificationToken" | "invitation"
+      modelProps: "workspace" | "userWorkspace" | "meeting" | "version" | "flag" | "auditEvent" | "account" | "session" | "user" | "verificationToken" | "invitation"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1108,6 +1205,80 @@ export namespace Prisma {
           count: {
             args: Prisma.VersionCountArgs<ExtArgs>
             result: $Utils.Optional<VersionCountAggregateOutputType> | number
+          }
+        }
+      }
+      Flag: {
+        payload: Prisma.$FlagPayload<ExtArgs>
+        fields: Prisma.FlagFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.FlagFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FlagPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.FlagFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FlagPayload>
+          }
+          findFirst: {
+            args: Prisma.FlagFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FlagPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.FlagFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FlagPayload>
+          }
+          findMany: {
+            args: Prisma.FlagFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FlagPayload>[]
+          }
+          create: {
+            args: Prisma.FlagCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FlagPayload>
+          }
+          createMany: {
+            args: Prisma.FlagCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.FlagCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FlagPayload>[]
+          }
+          delete: {
+            args: Prisma.FlagDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FlagPayload>
+          }
+          update: {
+            args: Prisma.FlagUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FlagPayload>
+          }
+          deleteMany: {
+            args: Prisma.FlagDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.FlagUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.FlagUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FlagPayload>[]
+          }
+          upsert: {
+            args: Prisma.FlagUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FlagPayload>
+          }
+          aggregate: {
+            args: Prisma.FlagAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateFlag>
+          }
+          groupBy: {
+            args: Prisma.FlagGroupByArgs<ExtArgs>
+            result: $Utils.Optional<FlagGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.FlagCountArgs<ExtArgs>
+            result: $Utils.Optional<FlagCountAggregateOutputType> | number
           }
         }
       }
@@ -1655,6 +1826,7 @@ export namespace Prisma {
     userWorkspace?: UserWorkspaceOmit
     meeting?: MeetingOmit
     version?: VersionOmit
+    flag?: FlagOmit
     auditEvent?: AuditEventOmit
     account?: AccountOmit
     session?: SessionOmit
@@ -1745,6 +1917,7 @@ export namespace Prisma {
     meetings: number
     auditEvents: number
     invitations: number
+    flags: number
   }
 
   export type WorkspaceCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -1752,6 +1925,7 @@ export namespace Prisma {
     meetings?: boolean | WorkspaceCountOutputTypeCountMeetingsArgs
     auditEvents?: boolean | WorkspaceCountOutputTypeCountAuditEventsArgs
     invitations?: boolean | WorkspaceCountOutputTypeCountInvitationsArgs
+    flags?: boolean | WorkspaceCountOutputTypeCountFlagsArgs
   }
 
   // Custom InputTypes
@@ -1793,6 +1967,13 @@ export namespace Prisma {
     where?: InvitationWhereInput
   }
 
+  /**
+   * WorkspaceCountOutputType without action
+   */
+  export type WorkspaceCountOutputTypeCountFlagsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FlagWhereInput
+  }
+
 
   /**
    * Count Type MeetingCountOutputType
@@ -1801,11 +1982,13 @@ export namespace Prisma {
   export type MeetingCountOutputType = {
     versions: number
     auditEvents: number
+    flags: number
   }
 
   export type MeetingCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     versions?: boolean | MeetingCountOutputTypeCountVersionsArgs
     auditEvents?: boolean | MeetingCountOutputTypeCountAuditEventsArgs
+    flags?: boolean | MeetingCountOutputTypeCountFlagsArgs
   }
 
   // Custom InputTypes
@@ -1831,6 +2014,13 @@ export namespace Prisma {
    */
   export type MeetingCountOutputTypeCountAuditEventsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: AuditEventWhereInput
+  }
+
+  /**
+   * MeetingCountOutputType without action
+   */
+  export type MeetingCountOutputTypeCountFlagsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FlagWhereInput
   }
 
 
@@ -2121,6 +2311,7 @@ export namespace Prisma {
     meetings?: boolean | Workspace$meetingsArgs<ExtArgs>
     auditEvents?: boolean | Workspace$auditEventsArgs<ExtArgs>
     invitations?: boolean | Workspace$invitationsArgs<ExtArgs>
+    flags?: boolean | Workspace$flagsArgs<ExtArgs>
     _count?: boolean | WorkspaceCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["workspace"]>
 
@@ -2166,6 +2357,7 @@ export namespace Prisma {
     meetings?: boolean | Workspace$meetingsArgs<ExtArgs>
     auditEvents?: boolean | Workspace$auditEventsArgs<ExtArgs>
     invitations?: boolean | Workspace$invitationsArgs<ExtArgs>
+    flags?: boolean | Workspace$flagsArgs<ExtArgs>
     _count?: boolean | WorkspaceCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type WorkspaceIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -2178,6 +2370,7 @@ export namespace Prisma {
       meetings: Prisma.$MeetingPayload<ExtArgs>[]
       auditEvents: Prisma.$AuditEventPayload<ExtArgs>[]
       invitations: Prisma.$InvitationPayload<ExtArgs>[]
+      flags: Prisma.$FlagPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -2587,6 +2780,7 @@ export namespace Prisma {
     meetings<T extends Workspace$meetingsArgs<ExtArgs> = {}>(args?: Subset<T, Workspace$meetingsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MeetingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     auditEvents<T extends Workspace$auditEventsArgs<ExtArgs> = {}>(args?: Subset<T, Workspace$auditEventsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AuditEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     invitations<T extends Workspace$invitationsArgs<ExtArgs> = {}>(args?: Subset<T, Workspace$invitationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InvitationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    flags<T extends Workspace$flagsArgs<ExtArgs> = {}>(args?: Subset<T, Workspace$flagsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FlagPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3106,6 +3300,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: InvitationScalarFieldEnum | InvitationScalarFieldEnum[]
+  }
+
+  /**
+   * Workspace.flags
+   */
+  export type Workspace$flagsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Flag
+     */
+    select?: FlagSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Flag
+     */
+    omit?: FlagOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FlagInclude<ExtArgs> | null
+    where?: FlagWhereInput
+    orderBy?: FlagOrderByWithRelationInput | FlagOrderByWithRelationInput[]
+    cursor?: FlagWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: FlagScalarFieldEnum | FlagScalarFieldEnum[]
   }
 
   /**
@@ -4180,10 +4398,14 @@ export namespace Prisma {
   }
 
   export type MeetingAvgAggregateOutputType = {
+    sourceFileSize: number | null
+    finalizedPolicyVersion: number | null
     timeToFinalize: number | null
   }
 
   export type MeetingSumAggregateOutputType = {
+    sourceFileSize: number | null
+    finalizedPolicyVersion: number | null
     timeToFinalize: number | null
   }
 
@@ -4195,9 +4417,19 @@ export namespace Prisma {
     meetingDate: Date | null
     status: $Enums.MeetingStatus | null
     fileUrl: string | null
+    sourceFileSha256: string | null
+    sourceFileName: string | null
+    sourceFileSize: number | null
+    sourceFileMime: string | null
+    sourceUploadedAt: Date | null
     searchableText: string | null
     finalizedBy: string | null
     finalizedAt: Date | null
+    finalizeReason: $Enums.FinalizeReason | null
+    finalizeNote: string | null
+    finalizedPolicyVersion: number | null
+    samplingBucket: string | null
+    samplingRuleId: string | null
     draftReadyAt: Date | null
     timeToFinalize: number | null
     readyForCCO: boolean | null
@@ -4213,9 +4445,19 @@ export namespace Prisma {
     meetingDate: Date | null
     status: $Enums.MeetingStatus | null
     fileUrl: string | null
+    sourceFileSha256: string | null
+    sourceFileName: string | null
+    sourceFileSize: number | null
+    sourceFileMime: string | null
+    sourceUploadedAt: Date | null
     searchableText: string | null
     finalizedBy: string | null
     finalizedAt: Date | null
+    finalizeReason: $Enums.FinalizeReason | null
+    finalizeNote: string | null
+    finalizedPolicyVersion: number | null
+    samplingBucket: string | null
+    samplingRuleId: string | null
     draftReadyAt: Date | null
     timeToFinalize: number | null
     readyForCCO: boolean | null
@@ -4231,11 +4473,21 @@ export namespace Prisma {
     meetingDate: number
     status: number
     fileUrl: number
+    sourceFileSha256: number
+    sourceFileName: number
+    sourceFileSize: number
+    sourceFileMime: number
+    sourceUploadedAt: number
     transcript: number
     extraction: number
     searchableText: number
     finalizedBy: number
     finalizedAt: number
+    finalizeReason: number
+    finalizeNote: number
+    finalizedPolicyVersion: number
+    samplingBucket: number
+    samplingRuleId: number
     draftReadyAt: number
     timeToFinalize: number
     readyForCCO: number
@@ -4246,10 +4498,14 @@ export namespace Prisma {
 
 
   export type MeetingAvgAggregateInputType = {
+    sourceFileSize?: true
+    finalizedPolicyVersion?: true
     timeToFinalize?: true
   }
 
   export type MeetingSumAggregateInputType = {
+    sourceFileSize?: true
+    finalizedPolicyVersion?: true
     timeToFinalize?: true
   }
 
@@ -4261,9 +4517,19 @@ export namespace Prisma {
     meetingDate?: true
     status?: true
     fileUrl?: true
+    sourceFileSha256?: true
+    sourceFileName?: true
+    sourceFileSize?: true
+    sourceFileMime?: true
+    sourceUploadedAt?: true
     searchableText?: true
     finalizedBy?: true
     finalizedAt?: true
+    finalizeReason?: true
+    finalizeNote?: true
+    finalizedPolicyVersion?: true
+    samplingBucket?: true
+    samplingRuleId?: true
     draftReadyAt?: true
     timeToFinalize?: true
     readyForCCO?: true
@@ -4279,9 +4545,19 @@ export namespace Prisma {
     meetingDate?: true
     status?: true
     fileUrl?: true
+    sourceFileSha256?: true
+    sourceFileName?: true
+    sourceFileSize?: true
+    sourceFileMime?: true
+    sourceUploadedAt?: true
     searchableText?: true
     finalizedBy?: true
     finalizedAt?: true
+    finalizeReason?: true
+    finalizeNote?: true
+    finalizedPolicyVersion?: true
+    samplingBucket?: true
+    samplingRuleId?: true
     draftReadyAt?: true
     timeToFinalize?: true
     readyForCCO?: true
@@ -4297,11 +4573,21 @@ export namespace Prisma {
     meetingDate?: true
     status?: true
     fileUrl?: true
+    sourceFileSha256?: true
+    sourceFileName?: true
+    sourceFileSize?: true
+    sourceFileMime?: true
+    sourceUploadedAt?: true
     transcript?: true
     extraction?: true
     searchableText?: true
     finalizedBy?: true
     finalizedAt?: true
+    finalizeReason?: true
+    finalizeNote?: true
+    finalizedPolicyVersion?: true
+    samplingBucket?: true
+    samplingRuleId?: true
     draftReadyAt?: true
     timeToFinalize?: true
     readyForCCO?: true
@@ -4404,11 +4690,21 @@ export namespace Prisma {
     meetingDate: Date
     status: $Enums.MeetingStatus
     fileUrl: string | null
+    sourceFileSha256: string | null
+    sourceFileName: string | null
+    sourceFileSize: number | null
+    sourceFileMime: string | null
+    sourceUploadedAt: Date | null
     transcript: JsonValue | null
     extraction: JsonValue | null
     searchableText: string | null
     finalizedBy: string | null
     finalizedAt: Date | null
+    finalizeReason: $Enums.FinalizeReason | null
+    finalizeNote: string | null
+    finalizedPolicyVersion: number | null
+    samplingBucket: string | null
+    samplingRuleId: string | null
     draftReadyAt: Date | null
     timeToFinalize: number | null
     readyForCCO: boolean
@@ -4443,11 +4739,21 @@ export namespace Prisma {
     meetingDate?: boolean
     status?: boolean
     fileUrl?: boolean
+    sourceFileSha256?: boolean
+    sourceFileName?: boolean
+    sourceFileSize?: boolean
+    sourceFileMime?: boolean
+    sourceUploadedAt?: boolean
     transcript?: boolean
     extraction?: boolean
     searchableText?: boolean
     finalizedBy?: boolean
     finalizedAt?: boolean
+    finalizeReason?: boolean
+    finalizeNote?: boolean
+    finalizedPolicyVersion?: boolean
+    samplingBucket?: boolean
+    samplingRuleId?: boolean
     draftReadyAt?: boolean
     timeToFinalize?: boolean
     readyForCCO?: boolean
@@ -4456,6 +4762,7 @@ export namespace Prisma {
     workspace?: boolean | WorkspaceDefaultArgs<ExtArgs>
     versions?: boolean | Meeting$versionsArgs<ExtArgs>
     auditEvents?: boolean | Meeting$auditEventsArgs<ExtArgs>
+    flags?: boolean | Meeting$flagsArgs<ExtArgs>
     _count?: boolean | MeetingCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["meeting"]>
 
@@ -4467,11 +4774,21 @@ export namespace Prisma {
     meetingDate?: boolean
     status?: boolean
     fileUrl?: boolean
+    sourceFileSha256?: boolean
+    sourceFileName?: boolean
+    sourceFileSize?: boolean
+    sourceFileMime?: boolean
+    sourceUploadedAt?: boolean
     transcript?: boolean
     extraction?: boolean
     searchableText?: boolean
     finalizedBy?: boolean
     finalizedAt?: boolean
+    finalizeReason?: boolean
+    finalizeNote?: boolean
+    finalizedPolicyVersion?: boolean
+    samplingBucket?: boolean
+    samplingRuleId?: boolean
     draftReadyAt?: boolean
     timeToFinalize?: boolean
     readyForCCO?: boolean
@@ -4488,11 +4805,21 @@ export namespace Prisma {
     meetingDate?: boolean
     status?: boolean
     fileUrl?: boolean
+    sourceFileSha256?: boolean
+    sourceFileName?: boolean
+    sourceFileSize?: boolean
+    sourceFileMime?: boolean
+    sourceUploadedAt?: boolean
     transcript?: boolean
     extraction?: boolean
     searchableText?: boolean
     finalizedBy?: boolean
     finalizedAt?: boolean
+    finalizeReason?: boolean
+    finalizeNote?: boolean
+    finalizedPolicyVersion?: boolean
+    samplingBucket?: boolean
+    samplingRuleId?: boolean
     draftReadyAt?: boolean
     timeToFinalize?: boolean
     readyForCCO?: boolean
@@ -4509,11 +4836,21 @@ export namespace Prisma {
     meetingDate?: boolean
     status?: boolean
     fileUrl?: boolean
+    sourceFileSha256?: boolean
+    sourceFileName?: boolean
+    sourceFileSize?: boolean
+    sourceFileMime?: boolean
+    sourceUploadedAt?: boolean
     transcript?: boolean
     extraction?: boolean
     searchableText?: boolean
     finalizedBy?: boolean
     finalizedAt?: boolean
+    finalizeReason?: boolean
+    finalizeNote?: boolean
+    finalizedPolicyVersion?: boolean
+    samplingBucket?: boolean
+    samplingRuleId?: boolean
     draftReadyAt?: boolean
     timeToFinalize?: boolean
     readyForCCO?: boolean
@@ -4521,11 +4858,12 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type MeetingOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "workspaceId" | "clientName" | "meetingType" | "meetingDate" | "status" | "fileUrl" | "transcript" | "extraction" | "searchableText" | "finalizedBy" | "finalizedAt" | "draftReadyAt" | "timeToFinalize" | "readyForCCO" | "createdAt" | "updatedAt", ExtArgs["result"]["meeting"]>
+  export type MeetingOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "workspaceId" | "clientName" | "meetingType" | "meetingDate" | "status" | "fileUrl" | "sourceFileSha256" | "sourceFileName" | "sourceFileSize" | "sourceFileMime" | "sourceUploadedAt" | "transcript" | "extraction" | "searchableText" | "finalizedBy" | "finalizedAt" | "finalizeReason" | "finalizeNote" | "finalizedPolicyVersion" | "samplingBucket" | "samplingRuleId" | "draftReadyAt" | "timeToFinalize" | "readyForCCO" | "createdAt" | "updatedAt", ExtArgs["result"]["meeting"]>
   export type MeetingInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     workspace?: boolean | WorkspaceDefaultArgs<ExtArgs>
     versions?: boolean | Meeting$versionsArgs<ExtArgs>
     auditEvents?: boolean | Meeting$auditEventsArgs<ExtArgs>
+    flags?: boolean | Meeting$flagsArgs<ExtArgs>
     _count?: boolean | MeetingCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type MeetingIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -4541,6 +4879,7 @@ export namespace Prisma {
       workspace: Prisma.$WorkspacePayload<ExtArgs>
       versions: Prisma.$VersionPayload<ExtArgs>[]
       auditEvents: Prisma.$AuditEventPayload<ExtArgs>[]
+      flags: Prisma.$FlagPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -4550,11 +4889,21 @@ export namespace Prisma {
       meetingDate: Date
       status: $Enums.MeetingStatus
       fileUrl: string | null
+      sourceFileSha256: string | null
+      sourceFileName: string | null
+      sourceFileSize: number | null
+      sourceFileMime: string | null
+      sourceUploadedAt: Date | null
       transcript: Prisma.JsonValue | null
       extraction: Prisma.JsonValue | null
       searchableText: string | null
       finalizedBy: string | null
       finalizedAt: Date | null
+      finalizeReason: $Enums.FinalizeReason | null
+      finalizeNote: string | null
+      finalizedPolicyVersion: number | null
+      samplingBucket: string | null
+      samplingRuleId: string | null
       draftReadyAt: Date | null
       timeToFinalize: number | null
       readyForCCO: boolean
@@ -4957,6 +5306,7 @@ export namespace Prisma {
     workspace<T extends WorkspaceDefaultArgs<ExtArgs> = {}>(args?: Subset<T, WorkspaceDefaultArgs<ExtArgs>>): Prisma__WorkspaceClient<$Result.GetResult<Prisma.$WorkspacePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     versions<T extends Meeting$versionsArgs<ExtArgs> = {}>(args?: Subset<T, Meeting$versionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$VersionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     auditEvents<T extends Meeting$auditEventsArgs<ExtArgs> = {}>(args?: Subset<T, Meeting$auditEventsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AuditEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    flags<T extends Meeting$flagsArgs<ExtArgs> = {}>(args?: Subset<T, Meeting$flagsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FlagPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4993,11 +5343,21 @@ export namespace Prisma {
     readonly meetingDate: FieldRef<"Meeting", 'DateTime'>
     readonly status: FieldRef<"Meeting", 'MeetingStatus'>
     readonly fileUrl: FieldRef<"Meeting", 'String'>
+    readonly sourceFileSha256: FieldRef<"Meeting", 'String'>
+    readonly sourceFileName: FieldRef<"Meeting", 'String'>
+    readonly sourceFileSize: FieldRef<"Meeting", 'Int'>
+    readonly sourceFileMime: FieldRef<"Meeting", 'String'>
+    readonly sourceUploadedAt: FieldRef<"Meeting", 'DateTime'>
     readonly transcript: FieldRef<"Meeting", 'Json'>
     readonly extraction: FieldRef<"Meeting", 'Json'>
     readonly searchableText: FieldRef<"Meeting", 'String'>
     readonly finalizedBy: FieldRef<"Meeting", 'String'>
     readonly finalizedAt: FieldRef<"Meeting", 'DateTime'>
+    readonly finalizeReason: FieldRef<"Meeting", 'FinalizeReason'>
+    readonly finalizeNote: FieldRef<"Meeting", 'String'>
+    readonly finalizedPolicyVersion: FieldRef<"Meeting", 'Int'>
+    readonly samplingBucket: FieldRef<"Meeting", 'String'>
+    readonly samplingRuleId: FieldRef<"Meeting", 'String'>
     readonly draftReadyAt: FieldRef<"Meeting", 'DateTime'>
     readonly timeToFinalize: FieldRef<"Meeting", 'Int'>
     readonly readyForCCO: FieldRef<"Meeting", 'Boolean'>
@@ -5444,6 +5804,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: AuditEventScalarFieldEnum | AuditEventScalarFieldEnum[]
+  }
+
+  /**
+   * Meeting.flags
+   */
+  export type Meeting$flagsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Flag
+     */
+    select?: FlagSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Flag
+     */
+    omit?: FlagOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FlagInclude<ExtArgs> | null
+    where?: FlagWhereInput
+    orderBy?: FlagOrderByWithRelationInput | FlagOrderByWithRelationInput[]
+    cursor?: FlagWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: FlagScalarFieldEnum | FlagScalarFieldEnum[]
   }
 
   /**
@@ -6580,6 +6964,1198 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: VersionInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model Flag
+   */
+
+  export type AggregateFlag = {
+    _count: FlagCountAggregateOutputType | null
+    _min: FlagMinAggregateOutputType | null
+    _max: FlagMaxAggregateOutputType | null
+  }
+
+  export type FlagMinAggregateOutputType = {
+    id: string | null
+    workspaceId: string | null
+    meetingId: string | null
+    type: $Enums.FlagType | null
+    severity: $Enums.FlagSeverity | null
+    status: $Enums.FlagStatus | null
+    createdByType: $Enums.FlagCreatedByType | null
+    createdByUserId: string | null
+    resolvedByUserId: string | null
+    resolvedAt: Date | null
+    resolutionType: $Enums.FlagResolutionType | null
+    resolutionNote: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type FlagMaxAggregateOutputType = {
+    id: string | null
+    workspaceId: string | null
+    meetingId: string | null
+    type: $Enums.FlagType | null
+    severity: $Enums.FlagSeverity | null
+    status: $Enums.FlagStatus | null
+    createdByType: $Enums.FlagCreatedByType | null
+    createdByUserId: string | null
+    resolvedByUserId: string | null
+    resolvedAt: Date | null
+    resolutionType: $Enums.FlagResolutionType | null
+    resolutionNote: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type FlagCountAggregateOutputType = {
+    id: number
+    workspaceId: number
+    meetingId: number
+    type: number
+    severity: number
+    status: number
+    evidence: number
+    createdByType: number
+    createdByUserId: number
+    resolvedByUserId: number
+    resolvedAt: number
+    resolutionType: number
+    resolutionNote: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type FlagMinAggregateInputType = {
+    id?: true
+    workspaceId?: true
+    meetingId?: true
+    type?: true
+    severity?: true
+    status?: true
+    createdByType?: true
+    createdByUserId?: true
+    resolvedByUserId?: true
+    resolvedAt?: true
+    resolutionType?: true
+    resolutionNote?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type FlagMaxAggregateInputType = {
+    id?: true
+    workspaceId?: true
+    meetingId?: true
+    type?: true
+    severity?: true
+    status?: true
+    createdByType?: true
+    createdByUserId?: true
+    resolvedByUserId?: true
+    resolvedAt?: true
+    resolutionType?: true
+    resolutionNote?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type FlagCountAggregateInputType = {
+    id?: true
+    workspaceId?: true
+    meetingId?: true
+    type?: true
+    severity?: true
+    status?: true
+    evidence?: true
+    createdByType?: true
+    createdByUserId?: true
+    resolvedByUserId?: true
+    resolvedAt?: true
+    resolutionType?: true
+    resolutionNote?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type FlagAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Flag to aggregate.
+     */
+    where?: FlagWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Flags to fetch.
+     */
+    orderBy?: FlagOrderByWithRelationInput | FlagOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: FlagWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Flags from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Flags.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned Flags
+    **/
+    _count?: true | FlagCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: FlagMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: FlagMaxAggregateInputType
+  }
+
+  export type GetFlagAggregateType<T extends FlagAggregateArgs> = {
+        [P in keyof T & keyof AggregateFlag]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateFlag[P]>
+      : GetScalarType<T[P], AggregateFlag[P]>
+  }
+
+
+
+
+  export type FlagGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FlagWhereInput
+    orderBy?: FlagOrderByWithAggregationInput | FlagOrderByWithAggregationInput[]
+    by: FlagScalarFieldEnum[] | FlagScalarFieldEnum
+    having?: FlagScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: FlagCountAggregateInputType | true
+    _min?: FlagMinAggregateInputType
+    _max?: FlagMaxAggregateInputType
+  }
+
+  export type FlagGroupByOutputType = {
+    id: string
+    workspaceId: string
+    meetingId: string
+    type: $Enums.FlagType
+    severity: $Enums.FlagSeverity
+    status: $Enums.FlagStatus
+    evidence: JsonValue | null
+    createdByType: $Enums.FlagCreatedByType
+    createdByUserId: string | null
+    resolvedByUserId: string | null
+    resolvedAt: Date | null
+    resolutionType: $Enums.FlagResolutionType | null
+    resolutionNote: string | null
+    createdAt: Date
+    updatedAt: Date
+    _count: FlagCountAggregateOutputType | null
+    _min: FlagMinAggregateOutputType | null
+    _max: FlagMaxAggregateOutputType | null
+  }
+
+  type GetFlagGroupByPayload<T extends FlagGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<FlagGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof FlagGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], FlagGroupByOutputType[P]>
+            : GetScalarType<T[P], FlagGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type FlagSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    workspaceId?: boolean
+    meetingId?: boolean
+    type?: boolean
+    severity?: boolean
+    status?: boolean
+    evidence?: boolean
+    createdByType?: boolean
+    createdByUserId?: boolean
+    resolvedByUserId?: boolean
+    resolvedAt?: boolean
+    resolutionType?: boolean
+    resolutionNote?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    meeting?: boolean | MeetingDefaultArgs<ExtArgs>
+    workspace?: boolean | WorkspaceDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["flag"]>
+
+  export type FlagSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    workspaceId?: boolean
+    meetingId?: boolean
+    type?: boolean
+    severity?: boolean
+    status?: boolean
+    evidence?: boolean
+    createdByType?: boolean
+    createdByUserId?: boolean
+    resolvedByUserId?: boolean
+    resolvedAt?: boolean
+    resolutionType?: boolean
+    resolutionNote?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    meeting?: boolean | MeetingDefaultArgs<ExtArgs>
+    workspace?: boolean | WorkspaceDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["flag"]>
+
+  export type FlagSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    workspaceId?: boolean
+    meetingId?: boolean
+    type?: boolean
+    severity?: boolean
+    status?: boolean
+    evidence?: boolean
+    createdByType?: boolean
+    createdByUserId?: boolean
+    resolvedByUserId?: boolean
+    resolvedAt?: boolean
+    resolutionType?: boolean
+    resolutionNote?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    meeting?: boolean | MeetingDefaultArgs<ExtArgs>
+    workspace?: boolean | WorkspaceDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["flag"]>
+
+  export type FlagSelectScalar = {
+    id?: boolean
+    workspaceId?: boolean
+    meetingId?: boolean
+    type?: boolean
+    severity?: boolean
+    status?: boolean
+    evidence?: boolean
+    createdByType?: boolean
+    createdByUserId?: boolean
+    resolvedByUserId?: boolean
+    resolvedAt?: boolean
+    resolutionType?: boolean
+    resolutionNote?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type FlagOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "workspaceId" | "meetingId" | "type" | "severity" | "status" | "evidence" | "createdByType" | "createdByUserId" | "resolvedByUserId" | "resolvedAt" | "resolutionType" | "resolutionNote" | "createdAt" | "updatedAt", ExtArgs["result"]["flag"]>
+  export type FlagInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    meeting?: boolean | MeetingDefaultArgs<ExtArgs>
+    workspace?: boolean | WorkspaceDefaultArgs<ExtArgs>
+  }
+  export type FlagIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    meeting?: boolean | MeetingDefaultArgs<ExtArgs>
+    workspace?: boolean | WorkspaceDefaultArgs<ExtArgs>
+  }
+  export type FlagIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    meeting?: boolean | MeetingDefaultArgs<ExtArgs>
+    workspace?: boolean | WorkspaceDefaultArgs<ExtArgs>
+  }
+
+  export type $FlagPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Flag"
+    objects: {
+      meeting: Prisma.$MeetingPayload<ExtArgs>
+      workspace: Prisma.$WorkspacePayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      workspaceId: string
+      meetingId: string
+      type: $Enums.FlagType
+      severity: $Enums.FlagSeverity
+      status: $Enums.FlagStatus
+      evidence: Prisma.JsonValue | null
+      createdByType: $Enums.FlagCreatedByType
+      createdByUserId: string | null
+      resolvedByUserId: string | null
+      resolvedAt: Date | null
+      resolutionType: $Enums.FlagResolutionType | null
+      resolutionNote: string | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["flag"]>
+    composites: {}
+  }
+
+  type FlagGetPayload<S extends boolean | null | undefined | FlagDefaultArgs> = $Result.GetResult<Prisma.$FlagPayload, S>
+
+  type FlagCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<FlagFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: FlagCountAggregateInputType | true
+    }
+
+  export interface FlagDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Flag'], meta: { name: 'Flag' } }
+    /**
+     * Find zero or one Flag that matches the filter.
+     * @param {FlagFindUniqueArgs} args - Arguments to find a Flag
+     * @example
+     * // Get one Flag
+     * const flag = await prisma.flag.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends FlagFindUniqueArgs>(args: SelectSubset<T, FlagFindUniqueArgs<ExtArgs>>): Prisma__FlagClient<$Result.GetResult<Prisma.$FlagPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Flag that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {FlagFindUniqueOrThrowArgs} args - Arguments to find a Flag
+     * @example
+     * // Get one Flag
+     * const flag = await prisma.flag.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends FlagFindUniqueOrThrowArgs>(args: SelectSubset<T, FlagFindUniqueOrThrowArgs<ExtArgs>>): Prisma__FlagClient<$Result.GetResult<Prisma.$FlagPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Flag that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FlagFindFirstArgs} args - Arguments to find a Flag
+     * @example
+     * // Get one Flag
+     * const flag = await prisma.flag.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends FlagFindFirstArgs>(args?: SelectSubset<T, FlagFindFirstArgs<ExtArgs>>): Prisma__FlagClient<$Result.GetResult<Prisma.$FlagPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Flag that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FlagFindFirstOrThrowArgs} args - Arguments to find a Flag
+     * @example
+     * // Get one Flag
+     * const flag = await prisma.flag.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends FlagFindFirstOrThrowArgs>(args?: SelectSubset<T, FlagFindFirstOrThrowArgs<ExtArgs>>): Prisma__FlagClient<$Result.GetResult<Prisma.$FlagPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Flags that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FlagFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Flags
+     * const flags = await prisma.flag.findMany()
+     * 
+     * // Get first 10 Flags
+     * const flags = await prisma.flag.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const flagWithIdOnly = await prisma.flag.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends FlagFindManyArgs>(args?: SelectSubset<T, FlagFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FlagPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Flag.
+     * @param {FlagCreateArgs} args - Arguments to create a Flag.
+     * @example
+     * // Create one Flag
+     * const Flag = await prisma.flag.create({
+     *   data: {
+     *     // ... data to create a Flag
+     *   }
+     * })
+     * 
+     */
+    create<T extends FlagCreateArgs>(args: SelectSubset<T, FlagCreateArgs<ExtArgs>>): Prisma__FlagClient<$Result.GetResult<Prisma.$FlagPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Flags.
+     * @param {FlagCreateManyArgs} args - Arguments to create many Flags.
+     * @example
+     * // Create many Flags
+     * const flag = await prisma.flag.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends FlagCreateManyArgs>(args?: SelectSubset<T, FlagCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many Flags and returns the data saved in the database.
+     * @param {FlagCreateManyAndReturnArgs} args - Arguments to create many Flags.
+     * @example
+     * // Create many Flags
+     * const flag = await prisma.flag.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many Flags and only return the `id`
+     * const flagWithIdOnly = await prisma.flag.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends FlagCreateManyAndReturnArgs>(args?: SelectSubset<T, FlagCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FlagPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a Flag.
+     * @param {FlagDeleteArgs} args - Arguments to delete one Flag.
+     * @example
+     * // Delete one Flag
+     * const Flag = await prisma.flag.delete({
+     *   where: {
+     *     // ... filter to delete one Flag
+     *   }
+     * })
+     * 
+     */
+    delete<T extends FlagDeleteArgs>(args: SelectSubset<T, FlagDeleteArgs<ExtArgs>>): Prisma__FlagClient<$Result.GetResult<Prisma.$FlagPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Flag.
+     * @param {FlagUpdateArgs} args - Arguments to update one Flag.
+     * @example
+     * // Update one Flag
+     * const flag = await prisma.flag.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends FlagUpdateArgs>(args: SelectSubset<T, FlagUpdateArgs<ExtArgs>>): Prisma__FlagClient<$Result.GetResult<Prisma.$FlagPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Flags.
+     * @param {FlagDeleteManyArgs} args - Arguments to filter Flags to delete.
+     * @example
+     * // Delete a few Flags
+     * const { count } = await prisma.flag.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends FlagDeleteManyArgs>(args?: SelectSubset<T, FlagDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Flags.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FlagUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Flags
+     * const flag = await prisma.flag.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends FlagUpdateManyArgs>(args: SelectSubset<T, FlagUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Flags and returns the data updated in the database.
+     * @param {FlagUpdateManyAndReturnArgs} args - Arguments to update many Flags.
+     * @example
+     * // Update many Flags
+     * const flag = await prisma.flag.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more Flags and only return the `id`
+     * const flagWithIdOnly = await prisma.flag.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends FlagUpdateManyAndReturnArgs>(args: SelectSubset<T, FlagUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FlagPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one Flag.
+     * @param {FlagUpsertArgs} args - Arguments to update or create a Flag.
+     * @example
+     * // Update or create a Flag
+     * const flag = await prisma.flag.upsert({
+     *   create: {
+     *     // ... data to create a Flag
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Flag we want to update
+     *   }
+     * })
+     */
+    upsert<T extends FlagUpsertArgs>(args: SelectSubset<T, FlagUpsertArgs<ExtArgs>>): Prisma__FlagClient<$Result.GetResult<Prisma.$FlagPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Flags.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FlagCountArgs} args - Arguments to filter Flags to count.
+     * @example
+     * // Count the number of Flags
+     * const count = await prisma.flag.count({
+     *   where: {
+     *     // ... the filter for the Flags we want to count
+     *   }
+     * })
+    **/
+    count<T extends FlagCountArgs>(
+      args?: Subset<T, FlagCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], FlagCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Flag.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FlagAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends FlagAggregateArgs>(args: Subset<T, FlagAggregateArgs>): Prisma.PrismaPromise<GetFlagAggregateType<T>>
+
+    /**
+     * Group by Flag.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FlagGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends FlagGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: FlagGroupByArgs['orderBy'] }
+        : { orderBy?: FlagGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, FlagGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetFlagGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the Flag model
+   */
+  readonly fields: FlagFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for Flag.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__FlagClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    meeting<T extends MeetingDefaultArgs<ExtArgs> = {}>(args?: Subset<T, MeetingDefaultArgs<ExtArgs>>): Prisma__MeetingClient<$Result.GetResult<Prisma.$MeetingPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    workspace<T extends WorkspaceDefaultArgs<ExtArgs> = {}>(args?: Subset<T, WorkspaceDefaultArgs<ExtArgs>>): Prisma__WorkspaceClient<$Result.GetResult<Prisma.$WorkspacePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the Flag model
+   */
+  interface FlagFieldRefs {
+    readonly id: FieldRef<"Flag", 'String'>
+    readonly workspaceId: FieldRef<"Flag", 'String'>
+    readonly meetingId: FieldRef<"Flag", 'String'>
+    readonly type: FieldRef<"Flag", 'FlagType'>
+    readonly severity: FieldRef<"Flag", 'FlagSeverity'>
+    readonly status: FieldRef<"Flag", 'FlagStatus'>
+    readonly evidence: FieldRef<"Flag", 'Json'>
+    readonly createdByType: FieldRef<"Flag", 'FlagCreatedByType'>
+    readonly createdByUserId: FieldRef<"Flag", 'String'>
+    readonly resolvedByUserId: FieldRef<"Flag", 'String'>
+    readonly resolvedAt: FieldRef<"Flag", 'DateTime'>
+    readonly resolutionType: FieldRef<"Flag", 'FlagResolutionType'>
+    readonly resolutionNote: FieldRef<"Flag", 'String'>
+    readonly createdAt: FieldRef<"Flag", 'DateTime'>
+    readonly updatedAt: FieldRef<"Flag", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * Flag findUnique
+   */
+  export type FlagFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Flag
+     */
+    select?: FlagSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Flag
+     */
+    omit?: FlagOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FlagInclude<ExtArgs> | null
+    /**
+     * Filter, which Flag to fetch.
+     */
+    where: FlagWhereUniqueInput
+  }
+
+  /**
+   * Flag findUniqueOrThrow
+   */
+  export type FlagFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Flag
+     */
+    select?: FlagSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Flag
+     */
+    omit?: FlagOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FlagInclude<ExtArgs> | null
+    /**
+     * Filter, which Flag to fetch.
+     */
+    where: FlagWhereUniqueInput
+  }
+
+  /**
+   * Flag findFirst
+   */
+  export type FlagFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Flag
+     */
+    select?: FlagSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Flag
+     */
+    omit?: FlagOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FlagInclude<ExtArgs> | null
+    /**
+     * Filter, which Flag to fetch.
+     */
+    where?: FlagWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Flags to fetch.
+     */
+    orderBy?: FlagOrderByWithRelationInput | FlagOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Flags.
+     */
+    cursor?: FlagWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Flags from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Flags.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Flags.
+     */
+    distinct?: FlagScalarFieldEnum | FlagScalarFieldEnum[]
+  }
+
+  /**
+   * Flag findFirstOrThrow
+   */
+  export type FlagFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Flag
+     */
+    select?: FlagSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Flag
+     */
+    omit?: FlagOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FlagInclude<ExtArgs> | null
+    /**
+     * Filter, which Flag to fetch.
+     */
+    where?: FlagWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Flags to fetch.
+     */
+    orderBy?: FlagOrderByWithRelationInput | FlagOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Flags.
+     */
+    cursor?: FlagWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Flags from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Flags.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Flags.
+     */
+    distinct?: FlagScalarFieldEnum | FlagScalarFieldEnum[]
+  }
+
+  /**
+   * Flag findMany
+   */
+  export type FlagFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Flag
+     */
+    select?: FlagSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Flag
+     */
+    omit?: FlagOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FlagInclude<ExtArgs> | null
+    /**
+     * Filter, which Flags to fetch.
+     */
+    where?: FlagWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Flags to fetch.
+     */
+    orderBy?: FlagOrderByWithRelationInput | FlagOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing Flags.
+     */
+    cursor?: FlagWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Flags from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Flags.
+     */
+    skip?: number
+    distinct?: FlagScalarFieldEnum | FlagScalarFieldEnum[]
+  }
+
+  /**
+   * Flag create
+   */
+  export type FlagCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Flag
+     */
+    select?: FlagSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Flag
+     */
+    omit?: FlagOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FlagInclude<ExtArgs> | null
+    /**
+     * The data needed to create a Flag.
+     */
+    data: XOR<FlagCreateInput, FlagUncheckedCreateInput>
+  }
+
+  /**
+   * Flag createMany
+   */
+  export type FlagCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Flags.
+     */
+    data: FlagCreateManyInput | FlagCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * Flag createManyAndReturn
+   */
+  export type FlagCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Flag
+     */
+    select?: FlagSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Flag
+     */
+    omit?: FlagOmit<ExtArgs> | null
+    /**
+     * The data used to create many Flags.
+     */
+    data: FlagCreateManyInput | FlagCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FlagIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * Flag update
+   */
+  export type FlagUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Flag
+     */
+    select?: FlagSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Flag
+     */
+    omit?: FlagOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FlagInclude<ExtArgs> | null
+    /**
+     * The data needed to update a Flag.
+     */
+    data: XOR<FlagUpdateInput, FlagUncheckedUpdateInput>
+    /**
+     * Choose, which Flag to update.
+     */
+    where: FlagWhereUniqueInput
+  }
+
+  /**
+   * Flag updateMany
+   */
+  export type FlagUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Flags.
+     */
+    data: XOR<FlagUpdateManyMutationInput, FlagUncheckedUpdateManyInput>
+    /**
+     * Filter which Flags to update
+     */
+    where?: FlagWhereInput
+    /**
+     * Limit how many Flags to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * Flag updateManyAndReturn
+   */
+  export type FlagUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Flag
+     */
+    select?: FlagSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Flag
+     */
+    omit?: FlagOmit<ExtArgs> | null
+    /**
+     * The data used to update Flags.
+     */
+    data: XOR<FlagUpdateManyMutationInput, FlagUncheckedUpdateManyInput>
+    /**
+     * Filter which Flags to update
+     */
+    where?: FlagWhereInput
+    /**
+     * Limit how many Flags to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FlagIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * Flag upsert
+   */
+  export type FlagUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Flag
+     */
+    select?: FlagSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Flag
+     */
+    omit?: FlagOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FlagInclude<ExtArgs> | null
+    /**
+     * The filter to search for the Flag to update in case it exists.
+     */
+    where: FlagWhereUniqueInput
+    /**
+     * In case the Flag found by the `where` argument doesn't exist, create a new Flag with this data.
+     */
+    create: XOR<FlagCreateInput, FlagUncheckedCreateInput>
+    /**
+     * In case the Flag was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<FlagUpdateInput, FlagUncheckedUpdateInput>
+  }
+
+  /**
+   * Flag delete
+   */
+  export type FlagDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Flag
+     */
+    select?: FlagSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Flag
+     */
+    omit?: FlagOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FlagInclude<ExtArgs> | null
+    /**
+     * Filter which Flag to delete.
+     */
+    where: FlagWhereUniqueInput
+  }
+
+  /**
+   * Flag deleteMany
+   */
+  export type FlagDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Flags to delete
+     */
+    where?: FlagWhereInput
+    /**
+     * Limit how many Flags to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * Flag without action
+   */
+  export type FlagDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Flag
+     */
+    select?: FlagSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Flag
+     */
+    omit?: FlagOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FlagInclude<ExtArgs> | null
   }
 
 
@@ -13212,11 +14788,21 @@ export namespace Prisma {
     meetingDate: 'meetingDate',
     status: 'status',
     fileUrl: 'fileUrl',
+    sourceFileSha256: 'sourceFileSha256',
+    sourceFileName: 'sourceFileName',
+    sourceFileSize: 'sourceFileSize',
+    sourceFileMime: 'sourceFileMime',
+    sourceUploadedAt: 'sourceUploadedAt',
     transcript: 'transcript',
     extraction: 'extraction',
     searchableText: 'searchableText',
     finalizedBy: 'finalizedBy',
     finalizedAt: 'finalizedAt',
+    finalizeReason: 'finalizeReason',
+    finalizeNote: 'finalizeNote',
+    finalizedPolicyVersion: 'finalizedPolicyVersion',
+    samplingBucket: 'samplingBucket',
+    samplingRuleId: 'samplingRuleId',
     draftReadyAt: 'draftReadyAt',
     timeToFinalize: 'timeToFinalize',
     readyForCCO: 'readyForCCO',
@@ -13238,6 +14824,27 @@ export namespace Prisma {
   };
 
   export type VersionScalarFieldEnum = (typeof VersionScalarFieldEnum)[keyof typeof VersionScalarFieldEnum]
+
+
+  export const FlagScalarFieldEnum: {
+    id: 'id',
+    workspaceId: 'workspaceId',
+    meetingId: 'meetingId',
+    type: 'type',
+    severity: 'severity',
+    status: 'status',
+    evidence: 'evidence',
+    createdByType: 'createdByType',
+    createdByUserId: 'createdByUserId',
+    resolvedByUserId: 'resolvedByUserId',
+    resolvedAt: 'resolvedAt',
+    resolutionType: 'resolutionType',
+    resolutionNote: 'resolutionNote',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type FlagScalarFieldEnum = (typeof FlagScalarFieldEnum)[keyof typeof FlagScalarFieldEnum]
 
 
   export const AuditEventScalarFieldEnum: {
@@ -13471,6 +15078,90 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'FinalizeReason'
+   */
+  export type EnumFinalizeReasonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FinalizeReason'>
+    
+
+
+  /**
+   * Reference to a field of type 'FinalizeReason[]'
+   */
+  export type ListEnumFinalizeReasonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FinalizeReason[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'FlagType'
+   */
+  export type EnumFlagTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FlagType'>
+    
+
+
+  /**
+   * Reference to a field of type 'FlagType[]'
+   */
+  export type ListEnumFlagTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FlagType[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'FlagSeverity'
+   */
+  export type EnumFlagSeverityFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FlagSeverity'>
+    
+
+
+  /**
+   * Reference to a field of type 'FlagSeverity[]'
+   */
+  export type ListEnumFlagSeverityFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FlagSeverity[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'FlagStatus'
+   */
+  export type EnumFlagStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FlagStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'FlagStatus[]'
+   */
+  export type ListEnumFlagStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FlagStatus[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'FlagCreatedByType'
+   */
+  export type EnumFlagCreatedByTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FlagCreatedByType'>
+    
+
+
+  /**
+   * Reference to a field of type 'FlagCreatedByType[]'
+   */
+  export type ListEnumFlagCreatedByTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FlagCreatedByType[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'FlagResolutionType'
+   */
+  export type EnumFlagResolutionTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FlagResolutionType'>
+    
+
+
+  /**
+   * Reference to a field of type 'FlagResolutionType[]'
+   */
+  export type ListEnumFlagResolutionTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FlagResolutionType[]'>
+    
+
+
+  /**
    * Reference to a field of type 'AuditAction'
    */
   export type EnumAuditActionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AuditAction'>
@@ -13518,6 +15209,7 @@ export namespace Prisma {
     meetings?: MeetingListRelationFilter
     auditEvents?: AuditEventListRelationFilter
     invitations?: InvitationListRelationFilter
+    flags?: FlagListRelationFilter
   }
 
   export type WorkspaceOrderByWithRelationInput = {
@@ -13534,6 +15226,7 @@ export namespace Prisma {
     meetings?: MeetingOrderByRelationAggregateInput
     auditEvents?: AuditEventOrderByRelationAggregateInput
     invitations?: InvitationOrderByRelationAggregateInput
+    flags?: FlagOrderByRelationAggregateInput
   }
 
   export type WorkspaceWhereUniqueInput = Prisma.AtLeast<{
@@ -13553,6 +15246,7 @@ export namespace Prisma {
     meetings?: MeetingListRelationFilter
     auditEvents?: AuditEventListRelationFilter
     invitations?: InvitationListRelationFilter
+    flags?: FlagListRelationFilter
   }, "id">
 
   export type WorkspaceOrderByWithAggregationInput = {
@@ -13647,11 +15341,21 @@ export namespace Prisma {
     meetingDate?: DateTimeFilter<"Meeting"> | Date | string
     status?: EnumMeetingStatusFilter<"Meeting"> | $Enums.MeetingStatus
     fileUrl?: StringNullableFilter<"Meeting"> | string | null
+    sourceFileSha256?: StringNullableFilter<"Meeting"> | string | null
+    sourceFileName?: StringNullableFilter<"Meeting"> | string | null
+    sourceFileSize?: IntNullableFilter<"Meeting"> | number | null
+    sourceFileMime?: StringNullableFilter<"Meeting"> | string | null
+    sourceUploadedAt?: DateTimeNullableFilter<"Meeting"> | Date | string | null
     transcript?: JsonNullableFilter<"Meeting">
     extraction?: JsonNullableFilter<"Meeting">
     searchableText?: StringNullableFilter<"Meeting"> | string | null
     finalizedBy?: StringNullableFilter<"Meeting"> | string | null
     finalizedAt?: DateTimeNullableFilter<"Meeting"> | Date | string | null
+    finalizeReason?: EnumFinalizeReasonNullableFilter<"Meeting"> | $Enums.FinalizeReason | null
+    finalizeNote?: StringNullableFilter<"Meeting"> | string | null
+    finalizedPolicyVersion?: IntNullableFilter<"Meeting"> | number | null
+    samplingBucket?: StringNullableFilter<"Meeting"> | string | null
+    samplingRuleId?: StringNullableFilter<"Meeting"> | string | null
     draftReadyAt?: DateTimeNullableFilter<"Meeting"> | Date | string | null
     timeToFinalize?: IntNullableFilter<"Meeting"> | number | null
     readyForCCO?: BoolFilter<"Meeting"> | boolean
@@ -13660,6 +15364,7 @@ export namespace Prisma {
     workspace?: XOR<WorkspaceScalarRelationFilter, WorkspaceWhereInput>
     versions?: VersionListRelationFilter
     auditEvents?: AuditEventListRelationFilter
+    flags?: FlagListRelationFilter
   }
 
   export type MeetingOrderByWithRelationInput = {
@@ -13670,11 +15375,21 @@ export namespace Prisma {
     meetingDate?: SortOrder
     status?: SortOrder
     fileUrl?: SortOrderInput | SortOrder
+    sourceFileSha256?: SortOrderInput | SortOrder
+    sourceFileName?: SortOrderInput | SortOrder
+    sourceFileSize?: SortOrderInput | SortOrder
+    sourceFileMime?: SortOrderInput | SortOrder
+    sourceUploadedAt?: SortOrderInput | SortOrder
     transcript?: SortOrderInput | SortOrder
     extraction?: SortOrderInput | SortOrder
     searchableText?: SortOrderInput | SortOrder
     finalizedBy?: SortOrderInput | SortOrder
     finalizedAt?: SortOrderInput | SortOrder
+    finalizeReason?: SortOrderInput | SortOrder
+    finalizeNote?: SortOrderInput | SortOrder
+    finalizedPolicyVersion?: SortOrderInput | SortOrder
+    samplingBucket?: SortOrderInput | SortOrder
+    samplingRuleId?: SortOrderInput | SortOrder
     draftReadyAt?: SortOrderInput | SortOrder
     timeToFinalize?: SortOrderInput | SortOrder
     readyForCCO?: SortOrder
@@ -13683,6 +15398,7 @@ export namespace Prisma {
     workspace?: WorkspaceOrderByWithRelationInput
     versions?: VersionOrderByRelationAggregateInput
     auditEvents?: AuditEventOrderByRelationAggregateInput
+    flags?: FlagOrderByRelationAggregateInput
   }
 
   export type MeetingWhereUniqueInput = Prisma.AtLeast<{
@@ -13696,11 +15412,21 @@ export namespace Prisma {
     meetingDate?: DateTimeFilter<"Meeting"> | Date | string
     status?: EnumMeetingStatusFilter<"Meeting"> | $Enums.MeetingStatus
     fileUrl?: StringNullableFilter<"Meeting"> | string | null
+    sourceFileSha256?: StringNullableFilter<"Meeting"> | string | null
+    sourceFileName?: StringNullableFilter<"Meeting"> | string | null
+    sourceFileSize?: IntNullableFilter<"Meeting"> | number | null
+    sourceFileMime?: StringNullableFilter<"Meeting"> | string | null
+    sourceUploadedAt?: DateTimeNullableFilter<"Meeting"> | Date | string | null
     transcript?: JsonNullableFilter<"Meeting">
     extraction?: JsonNullableFilter<"Meeting">
     searchableText?: StringNullableFilter<"Meeting"> | string | null
     finalizedBy?: StringNullableFilter<"Meeting"> | string | null
     finalizedAt?: DateTimeNullableFilter<"Meeting"> | Date | string | null
+    finalizeReason?: EnumFinalizeReasonNullableFilter<"Meeting"> | $Enums.FinalizeReason | null
+    finalizeNote?: StringNullableFilter<"Meeting"> | string | null
+    finalizedPolicyVersion?: IntNullableFilter<"Meeting"> | number | null
+    samplingBucket?: StringNullableFilter<"Meeting"> | string | null
+    samplingRuleId?: StringNullableFilter<"Meeting"> | string | null
     draftReadyAt?: DateTimeNullableFilter<"Meeting"> | Date | string | null
     timeToFinalize?: IntNullableFilter<"Meeting"> | number | null
     readyForCCO?: BoolFilter<"Meeting"> | boolean
@@ -13709,6 +15435,7 @@ export namespace Prisma {
     workspace?: XOR<WorkspaceScalarRelationFilter, WorkspaceWhereInput>
     versions?: VersionListRelationFilter
     auditEvents?: AuditEventListRelationFilter
+    flags?: FlagListRelationFilter
   }, "id">
 
   export type MeetingOrderByWithAggregationInput = {
@@ -13719,11 +15446,21 @@ export namespace Prisma {
     meetingDate?: SortOrder
     status?: SortOrder
     fileUrl?: SortOrderInput | SortOrder
+    sourceFileSha256?: SortOrderInput | SortOrder
+    sourceFileName?: SortOrderInput | SortOrder
+    sourceFileSize?: SortOrderInput | SortOrder
+    sourceFileMime?: SortOrderInput | SortOrder
+    sourceUploadedAt?: SortOrderInput | SortOrder
     transcript?: SortOrderInput | SortOrder
     extraction?: SortOrderInput | SortOrder
     searchableText?: SortOrderInput | SortOrder
     finalizedBy?: SortOrderInput | SortOrder
     finalizedAt?: SortOrderInput | SortOrder
+    finalizeReason?: SortOrderInput | SortOrder
+    finalizeNote?: SortOrderInput | SortOrder
+    finalizedPolicyVersion?: SortOrderInput | SortOrder
+    samplingBucket?: SortOrderInput | SortOrder
+    samplingRuleId?: SortOrderInput | SortOrder
     draftReadyAt?: SortOrderInput | SortOrder
     timeToFinalize?: SortOrderInput | SortOrder
     readyForCCO?: SortOrder
@@ -13747,11 +15484,21 @@ export namespace Prisma {
     meetingDate?: DateTimeWithAggregatesFilter<"Meeting"> | Date | string
     status?: EnumMeetingStatusWithAggregatesFilter<"Meeting"> | $Enums.MeetingStatus
     fileUrl?: StringNullableWithAggregatesFilter<"Meeting"> | string | null
+    sourceFileSha256?: StringNullableWithAggregatesFilter<"Meeting"> | string | null
+    sourceFileName?: StringNullableWithAggregatesFilter<"Meeting"> | string | null
+    sourceFileSize?: IntNullableWithAggregatesFilter<"Meeting"> | number | null
+    sourceFileMime?: StringNullableWithAggregatesFilter<"Meeting"> | string | null
+    sourceUploadedAt?: DateTimeNullableWithAggregatesFilter<"Meeting"> | Date | string | null
     transcript?: JsonNullableWithAggregatesFilter<"Meeting">
     extraction?: JsonNullableWithAggregatesFilter<"Meeting">
     searchableText?: StringNullableWithAggregatesFilter<"Meeting"> | string | null
     finalizedBy?: StringNullableWithAggregatesFilter<"Meeting"> | string | null
     finalizedAt?: DateTimeNullableWithAggregatesFilter<"Meeting"> | Date | string | null
+    finalizeReason?: EnumFinalizeReasonNullableWithAggregatesFilter<"Meeting"> | $Enums.FinalizeReason | null
+    finalizeNote?: StringNullableWithAggregatesFilter<"Meeting"> | string | null
+    finalizedPolicyVersion?: IntNullableWithAggregatesFilter<"Meeting"> | number | null
+    samplingBucket?: StringNullableWithAggregatesFilter<"Meeting"> | string | null
+    samplingRuleId?: StringNullableWithAggregatesFilter<"Meeting"> | string | null
     draftReadyAt?: DateTimeNullableWithAggregatesFilter<"Meeting"> | Date | string | null
     timeToFinalize?: IntNullableWithAggregatesFilter<"Meeting"> | number | null
     readyForCCO?: BoolWithAggregatesFilter<"Meeting"> | boolean
@@ -13824,6 +15571,114 @@ export namespace Prisma {
     whatChanged?: StringWithAggregatesFilter<"Version"> | string
     reason?: StringNullableWithAggregatesFilter<"Version"> | string | null
     timestamp?: DateTimeWithAggregatesFilter<"Version"> | Date | string
+  }
+
+  export type FlagWhereInput = {
+    AND?: FlagWhereInput | FlagWhereInput[]
+    OR?: FlagWhereInput[]
+    NOT?: FlagWhereInput | FlagWhereInput[]
+    id?: StringFilter<"Flag"> | string
+    workspaceId?: StringFilter<"Flag"> | string
+    meetingId?: StringFilter<"Flag"> | string
+    type?: EnumFlagTypeFilter<"Flag"> | $Enums.FlagType
+    severity?: EnumFlagSeverityFilter<"Flag"> | $Enums.FlagSeverity
+    status?: EnumFlagStatusFilter<"Flag"> | $Enums.FlagStatus
+    evidence?: JsonNullableFilter<"Flag">
+    createdByType?: EnumFlagCreatedByTypeFilter<"Flag"> | $Enums.FlagCreatedByType
+    createdByUserId?: StringNullableFilter<"Flag"> | string | null
+    resolvedByUserId?: StringNullableFilter<"Flag"> | string | null
+    resolvedAt?: DateTimeNullableFilter<"Flag"> | Date | string | null
+    resolutionType?: EnumFlagResolutionTypeNullableFilter<"Flag"> | $Enums.FlagResolutionType | null
+    resolutionNote?: StringNullableFilter<"Flag"> | string | null
+    createdAt?: DateTimeFilter<"Flag"> | Date | string
+    updatedAt?: DateTimeFilter<"Flag"> | Date | string
+    meeting?: XOR<MeetingScalarRelationFilter, MeetingWhereInput>
+    workspace?: XOR<WorkspaceScalarRelationFilter, WorkspaceWhereInput>
+  }
+
+  export type FlagOrderByWithRelationInput = {
+    id?: SortOrder
+    workspaceId?: SortOrder
+    meetingId?: SortOrder
+    type?: SortOrder
+    severity?: SortOrder
+    status?: SortOrder
+    evidence?: SortOrderInput | SortOrder
+    createdByType?: SortOrder
+    createdByUserId?: SortOrderInput | SortOrder
+    resolvedByUserId?: SortOrderInput | SortOrder
+    resolvedAt?: SortOrderInput | SortOrder
+    resolutionType?: SortOrderInput | SortOrder
+    resolutionNote?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    meeting?: MeetingOrderByWithRelationInput
+    workspace?: WorkspaceOrderByWithRelationInput
+  }
+
+  export type FlagWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: FlagWhereInput | FlagWhereInput[]
+    OR?: FlagWhereInput[]
+    NOT?: FlagWhereInput | FlagWhereInput[]
+    workspaceId?: StringFilter<"Flag"> | string
+    meetingId?: StringFilter<"Flag"> | string
+    type?: EnumFlagTypeFilter<"Flag"> | $Enums.FlagType
+    severity?: EnumFlagSeverityFilter<"Flag"> | $Enums.FlagSeverity
+    status?: EnumFlagStatusFilter<"Flag"> | $Enums.FlagStatus
+    evidence?: JsonNullableFilter<"Flag">
+    createdByType?: EnumFlagCreatedByTypeFilter<"Flag"> | $Enums.FlagCreatedByType
+    createdByUserId?: StringNullableFilter<"Flag"> | string | null
+    resolvedByUserId?: StringNullableFilter<"Flag"> | string | null
+    resolvedAt?: DateTimeNullableFilter<"Flag"> | Date | string | null
+    resolutionType?: EnumFlagResolutionTypeNullableFilter<"Flag"> | $Enums.FlagResolutionType | null
+    resolutionNote?: StringNullableFilter<"Flag"> | string | null
+    createdAt?: DateTimeFilter<"Flag"> | Date | string
+    updatedAt?: DateTimeFilter<"Flag"> | Date | string
+    meeting?: XOR<MeetingScalarRelationFilter, MeetingWhereInput>
+    workspace?: XOR<WorkspaceScalarRelationFilter, WorkspaceWhereInput>
+  }, "id">
+
+  export type FlagOrderByWithAggregationInput = {
+    id?: SortOrder
+    workspaceId?: SortOrder
+    meetingId?: SortOrder
+    type?: SortOrder
+    severity?: SortOrder
+    status?: SortOrder
+    evidence?: SortOrderInput | SortOrder
+    createdByType?: SortOrder
+    createdByUserId?: SortOrderInput | SortOrder
+    resolvedByUserId?: SortOrderInput | SortOrder
+    resolvedAt?: SortOrderInput | SortOrder
+    resolutionType?: SortOrderInput | SortOrder
+    resolutionNote?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: FlagCountOrderByAggregateInput
+    _max?: FlagMaxOrderByAggregateInput
+    _min?: FlagMinOrderByAggregateInput
+  }
+
+  export type FlagScalarWhereWithAggregatesInput = {
+    AND?: FlagScalarWhereWithAggregatesInput | FlagScalarWhereWithAggregatesInput[]
+    OR?: FlagScalarWhereWithAggregatesInput[]
+    NOT?: FlagScalarWhereWithAggregatesInput | FlagScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"Flag"> | string
+    workspaceId?: StringWithAggregatesFilter<"Flag"> | string
+    meetingId?: StringWithAggregatesFilter<"Flag"> | string
+    type?: EnumFlagTypeWithAggregatesFilter<"Flag"> | $Enums.FlagType
+    severity?: EnumFlagSeverityWithAggregatesFilter<"Flag"> | $Enums.FlagSeverity
+    status?: EnumFlagStatusWithAggregatesFilter<"Flag"> | $Enums.FlagStatus
+    evidence?: JsonNullableWithAggregatesFilter<"Flag">
+    createdByType?: EnumFlagCreatedByTypeWithAggregatesFilter<"Flag"> | $Enums.FlagCreatedByType
+    createdByUserId?: StringNullableWithAggregatesFilter<"Flag"> | string | null
+    resolvedByUserId?: StringNullableWithAggregatesFilter<"Flag"> | string | null
+    resolvedAt?: DateTimeNullableWithAggregatesFilter<"Flag"> | Date | string | null
+    resolutionType?: EnumFlagResolutionTypeNullableWithAggregatesFilter<"Flag"> | $Enums.FlagResolutionType | null
+    resolutionNote?: StringNullableWithAggregatesFilter<"Flag"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"Flag"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"Flag"> | Date | string
   }
 
   export type AuditEventWhereInput = {
@@ -14246,6 +16101,7 @@ export namespace Prisma {
     meetings?: MeetingCreateNestedManyWithoutWorkspaceInput
     auditEvents?: AuditEventCreateNestedManyWithoutWorkspaceInput
     invitations?: InvitationCreateNestedManyWithoutWorkspaceInput
+    flags?: FlagCreateNestedManyWithoutWorkspaceInput
   }
 
   export type WorkspaceUncheckedCreateInput = {
@@ -14262,6 +16118,7 @@ export namespace Prisma {
     meetings?: MeetingUncheckedCreateNestedManyWithoutWorkspaceInput
     auditEvents?: AuditEventUncheckedCreateNestedManyWithoutWorkspaceInput
     invitations?: InvitationUncheckedCreateNestedManyWithoutWorkspaceInput
+    flags?: FlagUncheckedCreateNestedManyWithoutWorkspaceInput
   }
 
   export type WorkspaceUpdateInput = {
@@ -14278,6 +16135,7 @@ export namespace Prisma {
     meetings?: MeetingUpdateManyWithoutWorkspaceNestedInput
     auditEvents?: AuditEventUpdateManyWithoutWorkspaceNestedInput
     invitations?: InvitationUpdateManyWithoutWorkspaceNestedInput
+    flags?: FlagUpdateManyWithoutWorkspaceNestedInput
   }
 
   export type WorkspaceUncheckedUpdateInput = {
@@ -14294,6 +16152,7 @@ export namespace Prisma {
     meetings?: MeetingUncheckedUpdateManyWithoutWorkspaceNestedInput
     auditEvents?: AuditEventUncheckedUpdateManyWithoutWorkspaceNestedInput
     invitations?: InvitationUncheckedUpdateManyWithoutWorkspaceNestedInput
+    flags?: FlagUncheckedUpdateManyWithoutWorkspaceNestedInput
   }
 
   export type WorkspaceCreateManyInput = {
@@ -14379,11 +16238,21 @@ export namespace Prisma {
     meetingDate: Date | string
     status?: $Enums.MeetingStatus
     fileUrl?: string | null
+    sourceFileSha256?: string | null
+    sourceFileName?: string | null
+    sourceFileSize?: number | null
+    sourceFileMime?: string | null
+    sourceUploadedAt?: Date | string | null
     transcript?: NullableJsonNullValueInput | InputJsonValue
     extraction?: NullableJsonNullValueInput | InputJsonValue
     searchableText?: string | null
     finalizedBy?: string | null
     finalizedAt?: Date | string | null
+    finalizeReason?: $Enums.FinalizeReason | null
+    finalizeNote?: string | null
+    finalizedPolicyVersion?: number | null
+    samplingBucket?: string | null
+    samplingRuleId?: string | null
     draftReadyAt?: Date | string | null
     timeToFinalize?: number | null
     readyForCCO?: boolean
@@ -14392,6 +16261,7 @@ export namespace Prisma {
     workspace: WorkspaceCreateNestedOneWithoutMeetingsInput
     versions?: VersionCreateNestedManyWithoutMeetingInput
     auditEvents?: AuditEventCreateNestedManyWithoutMeetingInput
+    flags?: FlagCreateNestedManyWithoutMeetingInput
   }
 
   export type MeetingUncheckedCreateInput = {
@@ -14402,11 +16272,21 @@ export namespace Prisma {
     meetingDate: Date | string
     status?: $Enums.MeetingStatus
     fileUrl?: string | null
+    sourceFileSha256?: string | null
+    sourceFileName?: string | null
+    sourceFileSize?: number | null
+    sourceFileMime?: string | null
+    sourceUploadedAt?: Date | string | null
     transcript?: NullableJsonNullValueInput | InputJsonValue
     extraction?: NullableJsonNullValueInput | InputJsonValue
     searchableText?: string | null
     finalizedBy?: string | null
     finalizedAt?: Date | string | null
+    finalizeReason?: $Enums.FinalizeReason | null
+    finalizeNote?: string | null
+    finalizedPolicyVersion?: number | null
+    samplingBucket?: string | null
+    samplingRuleId?: string | null
     draftReadyAt?: Date | string | null
     timeToFinalize?: number | null
     readyForCCO?: boolean
@@ -14414,6 +16294,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     versions?: VersionUncheckedCreateNestedManyWithoutMeetingInput
     auditEvents?: AuditEventUncheckedCreateNestedManyWithoutMeetingInput
+    flags?: FlagUncheckedCreateNestedManyWithoutMeetingInput
   }
 
   export type MeetingUpdateInput = {
@@ -14423,11 +16304,21 @@ export namespace Prisma {
     meetingDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumMeetingStatusFieldUpdateOperationsInput | $Enums.MeetingStatus
     fileUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceFileSha256?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceFileName?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceFileSize?: NullableIntFieldUpdateOperationsInput | number | null
+    sourceFileMime?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceUploadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     transcript?: NullableJsonNullValueInput | InputJsonValue
     extraction?: NullableJsonNullValueInput | InputJsonValue
     searchableText?: NullableStringFieldUpdateOperationsInput | string | null
     finalizedBy?: NullableStringFieldUpdateOperationsInput | string | null
     finalizedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    finalizeReason?: NullableEnumFinalizeReasonFieldUpdateOperationsInput | $Enums.FinalizeReason | null
+    finalizeNote?: NullableStringFieldUpdateOperationsInput | string | null
+    finalizedPolicyVersion?: NullableIntFieldUpdateOperationsInput | number | null
+    samplingBucket?: NullableStringFieldUpdateOperationsInput | string | null
+    samplingRuleId?: NullableStringFieldUpdateOperationsInput | string | null
     draftReadyAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     timeToFinalize?: NullableIntFieldUpdateOperationsInput | number | null
     readyForCCO?: BoolFieldUpdateOperationsInput | boolean
@@ -14436,6 +16327,7 @@ export namespace Prisma {
     workspace?: WorkspaceUpdateOneRequiredWithoutMeetingsNestedInput
     versions?: VersionUpdateManyWithoutMeetingNestedInput
     auditEvents?: AuditEventUpdateManyWithoutMeetingNestedInput
+    flags?: FlagUpdateManyWithoutMeetingNestedInput
   }
 
   export type MeetingUncheckedUpdateInput = {
@@ -14446,11 +16338,21 @@ export namespace Prisma {
     meetingDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumMeetingStatusFieldUpdateOperationsInput | $Enums.MeetingStatus
     fileUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceFileSha256?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceFileName?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceFileSize?: NullableIntFieldUpdateOperationsInput | number | null
+    sourceFileMime?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceUploadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     transcript?: NullableJsonNullValueInput | InputJsonValue
     extraction?: NullableJsonNullValueInput | InputJsonValue
     searchableText?: NullableStringFieldUpdateOperationsInput | string | null
     finalizedBy?: NullableStringFieldUpdateOperationsInput | string | null
     finalizedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    finalizeReason?: NullableEnumFinalizeReasonFieldUpdateOperationsInput | $Enums.FinalizeReason | null
+    finalizeNote?: NullableStringFieldUpdateOperationsInput | string | null
+    finalizedPolicyVersion?: NullableIntFieldUpdateOperationsInput | number | null
+    samplingBucket?: NullableStringFieldUpdateOperationsInput | string | null
+    samplingRuleId?: NullableStringFieldUpdateOperationsInput | string | null
     draftReadyAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     timeToFinalize?: NullableIntFieldUpdateOperationsInput | number | null
     readyForCCO?: BoolFieldUpdateOperationsInput | boolean
@@ -14458,6 +16360,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     versions?: VersionUncheckedUpdateManyWithoutMeetingNestedInput
     auditEvents?: AuditEventUncheckedUpdateManyWithoutMeetingNestedInput
+    flags?: FlagUncheckedUpdateManyWithoutMeetingNestedInput
   }
 
   export type MeetingCreateManyInput = {
@@ -14468,11 +16371,21 @@ export namespace Prisma {
     meetingDate: Date | string
     status?: $Enums.MeetingStatus
     fileUrl?: string | null
+    sourceFileSha256?: string | null
+    sourceFileName?: string | null
+    sourceFileSize?: number | null
+    sourceFileMime?: string | null
+    sourceUploadedAt?: Date | string | null
     transcript?: NullableJsonNullValueInput | InputJsonValue
     extraction?: NullableJsonNullValueInput | InputJsonValue
     searchableText?: string | null
     finalizedBy?: string | null
     finalizedAt?: Date | string | null
+    finalizeReason?: $Enums.FinalizeReason | null
+    finalizeNote?: string | null
+    finalizedPolicyVersion?: number | null
+    samplingBucket?: string | null
+    samplingRuleId?: string | null
     draftReadyAt?: Date | string | null
     timeToFinalize?: number | null
     readyForCCO?: boolean
@@ -14487,11 +16400,21 @@ export namespace Prisma {
     meetingDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumMeetingStatusFieldUpdateOperationsInput | $Enums.MeetingStatus
     fileUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceFileSha256?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceFileName?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceFileSize?: NullableIntFieldUpdateOperationsInput | number | null
+    sourceFileMime?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceUploadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     transcript?: NullableJsonNullValueInput | InputJsonValue
     extraction?: NullableJsonNullValueInput | InputJsonValue
     searchableText?: NullableStringFieldUpdateOperationsInput | string | null
     finalizedBy?: NullableStringFieldUpdateOperationsInput | string | null
     finalizedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    finalizeReason?: NullableEnumFinalizeReasonFieldUpdateOperationsInput | $Enums.FinalizeReason | null
+    finalizeNote?: NullableStringFieldUpdateOperationsInput | string | null
+    finalizedPolicyVersion?: NullableIntFieldUpdateOperationsInput | number | null
+    samplingBucket?: NullableStringFieldUpdateOperationsInput | string | null
+    samplingRuleId?: NullableStringFieldUpdateOperationsInput | string | null
     draftReadyAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     timeToFinalize?: NullableIntFieldUpdateOperationsInput | number | null
     readyForCCO?: BoolFieldUpdateOperationsInput | boolean
@@ -14507,11 +16430,21 @@ export namespace Prisma {
     meetingDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumMeetingStatusFieldUpdateOperationsInput | $Enums.MeetingStatus
     fileUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceFileSha256?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceFileName?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceFileSize?: NullableIntFieldUpdateOperationsInput | number | null
+    sourceFileMime?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceUploadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     transcript?: NullableJsonNullValueInput | InputJsonValue
     extraction?: NullableJsonNullValueInput | InputJsonValue
     searchableText?: NullableStringFieldUpdateOperationsInput | string | null
     finalizedBy?: NullableStringFieldUpdateOperationsInput | string | null
     finalizedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    finalizeReason?: NullableEnumFinalizeReasonFieldUpdateOperationsInput | $Enums.FinalizeReason | null
+    finalizeNote?: NullableStringFieldUpdateOperationsInput | string | null
+    finalizedPolicyVersion?: NullableIntFieldUpdateOperationsInput | number | null
+    samplingBucket?: NullableStringFieldUpdateOperationsInput | string | null
+    samplingRuleId?: NullableStringFieldUpdateOperationsInput | string | null
     draftReadyAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     timeToFinalize?: NullableIntFieldUpdateOperationsInput | number | null
     readyForCCO?: BoolFieldUpdateOperationsInput | boolean
@@ -14586,6 +16519,130 @@ export namespace Prisma {
     whatChanged?: StringFieldUpdateOperationsInput | string
     reason?: NullableStringFieldUpdateOperationsInput | string | null
     timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FlagCreateInput = {
+    id?: string
+    type: $Enums.FlagType
+    severity?: $Enums.FlagSeverity
+    status?: $Enums.FlagStatus
+    evidence?: NullableJsonNullValueInput | InputJsonValue
+    createdByType?: $Enums.FlagCreatedByType
+    createdByUserId?: string | null
+    resolvedByUserId?: string | null
+    resolvedAt?: Date | string | null
+    resolutionType?: $Enums.FlagResolutionType | null
+    resolutionNote?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    meeting: MeetingCreateNestedOneWithoutFlagsInput
+    workspace: WorkspaceCreateNestedOneWithoutFlagsInput
+  }
+
+  export type FlagUncheckedCreateInput = {
+    id?: string
+    workspaceId: string
+    meetingId: string
+    type: $Enums.FlagType
+    severity?: $Enums.FlagSeverity
+    status?: $Enums.FlagStatus
+    evidence?: NullableJsonNullValueInput | InputJsonValue
+    createdByType?: $Enums.FlagCreatedByType
+    createdByUserId?: string | null
+    resolvedByUserId?: string | null
+    resolvedAt?: Date | string | null
+    resolutionType?: $Enums.FlagResolutionType | null
+    resolutionNote?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type FlagUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: EnumFlagTypeFieldUpdateOperationsInput | $Enums.FlagType
+    severity?: EnumFlagSeverityFieldUpdateOperationsInput | $Enums.FlagSeverity
+    status?: EnumFlagStatusFieldUpdateOperationsInput | $Enums.FlagStatus
+    evidence?: NullableJsonNullValueInput | InputJsonValue
+    createdByType?: EnumFlagCreatedByTypeFieldUpdateOperationsInput | $Enums.FlagCreatedByType
+    createdByUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    resolvedByUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    resolutionType?: NullableEnumFlagResolutionTypeFieldUpdateOperationsInput | $Enums.FlagResolutionType | null
+    resolutionNote?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    meeting?: MeetingUpdateOneRequiredWithoutFlagsNestedInput
+    workspace?: WorkspaceUpdateOneRequiredWithoutFlagsNestedInput
+  }
+
+  export type FlagUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    workspaceId?: StringFieldUpdateOperationsInput | string
+    meetingId?: StringFieldUpdateOperationsInput | string
+    type?: EnumFlagTypeFieldUpdateOperationsInput | $Enums.FlagType
+    severity?: EnumFlagSeverityFieldUpdateOperationsInput | $Enums.FlagSeverity
+    status?: EnumFlagStatusFieldUpdateOperationsInput | $Enums.FlagStatus
+    evidence?: NullableJsonNullValueInput | InputJsonValue
+    createdByType?: EnumFlagCreatedByTypeFieldUpdateOperationsInput | $Enums.FlagCreatedByType
+    createdByUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    resolvedByUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    resolutionType?: NullableEnumFlagResolutionTypeFieldUpdateOperationsInput | $Enums.FlagResolutionType | null
+    resolutionNote?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FlagCreateManyInput = {
+    id?: string
+    workspaceId: string
+    meetingId: string
+    type: $Enums.FlagType
+    severity?: $Enums.FlagSeverity
+    status?: $Enums.FlagStatus
+    evidence?: NullableJsonNullValueInput | InputJsonValue
+    createdByType?: $Enums.FlagCreatedByType
+    createdByUserId?: string | null
+    resolvedByUserId?: string | null
+    resolvedAt?: Date | string | null
+    resolutionType?: $Enums.FlagResolutionType | null
+    resolutionNote?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type FlagUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: EnumFlagTypeFieldUpdateOperationsInput | $Enums.FlagType
+    severity?: EnumFlagSeverityFieldUpdateOperationsInput | $Enums.FlagSeverity
+    status?: EnumFlagStatusFieldUpdateOperationsInput | $Enums.FlagStatus
+    evidence?: NullableJsonNullValueInput | InputJsonValue
+    createdByType?: EnumFlagCreatedByTypeFieldUpdateOperationsInput | $Enums.FlagCreatedByType
+    createdByUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    resolvedByUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    resolutionType?: NullableEnumFlagResolutionTypeFieldUpdateOperationsInput | $Enums.FlagResolutionType | null
+    resolutionNote?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FlagUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    workspaceId?: StringFieldUpdateOperationsInput | string
+    meetingId?: StringFieldUpdateOperationsInput | string
+    type?: EnumFlagTypeFieldUpdateOperationsInput | $Enums.FlagType
+    severity?: EnumFlagSeverityFieldUpdateOperationsInput | $Enums.FlagSeverity
+    status?: EnumFlagStatusFieldUpdateOperationsInput | $Enums.FlagStatus
+    evidence?: NullableJsonNullValueInput | InputJsonValue
+    createdByType?: EnumFlagCreatedByTypeFieldUpdateOperationsInput | $Enums.FlagCreatedByType
+    createdByUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    resolvedByUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    resolutionType?: NullableEnumFlagResolutionTypeFieldUpdateOperationsInput | $Enums.FlagResolutionType | null
+    resolutionNote?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type AuditEventCreateInput = {
@@ -15106,6 +17163,12 @@ export namespace Prisma {
     none?: InvitationWhereInput
   }
 
+  export type FlagListRelationFilter = {
+    every?: FlagWhereInput
+    some?: FlagWhereInput
+    none?: FlagWhereInput
+  }
+
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
@@ -15124,6 +17187,10 @@ export namespace Prisma {
   }
 
   export type InvitationOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type FlagOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -15322,6 +17389,17 @@ export namespace Prisma {
     mode?: QueryMode
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
+
+  export type IntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
   export type JsonNullableFilter<$PrismaModel = never> =
     | PatchUndefined<
         Either<Required<JsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>,
@@ -15346,15 +17424,11 @@ export namespace Prisma {
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
 
-  export type IntNullableFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  export type EnumFinalizeReasonNullableFilter<$PrismaModel = never> = {
+    equals?: $Enums.FinalizeReason | EnumFinalizeReasonFieldRefInput<$PrismaModel> | null
+    in?: $Enums.FinalizeReason[] | ListEnumFinalizeReasonFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.FinalizeReason[] | ListEnumFinalizeReasonFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumFinalizeReasonNullableFilter<$PrismaModel> | $Enums.FinalizeReason | null
   }
 
   export type VersionListRelationFilter = {
@@ -15375,11 +17449,21 @@ export namespace Prisma {
     meetingDate?: SortOrder
     status?: SortOrder
     fileUrl?: SortOrder
+    sourceFileSha256?: SortOrder
+    sourceFileName?: SortOrder
+    sourceFileSize?: SortOrder
+    sourceFileMime?: SortOrder
+    sourceUploadedAt?: SortOrder
     transcript?: SortOrder
     extraction?: SortOrder
     searchableText?: SortOrder
     finalizedBy?: SortOrder
     finalizedAt?: SortOrder
+    finalizeReason?: SortOrder
+    finalizeNote?: SortOrder
+    finalizedPolicyVersion?: SortOrder
+    samplingBucket?: SortOrder
+    samplingRuleId?: SortOrder
     draftReadyAt?: SortOrder
     timeToFinalize?: SortOrder
     readyForCCO?: SortOrder
@@ -15388,6 +17472,8 @@ export namespace Prisma {
   }
 
   export type MeetingAvgOrderByAggregateInput = {
+    sourceFileSize?: SortOrder
+    finalizedPolicyVersion?: SortOrder
     timeToFinalize?: SortOrder
   }
 
@@ -15399,9 +17485,19 @@ export namespace Prisma {
     meetingDate?: SortOrder
     status?: SortOrder
     fileUrl?: SortOrder
+    sourceFileSha256?: SortOrder
+    sourceFileName?: SortOrder
+    sourceFileSize?: SortOrder
+    sourceFileMime?: SortOrder
+    sourceUploadedAt?: SortOrder
     searchableText?: SortOrder
     finalizedBy?: SortOrder
     finalizedAt?: SortOrder
+    finalizeReason?: SortOrder
+    finalizeNote?: SortOrder
+    finalizedPolicyVersion?: SortOrder
+    samplingBucket?: SortOrder
+    samplingRuleId?: SortOrder
     draftReadyAt?: SortOrder
     timeToFinalize?: SortOrder
     readyForCCO?: SortOrder
@@ -15417,9 +17513,19 @@ export namespace Prisma {
     meetingDate?: SortOrder
     status?: SortOrder
     fileUrl?: SortOrder
+    sourceFileSha256?: SortOrder
+    sourceFileName?: SortOrder
+    sourceFileSize?: SortOrder
+    sourceFileMime?: SortOrder
+    sourceUploadedAt?: SortOrder
     searchableText?: SortOrder
     finalizedBy?: SortOrder
     finalizedAt?: SortOrder
+    finalizeReason?: SortOrder
+    finalizeNote?: SortOrder
+    finalizedPolicyVersion?: SortOrder
+    samplingBucket?: SortOrder
+    samplingRuleId?: SortOrder
     draftReadyAt?: SortOrder
     timeToFinalize?: SortOrder
     readyForCCO?: SortOrder
@@ -15428,6 +17534,8 @@ export namespace Prisma {
   }
 
   export type MeetingSumOrderByAggregateInput = {
+    sourceFileSize?: SortOrder
+    finalizedPolicyVersion?: SortOrder
     timeToFinalize?: SortOrder
   }
 
@@ -15458,6 +17566,22 @@ export namespace Prisma {
     _min?: NestedStringNullableFilter<$PrismaModel>
     _max?: NestedStringNullableFilter<$PrismaModel>
   }
+
+  export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
+  }
   export type JsonNullableWithAggregatesFilter<$PrismaModel = never> =
     | PatchUndefined<
         Either<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
@@ -15485,20 +17609,14 @@ export namespace Prisma {
     _max?: NestedJsonNullableFilter<$PrismaModel>
   }
 
-  export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+  export type EnumFinalizeReasonNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.FinalizeReason | EnumFinalizeReasonFieldRefInput<$PrismaModel> | null
+    in?: $Enums.FinalizeReason[] | ListEnumFinalizeReasonFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.FinalizeReason[] | ListEnumFinalizeReasonFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumFinalizeReasonNullableWithAggregatesFilter<$PrismaModel> | $Enums.FinalizeReason | null
     _count?: NestedIntNullableFilter<$PrismaModel>
-    _avg?: NestedFloatNullableFilter<$PrismaModel>
-    _sum?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedIntNullableFilter<$PrismaModel>
-    _max?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedEnumFinalizeReasonNullableFilter<$PrismaModel>
+    _max?: NestedEnumFinalizeReasonNullableFilter<$PrismaModel>
   }
 
   export type MeetingScalarRelationFilter = {
@@ -15542,6 +17660,143 @@ export namespace Prisma {
 
   export type VersionSumOrderByAggregateInput = {
     version?: SortOrder
+  }
+
+  export type EnumFlagTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.FlagType | EnumFlagTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.FlagType[] | ListEnumFlagTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.FlagType[] | ListEnumFlagTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumFlagTypeFilter<$PrismaModel> | $Enums.FlagType
+  }
+
+  export type EnumFlagSeverityFilter<$PrismaModel = never> = {
+    equals?: $Enums.FlagSeverity | EnumFlagSeverityFieldRefInput<$PrismaModel>
+    in?: $Enums.FlagSeverity[] | ListEnumFlagSeverityFieldRefInput<$PrismaModel>
+    notIn?: $Enums.FlagSeverity[] | ListEnumFlagSeverityFieldRefInput<$PrismaModel>
+    not?: NestedEnumFlagSeverityFilter<$PrismaModel> | $Enums.FlagSeverity
+  }
+
+  export type EnumFlagStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.FlagStatus | EnumFlagStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.FlagStatus[] | ListEnumFlagStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.FlagStatus[] | ListEnumFlagStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumFlagStatusFilter<$PrismaModel> | $Enums.FlagStatus
+  }
+
+  export type EnumFlagCreatedByTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.FlagCreatedByType | EnumFlagCreatedByTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.FlagCreatedByType[] | ListEnumFlagCreatedByTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.FlagCreatedByType[] | ListEnumFlagCreatedByTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumFlagCreatedByTypeFilter<$PrismaModel> | $Enums.FlagCreatedByType
+  }
+
+  export type EnumFlagResolutionTypeNullableFilter<$PrismaModel = never> = {
+    equals?: $Enums.FlagResolutionType | EnumFlagResolutionTypeFieldRefInput<$PrismaModel> | null
+    in?: $Enums.FlagResolutionType[] | ListEnumFlagResolutionTypeFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.FlagResolutionType[] | ListEnumFlagResolutionTypeFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumFlagResolutionTypeNullableFilter<$PrismaModel> | $Enums.FlagResolutionType | null
+  }
+
+  export type FlagCountOrderByAggregateInput = {
+    id?: SortOrder
+    workspaceId?: SortOrder
+    meetingId?: SortOrder
+    type?: SortOrder
+    severity?: SortOrder
+    status?: SortOrder
+    evidence?: SortOrder
+    createdByType?: SortOrder
+    createdByUserId?: SortOrder
+    resolvedByUserId?: SortOrder
+    resolvedAt?: SortOrder
+    resolutionType?: SortOrder
+    resolutionNote?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type FlagMaxOrderByAggregateInput = {
+    id?: SortOrder
+    workspaceId?: SortOrder
+    meetingId?: SortOrder
+    type?: SortOrder
+    severity?: SortOrder
+    status?: SortOrder
+    createdByType?: SortOrder
+    createdByUserId?: SortOrder
+    resolvedByUserId?: SortOrder
+    resolvedAt?: SortOrder
+    resolutionType?: SortOrder
+    resolutionNote?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type FlagMinOrderByAggregateInput = {
+    id?: SortOrder
+    workspaceId?: SortOrder
+    meetingId?: SortOrder
+    type?: SortOrder
+    severity?: SortOrder
+    status?: SortOrder
+    createdByType?: SortOrder
+    createdByUserId?: SortOrder
+    resolvedByUserId?: SortOrder
+    resolvedAt?: SortOrder
+    resolutionType?: SortOrder
+    resolutionNote?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type EnumFlagTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.FlagType | EnumFlagTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.FlagType[] | ListEnumFlagTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.FlagType[] | ListEnumFlagTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumFlagTypeWithAggregatesFilter<$PrismaModel> | $Enums.FlagType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumFlagTypeFilter<$PrismaModel>
+    _max?: NestedEnumFlagTypeFilter<$PrismaModel>
+  }
+
+  export type EnumFlagSeverityWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.FlagSeverity | EnumFlagSeverityFieldRefInput<$PrismaModel>
+    in?: $Enums.FlagSeverity[] | ListEnumFlagSeverityFieldRefInput<$PrismaModel>
+    notIn?: $Enums.FlagSeverity[] | ListEnumFlagSeverityFieldRefInput<$PrismaModel>
+    not?: NestedEnumFlagSeverityWithAggregatesFilter<$PrismaModel> | $Enums.FlagSeverity
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumFlagSeverityFilter<$PrismaModel>
+    _max?: NestedEnumFlagSeverityFilter<$PrismaModel>
+  }
+
+  export type EnumFlagStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.FlagStatus | EnumFlagStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.FlagStatus[] | ListEnumFlagStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.FlagStatus[] | ListEnumFlagStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumFlagStatusWithAggregatesFilter<$PrismaModel> | $Enums.FlagStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumFlagStatusFilter<$PrismaModel>
+    _max?: NestedEnumFlagStatusFilter<$PrismaModel>
+  }
+
+  export type EnumFlagCreatedByTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.FlagCreatedByType | EnumFlagCreatedByTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.FlagCreatedByType[] | ListEnumFlagCreatedByTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.FlagCreatedByType[] | ListEnumFlagCreatedByTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumFlagCreatedByTypeWithAggregatesFilter<$PrismaModel> | $Enums.FlagCreatedByType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumFlagCreatedByTypeFilter<$PrismaModel>
+    _max?: NestedEnumFlagCreatedByTypeFilter<$PrismaModel>
+  }
+
+  export type EnumFlagResolutionTypeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.FlagResolutionType | EnumFlagResolutionTypeFieldRefInput<$PrismaModel> | null
+    in?: $Enums.FlagResolutionType[] | ListEnumFlagResolutionTypeFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.FlagResolutionType[] | ListEnumFlagResolutionTypeFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumFlagResolutionTypeNullableWithAggregatesFilter<$PrismaModel> | $Enums.FlagResolutionType | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedEnumFlagResolutionTypeNullableFilter<$PrismaModel>
+    _max?: NestedEnumFlagResolutionTypeNullableFilter<$PrismaModel>
   }
 
   export type EnumAuditActionFilter<$PrismaModel = never> = {
@@ -15820,6 +18075,13 @@ export namespace Prisma {
     connect?: InvitationWhereUniqueInput | InvitationWhereUniqueInput[]
   }
 
+  export type FlagCreateNestedManyWithoutWorkspaceInput = {
+    create?: XOR<FlagCreateWithoutWorkspaceInput, FlagUncheckedCreateWithoutWorkspaceInput> | FlagCreateWithoutWorkspaceInput[] | FlagUncheckedCreateWithoutWorkspaceInput[]
+    connectOrCreate?: FlagCreateOrConnectWithoutWorkspaceInput | FlagCreateOrConnectWithoutWorkspaceInput[]
+    createMany?: FlagCreateManyWorkspaceInputEnvelope
+    connect?: FlagWhereUniqueInput | FlagWhereUniqueInput[]
+  }
+
   export type UserWorkspaceUncheckedCreateNestedManyWithoutWorkspaceInput = {
     create?: XOR<UserWorkspaceCreateWithoutWorkspaceInput, UserWorkspaceUncheckedCreateWithoutWorkspaceInput> | UserWorkspaceCreateWithoutWorkspaceInput[] | UserWorkspaceUncheckedCreateWithoutWorkspaceInput[]
     connectOrCreate?: UserWorkspaceCreateOrConnectWithoutWorkspaceInput | UserWorkspaceCreateOrConnectWithoutWorkspaceInput[]
@@ -15846,6 +18108,13 @@ export namespace Prisma {
     connectOrCreate?: InvitationCreateOrConnectWithoutWorkspaceInput | InvitationCreateOrConnectWithoutWorkspaceInput[]
     createMany?: InvitationCreateManyWorkspaceInputEnvelope
     connect?: InvitationWhereUniqueInput | InvitationWhereUniqueInput[]
+  }
+
+  export type FlagUncheckedCreateNestedManyWithoutWorkspaceInput = {
+    create?: XOR<FlagCreateWithoutWorkspaceInput, FlagUncheckedCreateWithoutWorkspaceInput> | FlagCreateWithoutWorkspaceInput[] | FlagUncheckedCreateWithoutWorkspaceInput[]
+    connectOrCreate?: FlagCreateOrConnectWithoutWorkspaceInput | FlagCreateOrConnectWithoutWorkspaceInput[]
+    createMany?: FlagCreateManyWorkspaceInputEnvelope
+    connect?: FlagWhereUniqueInput | FlagWhereUniqueInput[]
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -15932,6 +18201,20 @@ export namespace Prisma {
     deleteMany?: InvitationScalarWhereInput | InvitationScalarWhereInput[]
   }
 
+  export type FlagUpdateManyWithoutWorkspaceNestedInput = {
+    create?: XOR<FlagCreateWithoutWorkspaceInput, FlagUncheckedCreateWithoutWorkspaceInput> | FlagCreateWithoutWorkspaceInput[] | FlagUncheckedCreateWithoutWorkspaceInput[]
+    connectOrCreate?: FlagCreateOrConnectWithoutWorkspaceInput | FlagCreateOrConnectWithoutWorkspaceInput[]
+    upsert?: FlagUpsertWithWhereUniqueWithoutWorkspaceInput | FlagUpsertWithWhereUniqueWithoutWorkspaceInput[]
+    createMany?: FlagCreateManyWorkspaceInputEnvelope
+    set?: FlagWhereUniqueInput | FlagWhereUniqueInput[]
+    disconnect?: FlagWhereUniqueInput | FlagWhereUniqueInput[]
+    delete?: FlagWhereUniqueInput | FlagWhereUniqueInput[]
+    connect?: FlagWhereUniqueInput | FlagWhereUniqueInput[]
+    update?: FlagUpdateWithWhereUniqueWithoutWorkspaceInput | FlagUpdateWithWhereUniqueWithoutWorkspaceInput[]
+    updateMany?: FlagUpdateManyWithWhereWithoutWorkspaceInput | FlagUpdateManyWithWhereWithoutWorkspaceInput[]
+    deleteMany?: FlagScalarWhereInput | FlagScalarWhereInput[]
+  }
+
   export type UserWorkspaceUncheckedUpdateManyWithoutWorkspaceNestedInput = {
     create?: XOR<UserWorkspaceCreateWithoutWorkspaceInput, UserWorkspaceUncheckedCreateWithoutWorkspaceInput> | UserWorkspaceCreateWithoutWorkspaceInput[] | UserWorkspaceUncheckedCreateWithoutWorkspaceInput[]
     connectOrCreate?: UserWorkspaceCreateOrConnectWithoutWorkspaceInput | UserWorkspaceCreateOrConnectWithoutWorkspaceInput[]
@@ -15988,6 +18271,20 @@ export namespace Prisma {
     deleteMany?: InvitationScalarWhereInput | InvitationScalarWhereInput[]
   }
 
+  export type FlagUncheckedUpdateManyWithoutWorkspaceNestedInput = {
+    create?: XOR<FlagCreateWithoutWorkspaceInput, FlagUncheckedCreateWithoutWorkspaceInput> | FlagCreateWithoutWorkspaceInput[] | FlagUncheckedCreateWithoutWorkspaceInput[]
+    connectOrCreate?: FlagCreateOrConnectWithoutWorkspaceInput | FlagCreateOrConnectWithoutWorkspaceInput[]
+    upsert?: FlagUpsertWithWhereUniqueWithoutWorkspaceInput | FlagUpsertWithWhereUniqueWithoutWorkspaceInput[]
+    createMany?: FlagCreateManyWorkspaceInputEnvelope
+    set?: FlagWhereUniqueInput | FlagWhereUniqueInput[]
+    disconnect?: FlagWhereUniqueInput | FlagWhereUniqueInput[]
+    delete?: FlagWhereUniqueInput | FlagWhereUniqueInput[]
+    connect?: FlagWhereUniqueInput | FlagWhereUniqueInput[]
+    update?: FlagUpdateWithWhereUniqueWithoutWorkspaceInput | FlagUpdateWithWhereUniqueWithoutWorkspaceInput[]
+    updateMany?: FlagUpdateManyWithWhereWithoutWorkspaceInput | FlagUpdateManyWithWhereWithoutWorkspaceInput[]
+    deleteMany?: FlagScalarWhereInput | FlagScalarWhereInput[]
+  }
+
   export type UserCreateNestedOneWithoutWorkspacesInput = {
     create?: XOR<UserCreateWithoutWorkspacesInput, UserUncheckedCreateWithoutWorkspacesInput>
     connectOrCreate?: UserCreateOrConnectWithoutWorkspacesInput
@@ -16040,6 +18337,13 @@ export namespace Prisma {
     connect?: AuditEventWhereUniqueInput | AuditEventWhereUniqueInput[]
   }
 
+  export type FlagCreateNestedManyWithoutMeetingInput = {
+    create?: XOR<FlagCreateWithoutMeetingInput, FlagUncheckedCreateWithoutMeetingInput> | FlagCreateWithoutMeetingInput[] | FlagUncheckedCreateWithoutMeetingInput[]
+    connectOrCreate?: FlagCreateOrConnectWithoutMeetingInput | FlagCreateOrConnectWithoutMeetingInput[]
+    createMany?: FlagCreateManyMeetingInputEnvelope
+    connect?: FlagWhereUniqueInput | FlagWhereUniqueInput[]
+  }
+
   export type VersionUncheckedCreateNestedManyWithoutMeetingInput = {
     create?: XOR<VersionCreateWithoutMeetingInput, VersionUncheckedCreateWithoutMeetingInput> | VersionCreateWithoutMeetingInput[] | VersionUncheckedCreateWithoutMeetingInput[]
     connectOrCreate?: VersionCreateOrConnectWithoutMeetingInput | VersionCreateOrConnectWithoutMeetingInput[]
@@ -16052,6 +18356,13 @@ export namespace Prisma {
     connectOrCreate?: AuditEventCreateOrConnectWithoutMeetingInput | AuditEventCreateOrConnectWithoutMeetingInput[]
     createMany?: AuditEventCreateManyMeetingInputEnvelope
     connect?: AuditEventWhereUniqueInput | AuditEventWhereUniqueInput[]
+  }
+
+  export type FlagUncheckedCreateNestedManyWithoutMeetingInput = {
+    create?: XOR<FlagCreateWithoutMeetingInput, FlagUncheckedCreateWithoutMeetingInput> | FlagCreateWithoutMeetingInput[] | FlagUncheckedCreateWithoutMeetingInput[]
+    connectOrCreate?: FlagCreateOrConnectWithoutMeetingInput | FlagCreateOrConnectWithoutMeetingInput[]
+    createMany?: FlagCreateManyMeetingInputEnvelope
+    connect?: FlagWhereUniqueInput | FlagWhereUniqueInput[]
   }
 
   export type EnumMeetingStatusFieldUpdateOperationsInput = {
@@ -16068,6 +18379,10 @@ export namespace Prisma {
     decrement?: number
     multiply?: number
     divide?: number
+  }
+
+  export type NullableEnumFinalizeReasonFieldUpdateOperationsInput = {
+    set?: $Enums.FinalizeReason | null
   }
 
   export type WorkspaceUpdateOneRequiredWithoutMeetingsNestedInput = {
@@ -16106,6 +18421,20 @@ export namespace Prisma {
     deleteMany?: AuditEventScalarWhereInput | AuditEventScalarWhereInput[]
   }
 
+  export type FlagUpdateManyWithoutMeetingNestedInput = {
+    create?: XOR<FlagCreateWithoutMeetingInput, FlagUncheckedCreateWithoutMeetingInput> | FlagCreateWithoutMeetingInput[] | FlagUncheckedCreateWithoutMeetingInput[]
+    connectOrCreate?: FlagCreateOrConnectWithoutMeetingInput | FlagCreateOrConnectWithoutMeetingInput[]
+    upsert?: FlagUpsertWithWhereUniqueWithoutMeetingInput | FlagUpsertWithWhereUniqueWithoutMeetingInput[]
+    createMany?: FlagCreateManyMeetingInputEnvelope
+    set?: FlagWhereUniqueInput | FlagWhereUniqueInput[]
+    disconnect?: FlagWhereUniqueInput | FlagWhereUniqueInput[]
+    delete?: FlagWhereUniqueInput | FlagWhereUniqueInput[]
+    connect?: FlagWhereUniqueInput | FlagWhereUniqueInput[]
+    update?: FlagUpdateWithWhereUniqueWithoutMeetingInput | FlagUpdateWithWhereUniqueWithoutMeetingInput[]
+    updateMany?: FlagUpdateManyWithWhereWithoutMeetingInput | FlagUpdateManyWithWhereWithoutMeetingInput[]
+    deleteMany?: FlagScalarWhereInput | FlagScalarWhereInput[]
+  }
+
   export type VersionUncheckedUpdateManyWithoutMeetingNestedInput = {
     create?: XOR<VersionCreateWithoutMeetingInput, VersionUncheckedCreateWithoutMeetingInput> | VersionCreateWithoutMeetingInput[] | VersionUncheckedCreateWithoutMeetingInput[]
     connectOrCreate?: VersionCreateOrConnectWithoutMeetingInput | VersionCreateOrConnectWithoutMeetingInput[]
@@ -16134,6 +18463,20 @@ export namespace Prisma {
     deleteMany?: AuditEventScalarWhereInput | AuditEventScalarWhereInput[]
   }
 
+  export type FlagUncheckedUpdateManyWithoutMeetingNestedInput = {
+    create?: XOR<FlagCreateWithoutMeetingInput, FlagUncheckedCreateWithoutMeetingInput> | FlagCreateWithoutMeetingInput[] | FlagUncheckedCreateWithoutMeetingInput[]
+    connectOrCreate?: FlagCreateOrConnectWithoutMeetingInput | FlagCreateOrConnectWithoutMeetingInput[]
+    upsert?: FlagUpsertWithWhereUniqueWithoutMeetingInput | FlagUpsertWithWhereUniqueWithoutMeetingInput[]
+    createMany?: FlagCreateManyMeetingInputEnvelope
+    set?: FlagWhereUniqueInput | FlagWhereUniqueInput[]
+    disconnect?: FlagWhereUniqueInput | FlagWhereUniqueInput[]
+    delete?: FlagWhereUniqueInput | FlagWhereUniqueInput[]
+    connect?: FlagWhereUniqueInput | FlagWhereUniqueInput[]
+    update?: FlagUpdateWithWhereUniqueWithoutMeetingInput | FlagUpdateWithWhereUniqueWithoutMeetingInput[]
+    updateMany?: FlagUpdateManyWithWhereWithoutMeetingInput | FlagUpdateManyWithWhereWithoutMeetingInput[]
+    deleteMany?: FlagScalarWhereInput | FlagScalarWhereInput[]
+  }
+
   export type MeetingCreateNestedOneWithoutVersionsInput = {
     create?: XOR<MeetingCreateWithoutVersionsInput, MeetingUncheckedCreateWithoutVersionsInput>
     connectOrCreate?: MeetingCreateOrConnectWithoutVersionsInput
@@ -16146,6 +18489,54 @@ export namespace Prisma {
     upsert?: MeetingUpsertWithoutVersionsInput
     connect?: MeetingWhereUniqueInput
     update?: XOR<XOR<MeetingUpdateToOneWithWhereWithoutVersionsInput, MeetingUpdateWithoutVersionsInput>, MeetingUncheckedUpdateWithoutVersionsInput>
+  }
+
+  export type MeetingCreateNestedOneWithoutFlagsInput = {
+    create?: XOR<MeetingCreateWithoutFlagsInput, MeetingUncheckedCreateWithoutFlagsInput>
+    connectOrCreate?: MeetingCreateOrConnectWithoutFlagsInput
+    connect?: MeetingWhereUniqueInput
+  }
+
+  export type WorkspaceCreateNestedOneWithoutFlagsInput = {
+    create?: XOR<WorkspaceCreateWithoutFlagsInput, WorkspaceUncheckedCreateWithoutFlagsInput>
+    connectOrCreate?: WorkspaceCreateOrConnectWithoutFlagsInput
+    connect?: WorkspaceWhereUniqueInput
+  }
+
+  export type EnumFlagTypeFieldUpdateOperationsInput = {
+    set?: $Enums.FlagType
+  }
+
+  export type EnumFlagSeverityFieldUpdateOperationsInput = {
+    set?: $Enums.FlagSeverity
+  }
+
+  export type EnumFlagStatusFieldUpdateOperationsInput = {
+    set?: $Enums.FlagStatus
+  }
+
+  export type EnumFlagCreatedByTypeFieldUpdateOperationsInput = {
+    set?: $Enums.FlagCreatedByType
+  }
+
+  export type NullableEnumFlagResolutionTypeFieldUpdateOperationsInput = {
+    set?: $Enums.FlagResolutionType | null
+  }
+
+  export type MeetingUpdateOneRequiredWithoutFlagsNestedInput = {
+    create?: XOR<MeetingCreateWithoutFlagsInput, MeetingUncheckedCreateWithoutFlagsInput>
+    connectOrCreate?: MeetingCreateOrConnectWithoutFlagsInput
+    upsert?: MeetingUpsertWithoutFlagsInput
+    connect?: MeetingWhereUniqueInput
+    update?: XOR<XOR<MeetingUpdateToOneWithWhereWithoutFlagsInput, MeetingUpdateWithoutFlagsInput>, MeetingUncheckedUpdateWithoutFlagsInput>
+  }
+
+  export type WorkspaceUpdateOneRequiredWithoutFlagsNestedInput = {
+    create?: XOR<WorkspaceCreateWithoutFlagsInput, WorkspaceUncheckedCreateWithoutFlagsInput>
+    connectOrCreate?: WorkspaceCreateOrConnectWithoutFlagsInput
+    upsert?: WorkspaceUpsertWithoutFlagsInput
+    connect?: WorkspaceWhereUniqueInput
+    update?: XOR<XOR<WorkspaceUpdateToOneWithWhereWithoutFlagsInput, WorkspaceUpdateWithoutFlagsInput>, WorkspaceUncheckedUpdateWithoutFlagsInput>
   }
 
   export type WorkspaceCreateNestedOneWithoutAuditEventsInput = {
@@ -16548,6 +18939,13 @@ export namespace Prisma {
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
 
+  export type NestedEnumFinalizeReasonNullableFilter<$PrismaModel = never> = {
+    equals?: $Enums.FinalizeReason | EnumFinalizeReasonFieldRefInput<$PrismaModel> | null
+    in?: $Enums.FinalizeReason[] | ListEnumFinalizeReasonFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.FinalizeReason[] | ListEnumFinalizeReasonFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumFinalizeReasonNullableFilter<$PrismaModel> | $Enums.FinalizeReason | null
+  }
+
   export type NestedEnumMeetingStatusWithAggregatesFilter<$PrismaModel = never> = {
     equals?: $Enums.MeetingStatus | EnumMeetingStatusFieldRefInput<$PrismaModel>
     in?: $Enums.MeetingStatus[] | ListEnumMeetingStatusFieldRefInput<$PrismaModel>
@@ -16573,29 +18971,6 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedStringNullableFilter<$PrismaModel>
     _max?: NestedStringNullableFilter<$PrismaModel>
-  }
-  export type NestedJsonNullableFilter<$PrismaModel = never> =
-    | PatchUndefined<
-        Either<Required<NestedJsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>,
-        Required<NestedJsonNullableFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>
-
-  export type NestedJsonNullableFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
 
   export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -16623,6 +18998,124 @@ export namespace Prisma {
     gt?: number | FloatFieldRefInput<$PrismaModel>
     gte?: number | FloatFieldRefInput<$PrismaModel>
     not?: NestedFloatNullableFilter<$PrismaModel> | number | null
+  }
+  export type NestedJsonNullableFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<NestedJsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>,
+        Required<NestedJsonNullableFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>
+
+  export type NestedJsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
+  export type NestedEnumFinalizeReasonNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.FinalizeReason | EnumFinalizeReasonFieldRefInput<$PrismaModel> | null
+    in?: $Enums.FinalizeReason[] | ListEnumFinalizeReasonFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.FinalizeReason[] | ListEnumFinalizeReasonFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumFinalizeReasonNullableWithAggregatesFilter<$PrismaModel> | $Enums.FinalizeReason | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedEnumFinalizeReasonNullableFilter<$PrismaModel>
+    _max?: NestedEnumFinalizeReasonNullableFilter<$PrismaModel>
+  }
+
+  export type NestedEnumFlagTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.FlagType | EnumFlagTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.FlagType[] | ListEnumFlagTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.FlagType[] | ListEnumFlagTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumFlagTypeFilter<$PrismaModel> | $Enums.FlagType
+  }
+
+  export type NestedEnumFlagSeverityFilter<$PrismaModel = never> = {
+    equals?: $Enums.FlagSeverity | EnumFlagSeverityFieldRefInput<$PrismaModel>
+    in?: $Enums.FlagSeverity[] | ListEnumFlagSeverityFieldRefInput<$PrismaModel>
+    notIn?: $Enums.FlagSeverity[] | ListEnumFlagSeverityFieldRefInput<$PrismaModel>
+    not?: NestedEnumFlagSeverityFilter<$PrismaModel> | $Enums.FlagSeverity
+  }
+
+  export type NestedEnumFlagStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.FlagStatus | EnumFlagStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.FlagStatus[] | ListEnumFlagStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.FlagStatus[] | ListEnumFlagStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumFlagStatusFilter<$PrismaModel> | $Enums.FlagStatus
+  }
+
+  export type NestedEnumFlagCreatedByTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.FlagCreatedByType | EnumFlagCreatedByTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.FlagCreatedByType[] | ListEnumFlagCreatedByTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.FlagCreatedByType[] | ListEnumFlagCreatedByTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumFlagCreatedByTypeFilter<$PrismaModel> | $Enums.FlagCreatedByType
+  }
+
+  export type NestedEnumFlagResolutionTypeNullableFilter<$PrismaModel = never> = {
+    equals?: $Enums.FlagResolutionType | EnumFlagResolutionTypeFieldRefInput<$PrismaModel> | null
+    in?: $Enums.FlagResolutionType[] | ListEnumFlagResolutionTypeFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.FlagResolutionType[] | ListEnumFlagResolutionTypeFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumFlagResolutionTypeNullableFilter<$PrismaModel> | $Enums.FlagResolutionType | null
+  }
+
+  export type NestedEnumFlagTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.FlagType | EnumFlagTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.FlagType[] | ListEnumFlagTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.FlagType[] | ListEnumFlagTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumFlagTypeWithAggregatesFilter<$PrismaModel> | $Enums.FlagType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumFlagTypeFilter<$PrismaModel>
+    _max?: NestedEnumFlagTypeFilter<$PrismaModel>
+  }
+
+  export type NestedEnumFlagSeverityWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.FlagSeverity | EnumFlagSeverityFieldRefInput<$PrismaModel>
+    in?: $Enums.FlagSeverity[] | ListEnumFlagSeverityFieldRefInput<$PrismaModel>
+    notIn?: $Enums.FlagSeverity[] | ListEnumFlagSeverityFieldRefInput<$PrismaModel>
+    not?: NestedEnumFlagSeverityWithAggregatesFilter<$PrismaModel> | $Enums.FlagSeverity
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumFlagSeverityFilter<$PrismaModel>
+    _max?: NestedEnumFlagSeverityFilter<$PrismaModel>
+  }
+
+  export type NestedEnumFlagStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.FlagStatus | EnumFlagStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.FlagStatus[] | ListEnumFlagStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.FlagStatus[] | ListEnumFlagStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumFlagStatusWithAggregatesFilter<$PrismaModel> | $Enums.FlagStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumFlagStatusFilter<$PrismaModel>
+    _max?: NestedEnumFlagStatusFilter<$PrismaModel>
+  }
+
+  export type NestedEnumFlagCreatedByTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.FlagCreatedByType | EnumFlagCreatedByTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.FlagCreatedByType[] | ListEnumFlagCreatedByTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.FlagCreatedByType[] | ListEnumFlagCreatedByTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumFlagCreatedByTypeWithAggregatesFilter<$PrismaModel> | $Enums.FlagCreatedByType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumFlagCreatedByTypeFilter<$PrismaModel>
+    _max?: NestedEnumFlagCreatedByTypeFilter<$PrismaModel>
+  }
+
+  export type NestedEnumFlagResolutionTypeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.FlagResolutionType | EnumFlagResolutionTypeFieldRefInput<$PrismaModel> | null
+    in?: $Enums.FlagResolutionType[] | ListEnumFlagResolutionTypeFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.FlagResolutionType[] | ListEnumFlagResolutionTypeFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumFlagResolutionTypeNullableWithAggregatesFilter<$PrismaModel> | $Enums.FlagResolutionType | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedEnumFlagResolutionTypeNullableFilter<$PrismaModel>
+    _max?: NestedEnumFlagResolutionTypeNullableFilter<$PrismaModel>
   }
 
   export type NestedEnumAuditActionFilter<$PrismaModel = never> = {
@@ -16669,11 +19162,21 @@ export namespace Prisma {
     meetingDate: Date | string
     status?: $Enums.MeetingStatus
     fileUrl?: string | null
+    sourceFileSha256?: string | null
+    sourceFileName?: string | null
+    sourceFileSize?: number | null
+    sourceFileMime?: string | null
+    sourceUploadedAt?: Date | string | null
     transcript?: NullableJsonNullValueInput | InputJsonValue
     extraction?: NullableJsonNullValueInput | InputJsonValue
     searchableText?: string | null
     finalizedBy?: string | null
     finalizedAt?: Date | string | null
+    finalizeReason?: $Enums.FinalizeReason | null
+    finalizeNote?: string | null
+    finalizedPolicyVersion?: number | null
+    samplingBucket?: string | null
+    samplingRuleId?: string | null
     draftReadyAt?: Date | string | null
     timeToFinalize?: number | null
     readyForCCO?: boolean
@@ -16681,6 +19184,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     versions?: VersionCreateNestedManyWithoutMeetingInput
     auditEvents?: AuditEventCreateNestedManyWithoutMeetingInput
+    flags?: FlagCreateNestedManyWithoutMeetingInput
   }
 
   export type MeetingUncheckedCreateWithoutWorkspaceInput = {
@@ -16690,11 +19194,21 @@ export namespace Prisma {
     meetingDate: Date | string
     status?: $Enums.MeetingStatus
     fileUrl?: string | null
+    sourceFileSha256?: string | null
+    sourceFileName?: string | null
+    sourceFileSize?: number | null
+    sourceFileMime?: string | null
+    sourceUploadedAt?: Date | string | null
     transcript?: NullableJsonNullValueInput | InputJsonValue
     extraction?: NullableJsonNullValueInput | InputJsonValue
     searchableText?: string | null
     finalizedBy?: string | null
     finalizedAt?: Date | string | null
+    finalizeReason?: $Enums.FinalizeReason | null
+    finalizeNote?: string | null
+    finalizedPolicyVersion?: number | null
+    samplingBucket?: string | null
+    samplingRuleId?: string | null
     draftReadyAt?: Date | string | null
     timeToFinalize?: number | null
     readyForCCO?: boolean
@@ -16702,6 +19216,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     versions?: VersionUncheckedCreateNestedManyWithoutMeetingInput
     auditEvents?: AuditEventUncheckedCreateNestedManyWithoutMeetingInput
+    flags?: FlagUncheckedCreateNestedManyWithoutMeetingInput
   }
 
   export type MeetingCreateOrConnectWithoutWorkspaceInput = {
@@ -16778,6 +19293,50 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type FlagCreateWithoutWorkspaceInput = {
+    id?: string
+    type: $Enums.FlagType
+    severity?: $Enums.FlagSeverity
+    status?: $Enums.FlagStatus
+    evidence?: NullableJsonNullValueInput | InputJsonValue
+    createdByType?: $Enums.FlagCreatedByType
+    createdByUserId?: string | null
+    resolvedByUserId?: string | null
+    resolvedAt?: Date | string | null
+    resolutionType?: $Enums.FlagResolutionType | null
+    resolutionNote?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    meeting: MeetingCreateNestedOneWithoutFlagsInput
+  }
+
+  export type FlagUncheckedCreateWithoutWorkspaceInput = {
+    id?: string
+    meetingId: string
+    type: $Enums.FlagType
+    severity?: $Enums.FlagSeverity
+    status?: $Enums.FlagStatus
+    evidence?: NullableJsonNullValueInput | InputJsonValue
+    createdByType?: $Enums.FlagCreatedByType
+    createdByUserId?: string | null
+    resolvedByUserId?: string | null
+    resolvedAt?: Date | string | null
+    resolutionType?: $Enums.FlagResolutionType | null
+    resolutionNote?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type FlagCreateOrConnectWithoutWorkspaceInput = {
+    where: FlagWhereUniqueInput
+    create: XOR<FlagCreateWithoutWorkspaceInput, FlagUncheckedCreateWithoutWorkspaceInput>
+  }
+
+  export type FlagCreateManyWorkspaceInputEnvelope = {
+    data: FlagCreateManyWorkspaceInput | FlagCreateManyWorkspaceInput[]
+    skipDuplicates?: boolean
+  }
+
   export type UserWorkspaceUpsertWithWhereUniqueWithoutWorkspaceInput = {
     where: UserWorkspaceWhereUniqueInput
     update: XOR<UserWorkspaceUpdateWithoutWorkspaceInput, UserWorkspaceUncheckedUpdateWithoutWorkspaceInput>
@@ -16830,11 +19389,21 @@ export namespace Prisma {
     meetingDate?: DateTimeFilter<"Meeting"> | Date | string
     status?: EnumMeetingStatusFilter<"Meeting"> | $Enums.MeetingStatus
     fileUrl?: StringNullableFilter<"Meeting"> | string | null
+    sourceFileSha256?: StringNullableFilter<"Meeting"> | string | null
+    sourceFileName?: StringNullableFilter<"Meeting"> | string | null
+    sourceFileSize?: IntNullableFilter<"Meeting"> | number | null
+    sourceFileMime?: StringNullableFilter<"Meeting"> | string | null
+    sourceUploadedAt?: DateTimeNullableFilter<"Meeting"> | Date | string | null
     transcript?: JsonNullableFilter<"Meeting">
     extraction?: JsonNullableFilter<"Meeting">
     searchableText?: StringNullableFilter<"Meeting"> | string | null
     finalizedBy?: StringNullableFilter<"Meeting"> | string | null
     finalizedAt?: DateTimeNullableFilter<"Meeting"> | Date | string | null
+    finalizeReason?: EnumFinalizeReasonNullableFilter<"Meeting"> | $Enums.FinalizeReason | null
+    finalizeNote?: StringNullableFilter<"Meeting"> | string | null
+    finalizedPolicyVersion?: IntNullableFilter<"Meeting"> | number | null
+    samplingBucket?: StringNullableFilter<"Meeting"> | string | null
+    samplingRuleId?: StringNullableFilter<"Meeting"> | string | null
     draftReadyAt?: DateTimeNullableFilter<"Meeting"> | Date | string | null
     timeToFinalize?: IntNullableFilter<"Meeting"> | number | null
     readyForCCO?: BoolFilter<"Meeting"> | boolean
@@ -16904,6 +19473,43 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Invitation"> | Date | string
   }
 
+  export type FlagUpsertWithWhereUniqueWithoutWorkspaceInput = {
+    where: FlagWhereUniqueInput
+    update: XOR<FlagUpdateWithoutWorkspaceInput, FlagUncheckedUpdateWithoutWorkspaceInput>
+    create: XOR<FlagCreateWithoutWorkspaceInput, FlagUncheckedCreateWithoutWorkspaceInput>
+  }
+
+  export type FlagUpdateWithWhereUniqueWithoutWorkspaceInput = {
+    where: FlagWhereUniqueInput
+    data: XOR<FlagUpdateWithoutWorkspaceInput, FlagUncheckedUpdateWithoutWorkspaceInput>
+  }
+
+  export type FlagUpdateManyWithWhereWithoutWorkspaceInput = {
+    where: FlagScalarWhereInput
+    data: XOR<FlagUpdateManyMutationInput, FlagUncheckedUpdateManyWithoutWorkspaceInput>
+  }
+
+  export type FlagScalarWhereInput = {
+    AND?: FlagScalarWhereInput | FlagScalarWhereInput[]
+    OR?: FlagScalarWhereInput[]
+    NOT?: FlagScalarWhereInput | FlagScalarWhereInput[]
+    id?: StringFilter<"Flag"> | string
+    workspaceId?: StringFilter<"Flag"> | string
+    meetingId?: StringFilter<"Flag"> | string
+    type?: EnumFlagTypeFilter<"Flag"> | $Enums.FlagType
+    severity?: EnumFlagSeverityFilter<"Flag"> | $Enums.FlagSeverity
+    status?: EnumFlagStatusFilter<"Flag"> | $Enums.FlagStatus
+    evidence?: JsonNullableFilter<"Flag">
+    createdByType?: EnumFlagCreatedByTypeFilter<"Flag"> | $Enums.FlagCreatedByType
+    createdByUserId?: StringNullableFilter<"Flag"> | string | null
+    resolvedByUserId?: StringNullableFilter<"Flag"> | string | null
+    resolvedAt?: DateTimeNullableFilter<"Flag"> | Date | string | null
+    resolutionType?: EnumFlagResolutionTypeNullableFilter<"Flag"> | $Enums.FlagResolutionType | null
+    resolutionNote?: StringNullableFilter<"Flag"> | string | null
+    createdAt?: DateTimeFilter<"Flag"> | Date | string
+    updatedAt?: DateTimeFilter<"Flag"> | Date | string
+  }
+
   export type UserCreateWithoutWorkspacesInput = {
     id?: string
     name?: string | null
@@ -16942,6 +19548,7 @@ export namespace Prisma {
     meetings?: MeetingCreateNestedManyWithoutWorkspaceInput
     auditEvents?: AuditEventCreateNestedManyWithoutWorkspaceInput
     invitations?: InvitationCreateNestedManyWithoutWorkspaceInput
+    flags?: FlagCreateNestedManyWithoutWorkspaceInput
   }
 
   export type WorkspaceUncheckedCreateWithoutUsersInput = {
@@ -16957,6 +19564,7 @@ export namespace Prisma {
     meetings?: MeetingUncheckedCreateNestedManyWithoutWorkspaceInput
     auditEvents?: AuditEventUncheckedCreateNestedManyWithoutWorkspaceInput
     invitations?: InvitationUncheckedCreateNestedManyWithoutWorkspaceInput
+    flags?: FlagUncheckedCreateNestedManyWithoutWorkspaceInput
   }
 
   export type WorkspaceCreateOrConnectWithoutUsersInput = {
@@ -17019,6 +19627,7 @@ export namespace Prisma {
     meetings?: MeetingUpdateManyWithoutWorkspaceNestedInput
     auditEvents?: AuditEventUpdateManyWithoutWorkspaceNestedInput
     invitations?: InvitationUpdateManyWithoutWorkspaceNestedInput
+    flags?: FlagUpdateManyWithoutWorkspaceNestedInput
   }
 
   export type WorkspaceUncheckedUpdateWithoutUsersInput = {
@@ -17034,6 +19643,7 @@ export namespace Prisma {
     meetings?: MeetingUncheckedUpdateManyWithoutWorkspaceNestedInput
     auditEvents?: AuditEventUncheckedUpdateManyWithoutWorkspaceNestedInput
     invitations?: InvitationUncheckedUpdateManyWithoutWorkspaceNestedInput
+    flags?: FlagUncheckedUpdateManyWithoutWorkspaceNestedInput
   }
 
   export type WorkspaceCreateWithoutMeetingsInput = {
@@ -17049,6 +19659,7 @@ export namespace Prisma {
     users?: UserWorkspaceCreateNestedManyWithoutWorkspaceInput
     auditEvents?: AuditEventCreateNestedManyWithoutWorkspaceInput
     invitations?: InvitationCreateNestedManyWithoutWorkspaceInput
+    flags?: FlagCreateNestedManyWithoutWorkspaceInput
   }
 
   export type WorkspaceUncheckedCreateWithoutMeetingsInput = {
@@ -17064,6 +19675,7 @@ export namespace Prisma {
     users?: UserWorkspaceUncheckedCreateNestedManyWithoutWorkspaceInput
     auditEvents?: AuditEventUncheckedCreateNestedManyWithoutWorkspaceInput
     invitations?: InvitationUncheckedCreateNestedManyWithoutWorkspaceInput
+    flags?: FlagUncheckedCreateNestedManyWithoutWorkspaceInput
   }
 
   export type WorkspaceCreateOrConnectWithoutMeetingsInput = {
@@ -17131,6 +19743,50 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type FlagCreateWithoutMeetingInput = {
+    id?: string
+    type: $Enums.FlagType
+    severity?: $Enums.FlagSeverity
+    status?: $Enums.FlagStatus
+    evidence?: NullableJsonNullValueInput | InputJsonValue
+    createdByType?: $Enums.FlagCreatedByType
+    createdByUserId?: string | null
+    resolvedByUserId?: string | null
+    resolvedAt?: Date | string | null
+    resolutionType?: $Enums.FlagResolutionType | null
+    resolutionNote?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    workspace: WorkspaceCreateNestedOneWithoutFlagsInput
+  }
+
+  export type FlagUncheckedCreateWithoutMeetingInput = {
+    id?: string
+    workspaceId: string
+    type: $Enums.FlagType
+    severity?: $Enums.FlagSeverity
+    status?: $Enums.FlagStatus
+    evidence?: NullableJsonNullValueInput | InputJsonValue
+    createdByType?: $Enums.FlagCreatedByType
+    createdByUserId?: string | null
+    resolvedByUserId?: string | null
+    resolvedAt?: Date | string | null
+    resolutionType?: $Enums.FlagResolutionType | null
+    resolutionNote?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type FlagCreateOrConnectWithoutMeetingInput = {
+    where: FlagWhereUniqueInput
+    create: XOR<FlagCreateWithoutMeetingInput, FlagUncheckedCreateWithoutMeetingInput>
+  }
+
+  export type FlagCreateManyMeetingInputEnvelope = {
+    data: FlagCreateManyMeetingInput | FlagCreateManyMeetingInput[]
+    skipDuplicates?: boolean
+  }
+
   export type WorkspaceUpsertWithoutMeetingsInput = {
     update: XOR<WorkspaceUpdateWithoutMeetingsInput, WorkspaceUncheckedUpdateWithoutMeetingsInput>
     create: XOR<WorkspaceCreateWithoutMeetingsInput, WorkspaceUncheckedCreateWithoutMeetingsInput>
@@ -17155,6 +19811,7 @@ export namespace Prisma {
     users?: UserWorkspaceUpdateManyWithoutWorkspaceNestedInput
     auditEvents?: AuditEventUpdateManyWithoutWorkspaceNestedInput
     invitations?: InvitationUpdateManyWithoutWorkspaceNestedInput
+    flags?: FlagUpdateManyWithoutWorkspaceNestedInput
   }
 
   export type WorkspaceUncheckedUpdateWithoutMeetingsInput = {
@@ -17170,6 +19827,7 @@ export namespace Prisma {
     users?: UserWorkspaceUncheckedUpdateManyWithoutWorkspaceNestedInput
     auditEvents?: AuditEventUncheckedUpdateManyWithoutWorkspaceNestedInput
     invitations?: InvitationUncheckedUpdateManyWithoutWorkspaceNestedInput
+    flags?: FlagUncheckedUpdateManyWithoutWorkspaceNestedInput
   }
 
   export type VersionUpsertWithWhereUniqueWithoutMeetingInput = {
@@ -17217,6 +19875,22 @@ export namespace Prisma {
     data: XOR<AuditEventUpdateManyMutationInput, AuditEventUncheckedUpdateManyWithoutMeetingInput>
   }
 
+  export type FlagUpsertWithWhereUniqueWithoutMeetingInput = {
+    where: FlagWhereUniqueInput
+    update: XOR<FlagUpdateWithoutMeetingInput, FlagUncheckedUpdateWithoutMeetingInput>
+    create: XOR<FlagCreateWithoutMeetingInput, FlagUncheckedCreateWithoutMeetingInput>
+  }
+
+  export type FlagUpdateWithWhereUniqueWithoutMeetingInput = {
+    where: FlagWhereUniqueInput
+    data: XOR<FlagUpdateWithoutMeetingInput, FlagUncheckedUpdateWithoutMeetingInput>
+  }
+
+  export type FlagUpdateManyWithWhereWithoutMeetingInput = {
+    where: FlagScalarWhereInput
+    data: XOR<FlagUpdateManyMutationInput, FlagUncheckedUpdateManyWithoutMeetingInput>
+  }
+
   export type MeetingCreateWithoutVersionsInput = {
     id?: string
     clientName: string
@@ -17224,11 +19898,21 @@ export namespace Prisma {
     meetingDate: Date | string
     status?: $Enums.MeetingStatus
     fileUrl?: string | null
+    sourceFileSha256?: string | null
+    sourceFileName?: string | null
+    sourceFileSize?: number | null
+    sourceFileMime?: string | null
+    sourceUploadedAt?: Date | string | null
     transcript?: NullableJsonNullValueInput | InputJsonValue
     extraction?: NullableJsonNullValueInput | InputJsonValue
     searchableText?: string | null
     finalizedBy?: string | null
     finalizedAt?: Date | string | null
+    finalizeReason?: $Enums.FinalizeReason | null
+    finalizeNote?: string | null
+    finalizedPolicyVersion?: number | null
+    samplingBucket?: string | null
+    samplingRuleId?: string | null
     draftReadyAt?: Date | string | null
     timeToFinalize?: number | null
     readyForCCO?: boolean
@@ -17236,6 +19920,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     workspace: WorkspaceCreateNestedOneWithoutMeetingsInput
     auditEvents?: AuditEventCreateNestedManyWithoutMeetingInput
+    flags?: FlagCreateNestedManyWithoutMeetingInput
   }
 
   export type MeetingUncheckedCreateWithoutVersionsInput = {
@@ -17246,17 +19931,28 @@ export namespace Prisma {
     meetingDate: Date | string
     status?: $Enums.MeetingStatus
     fileUrl?: string | null
+    sourceFileSha256?: string | null
+    sourceFileName?: string | null
+    sourceFileSize?: number | null
+    sourceFileMime?: string | null
+    sourceUploadedAt?: Date | string | null
     transcript?: NullableJsonNullValueInput | InputJsonValue
     extraction?: NullableJsonNullValueInput | InputJsonValue
     searchableText?: string | null
     finalizedBy?: string | null
     finalizedAt?: Date | string | null
+    finalizeReason?: $Enums.FinalizeReason | null
+    finalizeNote?: string | null
+    finalizedPolicyVersion?: number | null
+    samplingBucket?: string | null
+    samplingRuleId?: string | null
     draftReadyAt?: Date | string | null
     timeToFinalize?: number | null
     readyForCCO?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     auditEvents?: AuditEventUncheckedCreateNestedManyWithoutMeetingInput
+    flags?: FlagUncheckedCreateNestedManyWithoutMeetingInput
   }
 
   export type MeetingCreateOrConnectWithoutVersionsInput = {
@@ -17282,11 +19978,21 @@ export namespace Prisma {
     meetingDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumMeetingStatusFieldUpdateOperationsInput | $Enums.MeetingStatus
     fileUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceFileSha256?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceFileName?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceFileSize?: NullableIntFieldUpdateOperationsInput | number | null
+    sourceFileMime?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceUploadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     transcript?: NullableJsonNullValueInput | InputJsonValue
     extraction?: NullableJsonNullValueInput | InputJsonValue
     searchableText?: NullableStringFieldUpdateOperationsInput | string | null
     finalizedBy?: NullableStringFieldUpdateOperationsInput | string | null
     finalizedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    finalizeReason?: NullableEnumFinalizeReasonFieldUpdateOperationsInput | $Enums.FinalizeReason | null
+    finalizeNote?: NullableStringFieldUpdateOperationsInput | string | null
+    finalizedPolicyVersion?: NullableIntFieldUpdateOperationsInput | number | null
+    samplingBucket?: NullableStringFieldUpdateOperationsInput | string | null
+    samplingRuleId?: NullableStringFieldUpdateOperationsInput | string | null
     draftReadyAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     timeToFinalize?: NullableIntFieldUpdateOperationsInput | number | null
     readyForCCO?: BoolFieldUpdateOperationsInput | boolean
@@ -17294,6 +20000,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     workspace?: WorkspaceUpdateOneRequiredWithoutMeetingsNestedInput
     auditEvents?: AuditEventUpdateManyWithoutMeetingNestedInput
+    flags?: FlagUpdateManyWithoutMeetingNestedInput
   }
 
   export type MeetingUncheckedUpdateWithoutVersionsInput = {
@@ -17304,17 +20011,252 @@ export namespace Prisma {
     meetingDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumMeetingStatusFieldUpdateOperationsInput | $Enums.MeetingStatus
     fileUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceFileSha256?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceFileName?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceFileSize?: NullableIntFieldUpdateOperationsInput | number | null
+    sourceFileMime?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceUploadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     transcript?: NullableJsonNullValueInput | InputJsonValue
     extraction?: NullableJsonNullValueInput | InputJsonValue
     searchableText?: NullableStringFieldUpdateOperationsInput | string | null
     finalizedBy?: NullableStringFieldUpdateOperationsInput | string | null
     finalizedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    finalizeReason?: NullableEnumFinalizeReasonFieldUpdateOperationsInput | $Enums.FinalizeReason | null
+    finalizeNote?: NullableStringFieldUpdateOperationsInput | string | null
+    finalizedPolicyVersion?: NullableIntFieldUpdateOperationsInput | number | null
+    samplingBucket?: NullableStringFieldUpdateOperationsInput | string | null
+    samplingRuleId?: NullableStringFieldUpdateOperationsInput | string | null
     draftReadyAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     timeToFinalize?: NullableIntFieldUpdateOperationsInput | number | null
     readyForCCO?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     auditEvents?: AuditEventUncheckedUpdateManyWithoutMeetingNestedInput
+    flags?: FlagUncheckedUpdateManyWithoutMeetingNestedInput
+  }
+
+  export type MeetingCreateWithoutFlagsInput = {
+    id?: string
+    clientName: string
+    meetingType: string
+    meetingDate: Date | string
+    status?: $Enums.MeetingStatus
+    fileUrl?: string | null
+    sourceFileSha256?: string | null
+    sourceFileName?: string | null
+    sourceFileSize?: number | null
+    sourceFileMime?: string | null
+    sourceUploadedAt?: Date | string | null
+    transcript?: NullableJsonNullValueInput | InputJsonValue
+    extraction?: NullableJsonNullValueInput | InputJsonValue
+    searchableText?: string | null
+    finalizedBy?: string | null
+    finalizedAt?: Date | string | null
+    finalizeReason?: $Enums.FinalizeReason | null
+    finalizeNote?: string | null
+    finalizedPolicyVersion?: number | null
+    samplingBucket?: string | null
+    samplingRuleId?: string | null
+    draftReadyAt?: Date | string | null
+    timeToFinalize?: number | null
+    readyForCCO?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    workspace: WorkspaceCreateNestedOneWithoutMeetingsInput
+    versions?: VersionCreateNestedManyWithoutMeetingInput
+    auditEvents?: AuditEventCreateNestedManyWithoutMeetingInput
+  }
+
+  export type MeetingUncheckedCreateWithoutFlagsInput = {
+    id?: string
+    workspaceId: string
+    clientName: string
+    meetingType: string
+    meetingDate: Date | string
+    status?: $Enums.MeetingStatus
+    fileUrl?: string | null
+    sourceFileSha256?: string | null
+    sourceFileName?: string | null
+    sourceFileSize?: number | null
+    sourceFileMime?: string | null
+    sourceUploadedAt?: Date | string | null
+    transcript?: NullableJsonNullValueInput | InputJsonValue
+    extraction?: NullableJsonNullValueInput | InputJsonValue
+    searchableText?: string | null
+    finalizedBy?: string | null
+    finalizedAt?: Date | string | null
+    finalizeReason?: $Enums.FinalizeReason | null
+    finalizeNote?: string | null
+    finalizedPolicyVersion?: number | null
+    samplingBucket?: string | null
+    samplingRuleId?: string | null
+    draftReadyAt?: Date | string | null
+    timeToFinalize?: number | null
+    readyForCCO?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    versions?: VersionUncheckedCreateNestedManyWithoutMeetingInput
+    auditEvents?: AuditEventUncheckedCreateNestedManyWithoutMeetingInput
+  }
+
+  export type MeetingCreateOrConnectWithoutFlagsInput = {
+    where: MeetingWhereUniqueInput
+    create: XOR<MeetingCreateWithoutFlagsInput, MeetingUncheckedCreateWithoutFlagsInput>
+  }
+
+  export type WorkspaceCreateWithoutFlagsInput = {
+    id?: string
+    name: string
+    retentionYears?: number
+    legalHold?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    billingStatus?: $Enums.BillingStatus
+    pilotStartDate?: Date | string | null
+    subscriptionStartDate?: Date | string | null
+    users?: UserWorkspaceCreateNestedManyWithoutWorkspaceInput
+    meetings?: MeetingCreateNestedManyWithoutWorkspaceInput
+    auditEvents?: AuditEventCreateNestedManyWithoutWorkspaceInput
+    invitations?: InvitationCreateNestedManyWithoutWorkspaceInput
+  }
+
+  export type WorkspaceUncheckedCreateWithoutFlagsInput = {
+    id?: string
+    name: string
+    retentionYears?: number
+    legalHold?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    billingStatus?: $Enums.BillingStatus
+    pilotStartDate?: Date | string | null
+    subscriptionStartDate?: Date | string | null
+    users?: UserWorkspaceUncheckedCreateNestedManyWithoutWorkspaceInput
+    meetings?: MeetingUncheckedCreateNestedManyWithoutWorkspaceInput
+    auditEvents?: AuditEventUncheckedCreateNestedManyWithoutWorkspaceInput
+    invitations?: InvitationUncheckedCreateNestedManyWithoutWorkspaceInput
+  }
+
+  export type WorkspaceCreateOrConnectWithoutFlagsInput = {
+    where: WorkspaceWhereUniqueInput
+    create: XOR<WorkspaceCreateWithoutFlagsInput, WorkspaceUncheckedCreateWithoutFlagsInput>
+  }
+
+  export type MeetingUpsertWithoutFlagsInput = {
+    update: XOR<MeetingUpdateWithoutFlagsInput, MeetingUncheckedUpdateWithoutFlagsInput>
+    create: XOR<MeetingCreateWithoutFlagsInput, MeetingUncheckedCreateWithoutFlagsInput>
+    where?: MeetingWhereInput
+  }
+
+  export type MeetingUpdateToOneWithWhereWithoutFlagsInput = {
+    where?: MeetingWhereInput
+    data: XOR<MeetingUpdateWithoutFlagsInput, MeetingUncheckedUpdateWithoutFlagsInput>
+  }
+
+  export type MeetingUpdateWithoutFlagsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    clientName?: StringFieldUpdateOperationsInput | string
+    meetingType?: StringFieldUpdateOperationsInput | string
+    meetingDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumMeetingStatusFieldUpdateOperationsInput | $Enums.MeetingStatus
+    fileUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceFileSha256?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceFileName?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceFileSize?: NullableIntFieldUpdateOperationsInput | number | null
+    sourceFileMime?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceUploadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    transcript?: NullableJsonNullValueInput | InputJsonValue
+    extraction?: NullableJsonNullValueInput | InputJsonValue
+    searchableText?: NullableStringFieldUpdateOperationsInput | string | null
+    finalizedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    finalizedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    finalizeReason?: NullableEnumFinalizeReasonFieldUpdateOperationsInput | $Enums.FinalizeReason | null
+    finalizeNote?: NullableStringFieldUpdateOperationsInput | string | null
+    finalizedPolicyVersion?: NullableIntFieldUpdateOperationsInput | number | null
+    samplingBucket?: NullableStringFieldUpdateOperationsInput | string | null
+    samplingRuleId?: NullableStringFieldUpdateOperationsInput | string | null
+    draftReadyAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    timeToFinalize?: NullableIntFieldUpdateOperationsInput | number | null
+    readyForCCO?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    workspace?: WorkspaceUpdateOneRequiredWithoutMeetingsNestedInput
+    versions?: VersionUpdateManyWithoutMeetingNestedInput
+    auditEvents?: AuditEventUpdateManyWithoutMeetingNestedInput
+  }
+
+  export type MeetingUncheckedUpdateWithoutFlagsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    workspaceId?: StringFieldUpdateOperationsInput | string
+    clientName?: StringFieldUpdateOperationsInput | string
+    meetingType?: StringFieldUpdateOperationsInput | string
+    meetingDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumMeetingStatusFieldUpdateOperationsInput | $Enums.MeetingStatus
+    fileUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceFileSha256?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceFileName?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceFileSize?: NullableIntFieldUpdateOperationsInput | number | null
+    sourceFileMime?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceUploadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    transcript?: NullableJsonNullValueInput | InputJsonValue
+    extraction?: NullableJsonNullValueInput | InputJsonValue
+    searchableText?: NullableStringFieldUpdateOperationsInput | string | null
+    finalizedBy?: NullableStringFieldUpdateOperationsInput | string | null
+    finalizedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    finalizeReason?: NullableEnumFinalizeReasonFieldUpdateOperationsInput | $Enums.FinalizeReason | null
+    finalizeNote?: NullableStringFieldUpdateOperationsInput | string | null
+    finalizedPolicyVersion?: NullableIntFieldUpdateOperationsInput | number | null
+    samplingBucket?: NullableStringFieldUpdateOperationsInput | string | null
+    samplingRuleId?: NullableStringFieldUpdateOperationsInput | string | null
+    draftReadyAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    timeToFinalize?: NullableIntFieldUpdateOperationsInput | number | null
+    readyForCCO?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    versions?: VersionUncheckedUpdateManyWithoutMeetingNestedInput
+    auditEvents?: AuditEventUncheckedUpdateManyWithoutMeetingNestedInput
+  }
+
+  export type WorkspaceUpsertWithoutFlagsInput = {
+    update: XOR<WorkspaceUpdateWithoutFlagsInput, WorkspaceUncheckedUpdateWithoutFlagsInput>
+    create: XOR<WorkspaceCreateWithoutFlagsInput, WorkspaceUncheckedCreateWithoutFlagsInput>
+    where?: WorkspaceWhereInput
+  }
+
+  export type WorkspaceUpdateToOneWithWhereWithoutFlagsInput = {
+    where?: WorkspaceWhereInput
+    data: XOR<WorkspaceUpdateWithoutFlagsInput, WorkspaceUncheckedUpdateWithoutFlagsInput>
+  }
+
+  export type WorkspaceUpdateWithoutFlagsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    retentionYears?: IntFieldUpdateOperationsInput | number
+    legalHold?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    billingStatus?: EnumBillingStatusFieldUpdateOperationsInput | $Enums.BillingStatus
+    pilotStartDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionStartDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    users?: UserWorkspaceUpdateManyWithoutWorkspaceNestedInput
+    meetings?: MeetingUpdateManyWithoutWorkspaceNestedInput
+    auditEvents?: AuditEventUpdateManyWithoutWorkspaceNestedInput
+    invitations?: InvitationUpdateManyWithoutWorkspaceNestedInput
+  }
+
+  export type WorkspaceUncheckedUpdateWithoutFlagsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    retentionYears?: IntFieldUpdateOperationsInput | number
+    legalHold?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    billingStatus?: EnumBillingStatusFieldUpdateOperationsInput | $Enums.BillingStatus
+    pilotStartDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    subscriptionStartDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    users?: UserWorkspaceUncheckedUpdateManyWithoutWorkspaceNestedInput
+    meetings?: MeetingUncheckedUpdateManyWithoutWorkspaceNestedInput
+    auditEvents?: AuditEventUncheckedUpdateManyWithoutWorkspaceNestedInput
+    invitations?: InvitationUncheckedUpdateManyWithoutWorkspaceNestedInput
   }
 
   export type WorkspaceCreateWithoutAuditEventsInput = {
@@ -17330,6 +20272,7 @@ export namespace Prisma {
     users?: UserWorkspaceCreateNestedManyWithoutWorkspaceInput
     meetings?: MeetingCreateNestedManyWithoutWorkspaceInput
     invitations?: InvitationCreateNestedManyWithoutWorkspaceInput
+    flags?: FlagCreateNestedManyWithoutWorkspaceInput
   }
 
   export type WorkspaceUncheckedCreateWithoutAuditEventsInput = {
@@ -17345,6 +20288,7 @@ export namespace Prisma {
     users?: UserWorkspaceUncheckedCreateNestedManyWithoutWorkspaceInput
     meetings?: MeetingUncheckedCreateNestedManyWithoutWorkspaceInput
     invitations?: InvitationUncheckedCreateNestedManyWithoutWorkspaceInput
+    flags?: FlagUncheckedCreateNestedManyWithoutWorkspaceInput
   }
 
   export type WorkspaceCreateOrConnectWithoutAuditEventsInput = {
@@ -17359,11 +20303,21 @@ export namespace Prisma {
     meetingDate: Date | string
     status?: $Enums.MeetingStatus
     fileUrl?: string | null
+    sourceFileSha256?: string | null
+    sourceFileName?: string | null
+    sourceFileSize?: number | null
+    sourceFileMime?: string | null
+    sourceUploadedAt?: Date | string | null
     transcript?: NullableJsonNullValueInput | InputJsonValue
     extraction?: NullableJsonNullValueInput | InputJsonValue
     searchableText?: string | null
     finalizedBy?: string | null
     finalizedAt?: Date | string | null
+    finalizeReason?: $Enums.FinalizeReason | null
+    finalizeNote?: string | null
+    finalizedPolicyVersion?: number | null
+    samplingBucket?: string | null
+    samplingRuleId?: string | null
     draftReadyAt?: Date | string | null
     timeToFinalize?: number | null
     readyForCCO?: boolean
@@ -17371,6 +20325,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     workspace: WorkspaceCreateNestedOneWithoutMeetingsInput
     versions?: VersionCreateNestedManyWithoutMeetingInput
+    flags?: FlagCreateNestedManyWithoutMeetingInput
   }
 
   export type MeetingUncheckedCreateWithoutAuditEventsInput = {
@@ -17381,17 +20336,28 @@ export namespace Prisma {
     meetingDate: Date | string
     status?: $Enums.MeetingStatus
     fileUrl?: string | null
+    sourceFileSha256?: string | null
+    sourceFileName?: string | null
+    sourceFileSize?: number | null
+    sourceFileMime?: string | null
+    sourceUploadedAt?: Date | string | null
     transcript?: NullableJsonNullValueInput | InputJsonValue
     extraction?: NullableJsonNullValueInput | InputJsonValue
     searchableText?: string | null
     finalizedBy?: string | null
     finalizedAt?: Date | string | null
+    finalizeReason?: $Enums.FinalizeReason | null
+    finalizeNote?: string | null
+    finalizedPolicyVersion?: number | null
+    samplingBucket?: string | null
+    samplingRuleId?: string | null
     draftReadyAt?: Date | string | null
     timeToFinalize?: number | null
     readyForCCO?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     versions?: VersionUncheckedCreateNestedManyWithoutMeetingInput
+    flags?: FlagUncheckedCreateNestedManyWithoutMeetingInput
   }
 
   export type MeetingCreateOrConnectWithoutAuditEventsInput = {
@@ -17423,6 +20389,7 @@ export namespace Prisma {
     users?: UserWorkspaceUpdateManyWithoutWorkspaceNestedInput
     meetings?: MeetingUpdateManyWithoutWorkspaceNestedInput
     invitations?: InvitationUpdateManyWithoutWorkspaceNestedInput
+    flags?: FlagUpdateManyWithoutWorkspaceNestedInput
   }
 
   export type WorkspaceUncheckedUpdateWithoutAuditEventsInput = {
@@ -17438,6 +20405,7 @@ export namespace Prisma {
     users?: UserWorkspaceUncheckedUpdateManyWithoutWorkspaceNestedInput
     meetings?: MeetingUncheckedUpdateManyWithoutWorkspaceNestedInput
     invitations?: InvitationUncheckedUpdateManyWithoutWorkspaceNestedInput
+    flags?: FlagUncheckedUpdateManyWithoutWorkspaceNestedInput
   }
 
   export type MeetingUpsertWithoutAuditEventsInput = {
@@ -17458,11 +20426,21 @@ export namespace Prisma {
     meetingDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumMeetingStatusFieldUpdateOperationsInput | $Enums.MeetingStatus
     fileUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceFileSha256?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceFileName?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceFileSize?: NullableIntFieldUpdateOperationsInput | number | null
+    sourceFileMime?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceUploadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     transcript?: NullableJsonNullValueInput | InputJsonValue
     extraction?: NullableJsonNullValueInput | InputJsonValue
     searchableText?: NullableStringFieldUpdateOperationsInput | string | null
     finalizedBy?: NullableStringFieldUpdateOperationsInput | string | null
     finalizedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    finalizeReason?: NullableEnumFinalizeReasonFieldUpdateOperationsInput | $Enums.FinalizeReason | null
+    finalizeNote?: NullableStringFieldUpdateOperationsInput | string | null
+    finalizedPolicyVersion?: NullableIntFieldUpdateOperationsInput | number | null
+    samplingBucket?: NullableStringFieldUpdateOperationsInput | string | null
+    samplingRuleId?: NullableStringFieldUpdateOperationsInput | string | null
     draftReadyAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     timeToFinalize?: NullableIntFieldUpdateOperationsInput | number | null
     readyForCCO?: BoolFieldUpdateOperationsInput | boolean
@@ -17470,6 +20448,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     workspace?: WorkspaceUpdateOneRequiredWithoutMeetingsNestedInput
     versions?: VersionUpdateManyWithoutMeetingNestedInput
+    flags?: FlagUpdateManyWithoutMeetingNestedInput
   }
 
   export type MeetingUncheckedUpdateWithoutAuditEventsInput = {
@@ -17480,17 +20459,28 @@ export namespace Prisma {
     meetingDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumMeetingStatusFieldUpdateOperationsInput | $Enums.MeetingStatus
     fileUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceFileSha256?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceFileName?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceFileSize?: NullableIntFieldUpdateOperationsInput | number | null
+    sourceFileMime?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceUploadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     transcript?: NullableJsonNullValueInput | InputJsonValue
     extraction?: NullableJsonNullValueInput | InputJsonValue
     searchableText?: NullableStringFieldUpdateOperationsInput | string | null
     finalizedBy?: NullableStringFieldUpdateOperationsInput | string | null
     finalizedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    finalizeReason?: NullableEnumFinalizeReasonFieldUpdateOperationsInput | $Enums.FinalizeReason | null
+    finalizeNote?: NullableStringFieldUpdateOperationsInput | string | null
+    finalizedPolicyVersion?: NullableIntFieldUpdateOperationsInput | number | null
+    samplingBucket?: NullableStringFieldUpdateOperationsInput | string | null
+    samplingRuleId?: NullableStringFieldUpdateOperationsInput | string | null
     draftReadyAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     timeToFinalize?: NullableIntFieldUpdateOperationsInput | number | null
     readyForCCO?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     versions?: VersionUncheckedUpdateManyWithoutMeetingNestedInput
+    flags?: FlagUncheckedUpdateManyWithoutMeetingNestedInput
   }
 
   export type UserCreateWithoutAccountsInput = {
@@ -17777,6 +20767,7 @@ export namespace Prisma {
     users?: UserWorkspaceCreateNestedManyWithoutWorkspaceInput
     meetings?: MeetingCreateNestedManyWithoutWorkspaceInput
     auditEvents?: AuditEventCreateNestedManyWithoutWorkspaceInput
+    flags?: FlagCreateNestedManyWithoutWorkspaceInput
   }
 
   export type WorkspaceUncheckedCreateWithoutInvitationsInput = {
@@ -17792,6 +20783,7 @@ export namespace Prisma {
     users?: UserWorkspaceUncheckedCreateNestedManyWithoutWorkspaceInput
     meetings?: MeetingUncheckedCreateNestedManyWithoutWorkspaceInput
     auditEvents?: AuditEventUncheckedCreateNestedManyWithoutWorkspaceInput
+    flags?: FlagUncheckedCreateNestedManyWithoutWorkspaceInput
   }
 
   export type WorkspaceCreateOrConnectWithoutInvitationsInput = {
@@ -17823,6 +20815,7 @@ export namespace Prisma {
     users?: UserWorkspaceUpdateManyWithoutWorkspaceNestedInput
     meetings?: MeetingUpdateManyWithoutWorkspaceNestedInput
     auditEvents?: AuditEventUpdateManyWithoutWorkspaceNestedInput
+    flags?: FlagUpdateManyWithoutWorkspaceNestedInput
   }
 
   export type WorkspaceUncheckedUpdateWithoutInvitationsInput = {
@@ -17838,6 +20831,7 @@ export namespace Prisma {
     users?: UserWorkspaceUncheckedUpdateManyWithoutWorkspaceNestedInput
     meetings?: MeetingUncheckedUpdateManyWithoutWorkspaceNestedInput
     auditEvents?: AuditEventUncheckedUpdateManyWithoutWorkspaceNestedInput
+    flags?: FlagUncheckedUpdateManyWithoutWorkspaceNestedInput
   }
 
   export type UserWorkspaceCreateManyWorkspaceInput = {
@@ -17852,11 +20846,21 @@ export namespace Prisma {
     meetingDate: Date | string
     status?: $Enums.MeetingStatus
     fileUrl?: string | null
+    sourceFileSha256?: string | null
+    sourceFileName?: string | null
+    sourceFileSize?: number | null
+    sourceFileMime?: string | null
+    sourceUploadedAt?: Date | string | null
     transcript?: NullableJsonNullValueInput | InputJsonValue
     extraction?: NullableJsonNullValueInput | InputJsonValue
     searchableText?: string | null
     finalizedBy?: string | null
     finalizedAt?: Date | string | null
+    finalizeReason?: $Enums.FinalizeReason | null
+    finalizeNote?: string | null
+    finalizedPolicyVersion?: number | null
+    samplingBucket?: string | null
+    samplingRuleId?: string | null
     draftReadyAt?: Date | string | null
     timeToFinalize?: number | null
     readyForCCO?: boolean
@@ -17886,6 +20890,23 @@ export namespace Prisma {
     createdAt?: Date | string
   }
 
+  export type FlagCreateManyWorkspaceInput = {
+    id?: string
+    meetingId: string
+    type: $Enums.FlagType
+    severity?: $Enums.FlagSeverity
+    status?: $Enums.FlagStatus
+    evidence?: NullableJsonNullValueInput | InputJsonValue
+    createdByType?: $Enums.FlagCreatedByType
+    createdByUserId?: string | null
+    resolvedByUserId?: string | null
+    resolvedAt?: Date | string | null
+    resolutionType?: $Enums.FlagResolutionType | null
+    resolutionNote?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type UserWorkspaceUpdateWithoutWorkspaceInput = {
     role?: EnumWorkspaceRoleFieldUpdateOperationsInput | $Enums.WorkspaceRole
     user?: UserUpdateOneRequiredWithoutWorkspacesNestedInput
@@ -17908,11 +20929,21 @@ export namespace Prisma {
     meetingDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumMeetingStatusFieldUpdateOperationsInput | $Enums.MeetingStatus
     fileUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceFileSha256?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceFileName?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceFileSize?: NullableIntFieldUpdateOperationsInput | number | null
+    sourceFileMime?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceUploadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     transcript?: NullableJsonNullValueInput | InputJsonValue
     extraction?: NullableJsonNullValueInput | InputJsonValue
     searchableText?: NullableStringFieldUpdateOperationsInput | string | null
     finalizedBy?: NullableStringFieldUpdateOperationsInput | string | null
     finalizedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    finalizeReason?: NullableEnumFinalizeReasonFieldUpdateOperationsInput | $Enums.FinalizeReason | null
+    finalizeNote?: NullableStringFieldUpdateOperationsInput | string | null
+    finalizedPolicyVersion?: NullableIntFieldUpdateOperationsInput | number | null
+    samplingBucket?: NullableStringFieldUpdateOperationsInput | string | null
+    samplingRuleId?: NullableStringFieldUpdateOperationsInput | string | null
     draftReadyAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     timeToFinalize?: NullableIntFieldUpdateOperationsInput | number | null
     readyForCCO?: BoolFieldUpdateOperationsInput | boolean
@@ -17920,6 +20951,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     versions?: VersionUpdateManyWithoutMeetingNestedInput
     auditEvents?: AuditEventUpdateManyWithoutMeetingNestedInput
+    flags?: FlagUpdateManyWithoutMeetingNestedInput
   }
 
   export type MeetingUncheckedUpdateWithoutWorkspaceInput = {
@@ -17929,11 +20961,21 @@ export namespace Prisma {
     meetingDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumMeetingStatusFieldUpdateOperationsInput | $Enums.MeetingStatus
     fileUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceFileSha256?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceFileName?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceFileSize?: NullableIntFieldUpdateOperationsInput | number | null
+    sourceFileMime?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceUploadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     transcript?: NullableJsonNullValueInput | InputJsonValue
     extraction?: NullableJsonNullValueInput | InputJsonValue
     searchableText?: NullableStringFieldUpdateOperationsInput | string | null
     finalizedBy?: NullableStringFieldUpdateOperationsInput | string | null
     finalizedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    finalizeReason?: NullableEnumFinalizeReasonFieldUpdateOperationsInput | $Enums.FinalizeReason | null
+    finalizeNote?: NullableStringFieldUpdateOperationsInput | string | null
+    finalizedPolicyVersion?: NullableIntFieldUpdateOperationsInput | number | null
+    samplingBucket?: NullableStringFieldUpdateOperationsInput | string | null
+    samplingRuleId?: NullableStringFieldUpdateOperationsInput | string | null
     draftReadyAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     timeToFinalize?: NullableIntFieldUpdateOperationsInput | number | null
     readyForCCO?: BoolFieldUpdateOperationsInput | boolean
@@ -17941,6 +20983,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     versions?: VersionUncheckedUpdateManyWithoutMeetingNestedInput
     auditEvents?: AuditEventUncheckedUpdateManyWithoutMeetingNestedInput
+    flags?: FlagUncheckedUpdateManyWithoutMeetingNestedInput
   }
 
   export type MeetingUncheckedUpdateManyWithoutWorkspaceInput = {
@@ -17950,11 +20993,21 @@ export namespace Prisma {
     meetingDate?: DateTimeFieldUpdateOperationsInput | Date | string
     status?: EnumMeetingStatusFieldUpdateOperationsInput | $Enums.MeetingStatus
     fileUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceFileSha256?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceFileName?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceFileSize?: NullableIntFieldUpdateOperationsInput | number | null
+    sourceFileMime?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceUploadedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     transcript?: NullableJsonNullValueInput | InputJsonValue
     extraction?: NullableJsonNullValueInput | InputJsonValue
     searchableText?: NullableStringFieldUpdateOperationsInput | string | null
     finalizedBy?: NullableStringFieldUpdateOperationsInput | string | null
     finalizedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    finalizeReason?: NullableEnumFinalizeReasonFieldUpdateOperationsInput | $Enums.FinalizeReason | null
+    finalizeNote?: NullableStringFieldUpdateOperationsInput | string | null
+    finalizedPolicyVersion?: NullableIntFieldUpdateOperationsInput | number | null
+    samplingBucket?: NullableStringFieldUpdateOperationsInput | string | null
+    samplingRuleId?: NullableStringFieldUpdateOperationsInput | string | null
     draftReadyAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     timeToFinalize?: NullableIntFieldUpdateOperationsInput | number | null
     readyForCCO?: BoolFieldUpdateOperationsInput | boolean
@@ -18028,6 +21081,57 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type FlagUpdateWithoutWorkspaceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: EnumFlagTypeFieldUpdateOperationsInput | $Enums.FlagType
+    severity?: EnumFlagSeverityFieldUpdateOperationsInput | $Enums.FlagSeverity
+    status?: EnumFlagStatusFieldUpdateOperationsInput | $Enums.FlagStatus
+    evidence?: NullableJsonNullValueInput | InputJsonValue
+    createdByType?: EnumFlagCreatedByTypeFieldUpdateOperationsInput | $Enums.FlagCreatedByType
+    createdByUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    resolvedByUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    resolutionType?: NullableEnumFlagResolutionTypeFieldUpdateOperationsInput | $Enums.FlagResolutionType | null
+    resolutionNote?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    meeting?: MeetingUpdateOneRequiredWithoutFlagsNestedInput
+  }
+
+  export type FlagUncheckedUpdateWithoutWorkspaceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    meetingId?: StringFieldUpdateOperationsInput | string
+    type?: EnumFlagTypeFieldUpdateOperationsInput | $Enums.FlagType
+    severity?: EnumFlagSeverityFieldUpdateOperationsInput | $Enums.FlagSeverity
+    status?: EnumFlagStatusFieldUpdateOperationsInput | $Enums.FlagStatus
+    evidence?: NullableJsonNullValueInput | InputJsonValue
+    createdByType?: EnumFlagCreatedByTypeFieldUpdateOperationsInput | $Enums.FlagCreatedByType
+    createdByUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    resolvedByUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    resolutionType?: NullableEnumFlagResolutionTypeFieldUpdateOperationsInput | $Enums.FlagResolutionType | null
+    resolutionNote?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FlagUncheckedUpdateManyWithoutWorkspaceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    meetingId?: StringFieldUpdateOperationsInput | string
+    type?: EnumFlagTypeFieldUpdateOperationsInput | $Enums.FlagType
+    severity?: EnumFlagSeverityFieldUpdateOperationsInput | $Enums.FlagSeverity
+    status?: EnumFlagStatusFieldUpdateOperationsInput | $Enums.FlagStatus
+    evidence?: NullableJsonNullValueInput | InputJsonValue
+    createdByType?: EnumFlagCreatedByTypeFieldUpdateOperationsInput | $Enums.FlagCreatedByType
+    createdByUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    resolvedByUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    resolutionType?: NullableEnumFlagResolutionTypeFieldUpdateOperationsInput | $Enums.FlagResolutionType | null
+    resolutionNote?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type VersionCreateManyMeetingInput = {
     id?: string
     version: number
@@ -18046,6 +21150,23 @@ export namespace Prisma {
     resourceId: string
     metadata?: NullableJsonNullValueInput | InputJsonValue
     timestamp?: Date | string
+  }
+
+  export type FlagCreateManyMeetingInput = {
+    id?: string
+    workspaceId: string
+    type: $Enums.FlagType
+    severity?: $Enums.FlagSeverity
+    status?: $Enums.FlagStatus
+    evidence?: NullableJsonNullValueInput | InputJsonValue
+    createdByType?: $Enums.FlagCreatedByType
+    createdByUserId?: string | null
+    resolvedByUserId?: string | null
+    resolvedAt?: Date | string | null
+    resolutionType?: $Enums.FlagResolutionType | null
+    resolutionNote?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type VersionUpdateWithoutMeetingInput = {
@@ -18106,6 +21227,57 @@ export namespace Prisma {
     resourceId?: StringFieldUpdateOperationsInput | string
     metadata?: NullableJsonNullValueInput | InputJsonValue
     timestamp?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FlagUpdateWithoutMeetingInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: EnumFlagTypeFieldUpdateOperationsInput | $Enums.FlagType
+    severity?: EnumFlagSeverityFieldUpdateOperationsInput | $Enums.FlagSeverity
+    status?: EnumFlagStatusFieldUpdateOperationsInput | $Enums.FlagStatus
+    evidence?: NullableJsonNullValueInput | InputJsonValue
+    createdByType?: EnumFlagCreatedByTypeFieldUpdateOperationsInput | $Enums.FlagCreatedByType
+    createdByUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    resolvedByUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    resolutionType?: NullableEnumFlagResolutionTypeFieldUpdateOperationsInput | $Enums.FlagResolutionType | null
+    resolutionNote?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    workspace?: WorkspaceUpdateOneRequiredWithoutFlagsNestedInput
+  }
+
+  export type FlagUncheckedUpdateWithoutMeetingInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    workspaceId?: StringFieldUpdateOperationsInput | string
+    type?: EnumFlagTypeFieldUpdateOperationsInput | $Enums.FlagType
+    severity?: EnumFlagSeverityFieldUpdateOperationsInput | $Enums.FlagSeverity
+    status?: EnumFlagStatusFieldUpdateOperationsInput | $Enums.FlagStatus
+    evidence?: NullableJsonNullValueInput | InputJsonValue
+    createdByType?: EnumFlagCreatedByTypeFieldUpdateOperationsInput | $Enums.FlagCreatedByType
+    createdByUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    resolvedByUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    resolutionType?: NullableEnumFlagResolutionTypeFieldUpdateOperationsInput | $Enums.FlagResolutionType | null
+    resolutionNote?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FlagUncheckedUpdateManyWithoutMeetingInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    workspaceId?: StringFieldUpdateOperationsInput | string
+    type?: EnumFlagTypeFieldUpdateOperationsInput | $Enums.FlagType
+    severity?: EnumFlagSeverityFieldUpdateOperationsInput | $Enums.FlagSeverity
+    status?: EnumFlagStatusFieldUpdateOperationsInput | $Enums.FlagStatus
+    evidence?: NullableJsonNullValueInput | InputJsonValue
+    createdByType?: EnumFlagCreatedByTypeFieldUpdateOperationsInput | $Enums.FlagCreatedByType
+    createdByUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    resolvedByUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    resolutionType?: NullableEnumFlagResolutionTypeFieldUpdateOperationsInput | $Enums.FlagResolutionType | null
+    resolutionNote?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type AccountCreateManyUserInput = {

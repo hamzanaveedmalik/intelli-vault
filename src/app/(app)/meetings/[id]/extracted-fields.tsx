@@ -4,12 +4,20 @@ import { useState } from "react";
 import type { ExtractionData } from "~/server/extraction/types";
 import { Button } from "~/components/ui/button";
 import { Alert, AlertDescription } from "~/components/ui/alert";
+import { Badge } from "~/components/ui/badge";
 
 interface ExtractedFieldsProps {
   extraction: ExtractionData | null | undefined;
+  flags: Array<{
+    id: string;
+    type: string;
+    severity: string;
+    status: string;
+    evidence: any;
+  }>;
 }
 
-export default function ExtractedFields({ extraction }: ExtractedFieldsProps) {
+export default function ExtractedFields({ extraction, flags }: ExtractedFieldsProps) {
   const formatTime = (seconds: number): string => {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
@@ -28,6 +36,27 @@ export default function ExtractedFields({ extraction }: ExtractedFieldsProps) {
       segmentElement.classList.add("bg-yellow-100");
       setTimeout(() => {
         segmentElement.classList.remove("bg-yellow-100");
+      }, 2000);
+    }
+  };
+
+  const findFlagsForItem = (field: string, startTime?: number) => {
+    if (startTime === undefined) return [];
+    return flags.filter((flag) => {
+      const evidenceStart = flag.evidence?.recommendation?.startTime ?? flag.evidence?.startTime;
+      return flag.evidence?.recommendation && field === "recommendations"
+        ? Math.floor(evidenceStart) === Math.floor(startTime)
+        : false;
+    });
+  };
+
+  const scrollToFlag = (flagId: string) => {
+    const flagElement = document.getElementById(`flag-${flagId}`);
+    if (flagElement) {
+      flagElement.scrollIntoView({ behavior: "smooth", block: "center" });
+      flagElement.classList.add("ring-2", "ring-red-300");
+      setTimeout(() => {
+        flagElement.classList.remove("ring-2", "ring-red-300");
       }, 2000);
     }
   };
@@ -65,8 +94,15 @@ export default function ExtractedFields({ extraction }: ExtractedFieldsProps) {
             Recommendations ({extraction.recommendations.length})
           </h3>
           <ul className="space-y-3">
-            {extraction.recommendations.map((rec, idx) => (
-              <li key={idx} className="border-l-2 border-green-500 pl-3">
+            {extraction.recommendations.map((rec, idx) => {
+              const matchedFlags = findFlagsForItem("recommendations", rec.startTime);
+              return (
+              <li
+                key={idx}
+                className="border-l-2 border-green-500 pl-3"
+                data-claim-field="recommendations"
+                data-claim-start={Math.floor(rec.startTime ?? 0)}
+              >
                 <div className="flex items-start justify-between">
                   <p className="text-sm text-gray-900 flex-1">{rec.text}</p>
                   <Button
@@ -78,6 +114,20 @@ export default function ExtractedFields({ extraction }: ExtractedFieldsProps) {
                     {formatTime(rec.startTime)}
                   </Button>
                 </div>
+                {matchedFlags.length > 0 && (
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {matchedFlags.map((flag) => (
+                      <Badge
+                        key={flag.id}
+                        variant="destructive"
+                        className="cursor-pointer"
+                        onClick={() => scrollToFlag(flag.id)}
+                      >
+                        Flag: {flag.type.replace(/_/g, " ")}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
                 {rec.confidence !== undefined && (
                   <div className="mt-1 flex items-center gap-2">
                     <span className="text-xs text-gray-500">
@@ -86,7 +136,8 @@ export default function ExtractedFields({ extraction }: ExtractedFieldsProps) {
                   </div>
                 )}
               </li>
-            ))}
+            );
+            })}
           </ul>
         </div>
       )}

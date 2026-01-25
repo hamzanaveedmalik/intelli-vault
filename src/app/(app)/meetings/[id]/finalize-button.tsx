@@ -28,12 +28,20 @@ interface FinalizeButtonProps {
   meetingId: string;
   meetingStatus: string;
   userRole: string | null | undefined;
+  evidenceCoverage: number | null;
+  editedClaimsCount: number;
+  openCriticalFlagsCount: number;
+  openWarningFlagsCount: number;
 }
 
 export default function FinalizeButton({
   meetingId,
   meetingStatus,
   userRole,
+  evidenceCoverage,
+  editedClaimsCount,
+  openCriticalFlagsCount,
+  openWarningFlagsCount,
 }: FinalizeButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -107,6 +115,14 @@ export default function FinalizeButton({
               This action cannot be undone. Are you sure you want to proceed?
             </DialogDescription>
           </DialogHeader>
+          <div className="rounded-md border p-3 text-xs text-muted-foreground">
+            <div className="flex flex-wrap gap-2">
+              <span>Evidence coverage: {evidenceCoverage !== null ? `${(evidenceCoverage * 100).toFixed(1)}%` : "N/A"}</span>
+              <span>Edited claims: {editedClaimsCount}</span>
+              <span>Open critical: {openCriticalFlagsCount}</span>
+              <span>Open warnings: {openWarningFlagsCount}</span>
+            </div>
+          </div>
           <div className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="finalizeReason">Finalize Reason</Label>

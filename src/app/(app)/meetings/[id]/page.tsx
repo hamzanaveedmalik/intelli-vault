@@ -17,6 +17,7 @@ import FinalizeButton from "./finalize-button";
 import { MeetingStatusPoller } from "./meeting-status-poller";
 import RetryButton from "./retry-button";
 import FlagsPanel from "./flags-panel";
+import { validateEvidenceCoverage } from "~/server/extraction/evidence";
 
 export default async function MeetingDetailPage({
   params,
@@ -42,6 +43,9 @@ export default async function MeetingDetailPage({
     notFound();
   }
 
+  // Parse extraction data if available
+  const extraction = meeting.extraction as ExtractionData | null | undefined;
+
   const flags = await db.flag.findMany({
     where: {
       meetingId: meeting.id,
@@ -50,6 +54,16 @@ export default async function MeetingDetailPage({
       createdAt: "desc",
     },
   });
+
+  const openFlags = flags.filter((flag) => flag.status === "OPEN");
+  const openCriticalFlags = openFlags.filter((flag) => flag.severity === "CRITICAL");
+  const openWarningFlags = openFlags.filter((flag) => flag.severity === "WARN");
+  const evidenceStats = extraction?.evidenceMap
+    ? validateEvidenceCoverage(extraction.evidenceMap)
+    : null;
+  const editedClaimsCount = extraction?.evidenceMap
+    ? extraction.evidenceMap.filter((item) => item.edited).length
+    : 0;
 
   // Parse transcript if available
   const transcript = meeting.transcript as
@@ -64,9 +78,6 @@ export default async function MeetingDetailPage({
     speaker: seg.speaker,
     text: seg.text,
   })) ?? [];
-
-  // Parse extraction data if available
-  const extraction = meeting.extraction as ExtractionData | null | undefined;
 
   // Log view event
   if (session.user.id) {
@@ -166,6 +177,41 @@ export default async function MeetingDetailPage({
           </CardContent>
         </Card>
 
+        {/* Review Readiness Banner */}
+        <Card className={openCriticalFlags.length > 0 ? "border-red-300" : "border-emerald-300"}>
+          <CardContent className="pt-6">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <p className="text-sm font-semibold">
+                  {openCriticalFlags.length > 0
+                    ? `Blocked: ${openCriticalFlags.length} critical flag${openCriticalFlags.length > 1 ? "s" : ""} open`
+                    : "Ready: no critical flags open"}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {openWarningFlags.length > 0
+                    ? `${openWarningFlags.length} warning flag${openWarningFlags.length > 1 ? "s" : ""} remain open`
+                    : "No warning flags open"}
+                </p>
+              </div>
+              <div className="text-xs text-muted-foreground">
+                Evidence coverage: {evidenceStats ? `${(evidenceStats.coverage * 100).toFixed(1)}%` : "N/A"}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <FlagsPanel
+          flags={flags.map((flag) => ({
+            id: flag.id,
+            type: flag.type,
+            severity: flag.severity,
+            status: flag.status,
+            evidence: flag.evidence,
+            createdAt: flag.createdAt.toISOString(),
+          }))}
+          userRole={session.user.role}
+        />
+
         {/* Two-Column Layout: Transcript + Extracted Fields */}
         {meeting.status === "DRAFT_READY" || meeting.status === "DRAFT" || meeting.status === "FINALIZED" ? (
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
@@ -186,13 +232,29 @@ export default async function MeetingDetailPage({
               </CardHeader>
               <CardContent>
                 {meeting.status === "FINALIZED" ? (
-                  <ExtractedFields extraction={extraction} />
+                  <ExtractedFields
+                    extraction={extraction}
+                    flags={flags.map((flag) => ({
+                      id: flag.id,
+                      type: flag.type,
+                      severity: flag.severity,
+                      status: flag.status,
+                      evidence: flag.evidence,
+                    }))}
+                  />
                 ) : (
                   <EditableFields
                     meetingId={meeting.id}
                     extraction={extraction}
                     isReadOnly={meeting.status === "FINALIZED"}
                     transcript={transcript}
+                    flags={flags.map((flag) => ({
+                      id: flag.id,
+                      type: flag.type,
+                      severity: flag.severity,
+                      status: flag.status,
+                      evidence: flag.evidence,
+                    }))}
                   />
                 )}
                 {meeting.status !== "FINALIZED" && (
@@ -235,6 +297,7 @@ export default async function MeetingDetailPage({
                 meetingId={meeting.id}
                 status={meeting.status}
                 hasExtraction={!!extraction}
+                openFlagsCount={openFlags.length}
               />
             </CardContent>
           </Card>
@@ -251,6 +314,7 @@ export default async function MeetingDetailPage({
                 meetingId={meeting.id}
                 status={meeting.status}
                 hasExtraction={!!extraction}
+                openFlagsCount={openFlags.length}
               />
             </CardContent>
           </Card>
@@ -277,6 +341,10 @@ export default async function MeetingDetailPage({
                 meetingId={meeting.id}
                 meetingStatus={meeting.status}
                 userRole={session.user.role}
+                evidenceCoverage={evidenceStats?.coverage ?? null}
+                editedClaimsCount={editedClaimsCount}
+                openCriticalFlagsCount={openCriticalFlags.length}
+                openWarningFlagsCount={openWarningFlags.length}
               />
             </CardContent>
           </Card>
@@ -294,16 +362,6 @@ export default async function MeetingDetailPage({
           </Card>
         )}
 
-        <FlagsPanel
-          flags={flags.map((flag) => ({
-            id: flag.id,
-            type: flag.type,
-            severity: flag.severity,
-            status: flag.status,
-            evidence: flag.evidence,
-            createdAt: flag.createdAt.toISOString(),
-          }))}
-        />
       </div>
     </div>
   );

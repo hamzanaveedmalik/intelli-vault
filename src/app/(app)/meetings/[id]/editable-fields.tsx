@@ -8,6 +8,7 @@ import { Input } from "~/components/ui/input";
 import { Textarea } from "~/components/ui/textarea";
 import { Label } from "~/components/ui/label";
 import { Alert, AlertDescription } from "~/components/ui/alert";
+import { Badge } from "~/components/ui/badge";
 import {
   Dialog,
   DialogContent,
@@ -24,6 +25,13 @@ interface EditableFieldsProps {
   extraction: ExtractionData | null | undefined;
   isReadOnly?: boolean;
   transcript?: { segments: Array<{ startTime: number; endTime: number; speaker: string; text: string }> } | null;
+  flags: Array<{
+    id: string;
+    type: string;
+    severity: string;
+    status: string;
+    evidence: any;
+  }>;
 }
 
 export default function EditableFields({
@@ -31,6 +39,7 @@ export default function EditableFields({
   extraction,
   isReadOnly = false,
   transcript,
+  flags,
 }: EditableFieldsProps) {
   const router = useRouter();
   const [isEditing, setIsEditing] = useState<{
@@ -62,6 +71,27 @@ export default function EditableFields({
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     return `${mins}:${secs.toString().padStart(2, "0")}`;
+  };
+
+  const findFlagsForItem = (field: string, startTime?: number) => {
+    if (startTime === undefined) return [];
+    return flags.filter((flag) => {
+      const evidenceStart = flag.evidence?.recommendation?.startTime ?? flag.evidence?.startTime;
+      return flag.evidence?.recommendation && field === "recommendations"
+        ? Math.floor(evidenceStart) === Math.floor(startTime)
+        : false;
+    });
+  };
+
+  const scrollToFlag = (flagId: string) => {
+    const flagElement = document.getElementById(`flag-${flagId}`);
+    if (flagElement) {
+      flagElement.scrollIntoView({ behavior: "smooth", block: "center" });
+      flagElement.classList.add("ring-2", "ring-red-300");
+      setTimeout(() => {
+        flagElement.classList.remove("ring-2", "ring-red-300");
+      }, 2000);
+    }
   };
 
   const scrollToTimestamp = (startTime: number) => {
@@ -144,8 +174,15 @@ export default function EditableFields({
             {label} ({items.length})
           </h3>
           <ul className="space-y-3">
-            {items.map((item, idx) => (
-              <li key={idx} className={`border-l-2 ${borderColor} pl-3`}>
+            {items.map((item, idx) => {
+              const matchedFlags = findFlagsForItem(fieldType, item.startTime);
+              return (
+              <li
+                key={idx}
+                className={`border-l-2 ${borderColor} pl-3`}
+                data-claim-field={fieldType}
+                data-claim-start={Math.floor(item.startTime ?? 0)}
+              >
                 <div className="flex items-start justify-between">
                   <p className="text-sm text-gray-900 flex-1">{item.text}</p>
                   {item.startTime !== undefined && (
@@ -159,6 +196,20 @@ export default function EditableFields({
                     </Button>
                   )}
                 </div>
+                {matchedFlags.length > 0 && (
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {matchedFlags.map((flag) => (
+                      <Badge
+                        key={flag.id}
+                        variant="destructive"
+                        className="cursor-pointer"
+                        onClick={() => scrollToFlag(flag.id)}
+                      >
+                        Flag: {flag.type.replace(/_/g, " ")}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
                 {item.confidence !== undefined && (
                   <div className="mt-1 flex items-center gap-2">
                     <span className="text-xs text-gray-500">
@@ -167,7 +218,8 @@ export default function EditableFields({
                   </div>
                 )}
               </li>
-            ))}
+            );
+            })}
           </ul>
         </div>
       );
@@ -265,8 +317,15 @@ export default function EditableFields({
           )}
         </div>
         <ul className="space-y-3">
-          {items.map((item, idx) => (
-            <li key={idx} className={`border-l-2 ${borderColor} pl-3`}>
+          {items.map((item, idx) => {
+            const matchedFlags = findFlagsForItem(fieldType, item.startTime);
+            return (
+            <li
+              key={idx}
+              className={`border-l-2 ${borderColor} pl-3`}
+              data-claim-field={fieldType}
+              data-claim-start={Math.floor(item.startTime ?? 0)}
+            >
               {isEditing?.fieldType === fieldType && isEditing.index === idx ? (
                 <div className="space-y-3">
                   <div>
@@ -374,6 +433,20 @@ export default function EditableFields({
                   </div>
                 </div>
               )}
+              {matchedFlags.length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {matchedFlags.map((flag) => (
+                    <Badge
+                      key={flag.id}
+                      variant="destructive"
+                      className="cursor-pointer"
+                      onClick={() => scrollToFlag(flag.id)}
+                    >
+                      Flag: {flag.type.replace(/_/g, " ")}
+                    </Badge>
+                  ))}
+                </div>
+              )}
               {item.confidence !== undefined && (
                 <div className="mt-1 flex items-center gap-2">
                   <span className="text-xs text-gray-500">
@@ -382,7 +455,8 @@ export default function EditableFields({
                 </div>
               )}
             </li>
-          ))}
+          );
+          })}
         </ul>
       </div>
     );

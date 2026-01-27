@@ -27,6 +27,21 @@ export async function POST(
     const body = await request.json();
     const { invitations } = bulkInviteSchema.parse(body);
 
+    await db.user.upsert({
+      where: { id: session.user.id },
+      create: {
+        id: session.user.id,
+        email: session.user.email,
+        name: session.user.name,
+        image: session.user.image,
+      },
+      update: {
+        email: session.user.email,
+        name: session.user.name,
+        image: session.user.image,
+      },
+    });
+
     // Verify user has permission to invite (must be OWNER_CCO)
     if (session.user.role !== "OWNER_CCO") {
       return new Response("Forbidden: Only workspace owners can invite users", {

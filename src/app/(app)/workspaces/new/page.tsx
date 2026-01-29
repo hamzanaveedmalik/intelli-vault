@@ -59,9 +59,9 @@ export default function NewWorkspacePage() {
     intent === "solo" ? "Solo" : intent === "team" ? "Team" : "Free Trial";
   const trialCopy =
     intent === "solo"
-      ? "Start your 7-day Solo trial (1 user, 3 uploads)."
+      ? "You selected the Solo plan. Create your workspace to continue."
       : intent === "team"
-      ? "Start your 7-day Team trial (up to 10 users, 3 uploads)."
+      ? "You selected the Team plan. Create your workspace to continue."
       : "Start your 7-day free trial.";
 
   return (
@@ -111,9 +111,11 @@ export default function NewWorkspacePage() {
               >
                 {isLoading ? "Creating..." : `Create ${intentLabel} Workspace`}
               </Button>
-              <p className="text-xs text-center text-muted-foreground">
-                By creating a workspace, you agree to start your 7-day trial.
-              </p>
+              {intent === "trial" && (
+                <p className="text-xs text-center text-muted-foreground">
+                  By creating a workspace, you agree to start your 7-day trial.
+                </p>
+              )}
             </div>
           </form>
         </CardContent>

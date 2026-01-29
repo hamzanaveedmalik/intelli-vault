@@ -98,34 +98,52 @@ export default function WelcomeClient({
         </p>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Trial status</CardTitle>
-          <CardDescription>
-            {workspace.billingStatus === "TRIALING"
-              ? trialExpired
+      {workspace.billingStatus === "TRIALING" ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>Trial status</CardTitle>
+            <CardDescription>
+              {trialExpired
                 ? "Trial expired — upgrade to continue using paid features."
-                : `Trial active — ${trialDaysRemaining ?? 0} day(s) remaining.`
-              : "Billing not in trial mode."}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex flex-wrap gap-2">
-            <Badge variant="outline">
-              Uploads: {usage.uploadsUsed}/{entitlements.maxUploadsPerPeriod}
-            </Badge>
-            <Badge variant="outline">Members: {usage.membersCount}/{entitlements.maxUsers}</Badge>
-            {entitlements.exportsWatermarked && (
-              <Badge variant="secondary">Exports watermarked</Badge>
-            )}
-          </div>
-          {workspace.billingStatus === "TRIALING" && (
+                : `Trial active — ${trialDaysRemaining ?? 0} day(s) remaining.`}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex flex-wrap gap-2">
+              <Badge variant="outline">
+                Uploads: {usage.uploadsUsed}/{entitlements.maxUploadsPerPeriod}
+              </Badge>
+              <Badge variant="outline">Members: {usage.membersCount}/{entitlements.maxUsers}</Badge>
+              {entitlements.exportsWatermarked && (
+                <Badge variant="secondary">Exports watermarked</Badge>
+              )}
+            </div>
             <p className="text-xs text-muted-foreground">
               Exports are watermarked during trial.
             </p>
-          )}
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      ) : (
+        <Card>
+          <CardHeader>
+            <CardTitle>Plan overview</CardTitle>
+            <CardDescription>
+              {workspace.planTier === "TEAM" ? "Team plan" : "Solo plan"} for {workspace.name}.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex flex-wrap gap-2">
+              <Badge variant="outline">
+                Uploads: {usage.uploadsUsed}/{entitlements.maxUploadsPerPeriod}
+              </Badge>
+              <Badge variant="outline">Members: {usage.membersCount}/{entitlements.maxUsers}</Badge>
+              {!entitlements.exportsWatermarked && (
+                <Badge variant="secondary">Exports full access</Badge>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {workspace.billingStatus === "ACTIVE" ? (
         <Card>
@@ -139,61 +157,7 @@ export default function WelcomeClient({
             </Button>
           </CardContent>
         </Card>
-      ) : (
-        <Card>
-          <CardHeader>
-            <CardTitle>Upgrade your plan</CardTitle>
-            <CardDescription>Select plan, currency, and onboarding.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid gap-4 sm:grid-cols-3">
-              <div className="space-y-2">
-                <Label>Plan</Label>
-                <Select value={plan} onValueChange={(value) => setPlan(value as "SOLO" | "TEAM")}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select plan" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="SOLO">Solo</SelectItem>
-                    <SelectItem value="TEAM">Team</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label>Currency</Label>
-                <Select value={currency} onValueChange={setCurrency}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select currency" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="USD">USD</SelectItem>
-                    <SelectItem value="GBP">GBP</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label>Onboarding</Label>
-                <Select value={onboarding} onValueChange={setOnboarding}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select onboarding" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">None</SelectItem>
-                    <SelectItem value="standard">Standard</SelectItem>
-                    <SelectItem value="premium">Premium</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            <div className="flex">
-              <Button onClick={handleUpgrade} disabled={isLoading} className="w-full">
-                {isLoading ? "Redirecting..." : "Upgrade"}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      ) : null}
     </div>
   );
 }

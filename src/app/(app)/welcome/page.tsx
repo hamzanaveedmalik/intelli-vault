@@ -3,6 +3,7 @@ import { db } from "~/server/db";
 import { redirect } from "next/navigation";
 import { getEntitlements, isTrialExpired } from "~/server/billing/entitlements";
 import WelcomeClient from "./welcome-client";
+import { buildBillingIntentQuery, parseBillingIntent } from "~/lib/billing-intent";
 
 function getUsageWindow(currentPeriodStart: Date | null, currentPeriodEnd: Date | null) {
   if (currentPeriodStart && currentPeriodEnd) {
@@ -14,10 +15,20 @@ function getUsageWindow(currentPeriodStart: Date | null, currentPeriodEnd: Date 
   return { start, end };
 }
 
-export default async function WelcomePage() {
+export default async function WelcomePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ intent?: string; currency?: string; onboarding?: string }>;
+}) {
+  const params = await searchParams;
+  const intentParams = parseBillingIntent(params);
+  const intentQuery = buildBillingIntentQuery(intentParams);
   const session = await auth();
-  if (!session?.user?.workspaceId) {
-    redirect("/workspaces/new");
+  if (!session?.user) {
+    redirect(`/auth/signin${intentQuery}`);
+  }
+  if (!session.user.workspaceId) {
+    redirect(`/workspaces/new${intentQuery}`);
   }
 
   const workspace = await db.workspace.findUnique({
@@ -25,7 +36,7 @@ export default async function WelcomePage() {
   });
 
   if (!workspace) {
-    redirect("/workspaces/new");
+    redirect(`/workspaces/new${intentQuery}`);
   }
 
   const entitlements = getEntitlements(workspace);

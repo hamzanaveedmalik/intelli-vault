@@ -32,12 +32,15 @@ export const ENTITLEMENTS: Record<PlanTier, Entitlements> = {
   },
 };
 
-const TRIAL_ENTITLEMENTS: Entitlements = {
-  maxUsers: 1,
-  maxUploadsPerPeriod: 3,
-  allowApiAccess: false,
-  allowZipExport: false,
-  exportsWatermarked: true,
+const getTrialEntitlements = (planTier: PlanTier): Entitlements => {
+  const maxUsers = planTier === "TEAM" ? 10 : 1;
+  return {
+    maxUsers,
+    maxUploadsPerPeriod: 3,
+    allowApiAccess: false,
+    allowZipExport: false,
+    exportsWatermarked: true,
+  };
 };
 
 export function isPaywallBypassed(status: BillingStatus) {
@@ -59,7 +62,7 @@ export function getEntitlements(
   }
 
   if (workspace.billingStatus === "TRIALING") {
-    return TRIAL_ENTITLEMENTS;
+    return getTrialEntitlements(workspace.planTier);
   }
 
   return ENTITLEMENTS[workspace.planTier] ?? ENTITLEMENTS.FREE;
